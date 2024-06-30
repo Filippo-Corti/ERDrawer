@@ -17,6 +17,10 @@ export class Drawer {
         this.ctx = ctx as CanvasRenderingContext2D;
     }
 
+    clear() : void {
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
 
     /*drawCircle(x : number, y : number, radius : number, color : string = 'rgba(0 0 0 / 1)') : void {
         this.ctx.strokeStyle = color;

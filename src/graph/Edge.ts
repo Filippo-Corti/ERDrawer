@@ -16,8 +16,8 @@ export class Edge implements Drawable {
 
     draw(ctx: CanvasRenderingContext2D): void {
         ctx.beginPath();
-        ctx.moveTo(this.node1.x, this.node1.y);
-        ctx.lineTo(this.node2.x, this.node2.y);
+        ctx.moveTo(this.node1.pos.x, this.node1.pos.y);
+        ctx.lineTo(this.node2.pos.x, this.node2.pos.y);
         ctx.stroke();
     }
 

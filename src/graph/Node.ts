@@ -1,17 +1,18 @@
 import { Drawable } from "../Drawable";
+import { Vector2D } from "../Vector2D";
 
 export class Node implements Drawable {
 
     label : string;
-    x : number;
-    y : number;
+    pos : Vector2D;
+    disp : Vector2D;
 
     static DRAWING_RADIUS : number = 40;
 
     constructor(label: string, x: number, y: number) {
         this.label = label;
-        this.x = x;
-        this.y = y;
+        this.pos = new Vector2D(x, y);
+        this.disp = new Vector2D(0, 0);
     }
 
 
@@ -20,7 +21,7 @@ export class Node implements Drawable {
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
         ctx.beginPath();
-        ctx.arc(this.x, this.y, Node.DRAWING_RADIUS, 0, Math.PI * 2);
+        ctx.arc(this.pos.x, this.pos.y, Node.DRAWING_RADIUS, 0, Math.PI * 2);
         ctx.fill();
         ctx.stroke();
         //Draw Label
@@ -28,7 +29,7 @@ export class Node implements Drawable {
         ctx.font = Node.DRAWING_RADIUS + "px serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
-        ctx.fillText(this.label, this.x, this.y);
+        ctx.fillText(this.label, this.pos.x, this.pos.y);
     }
 
 
