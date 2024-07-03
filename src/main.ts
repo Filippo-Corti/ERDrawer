@@ -10,6 +10,7 @@ var seed = 1;
 function random() : number {
     var x = Math.sin(seed++) * 10000;
     return x - Math.floor(x);
+    //return Math.random()
 }
 
 function getRandomCoordinate(min: number, max: number) {

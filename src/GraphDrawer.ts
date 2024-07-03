@@ -28,6 +28,8 @@ export class GraphDrawer {
         const f_a = (x: number) => x * x / k;
         const f_r = (x: number) => k * k / x;
 
+        const centralNode = this.graph.getNodeWithMostEdges();
+
         for (let i = 0; i < n; i++) {
             //Calculate Repulsive Forces
             for (const [_, v] of this.graph.nodes) {
@@ -63,6 +65,16 @@ export class GraphDrawer {
             //     }
             // }
 
+            //Attract main node to center
+            const gamma: Vector2D = new Vector2D(centralNode.pos.x - width/2, centralNode.pos.y - height/2);
+            const gammaAbs: number = gamma.magnitude();
+            const fa: number = f_a(gammaAbs) * 100;
+            const vect = new Vector2D(gamma.x / gammaAbs * fa, gamma.y / gammaAbs * fa);
+            if (!Number.isNaN(vect.x) && !Number.isNaN(vect.y)) {
+                centralNode.disp.sum(vect.negative());
+            }
+
+
 
             //Limit max displacement to temperature t and prevent from displacement outside frame
             for (const [_, v] of this.graph.nodes) {
@@ -83,7 +95,7 @@ export class GraphDrawer {
     }
 
     getDiscretizedCoords(v: Vector2D): Vector2D {
-        const DELTA = 200;
+        const DELTA = 250;
         return this.getCoordsWithBoundaries(new Vector2D(Math.round(v.x / DELTA) * DELTA, Math.round(v.y / DELTA) * DELTA));
     }
 

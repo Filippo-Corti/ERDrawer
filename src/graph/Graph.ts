@@ -33,4 +33,40 @@ export class Graph implements Drawable {
         this.nodes.forEach(node => node.draw(ctx));
     }
 
+    getNodeWithMostEdges() : Node {
+        const edgeCounts = new Map<string, number>();
+
+        // Count edges for each node
+        this.edges.forEach(edge => {
+            const { node1, node2 } = edge;
+
+            if (!edgeCounts.has(node1.label)) {
+                edgeCounts.set(node1.label, 0);
+            }
+            if (!edgeCounts.has(node2.label)) {
+                edgeCounts.set(node2.label, 0);
+            }
+
+            edgeCounts.set(node1.label, edgeCounts.get(node1.label)! + 1);
+            edgeCounts.set(node2.label, edgeCounts.get(node2.label)! + 1);
+        });
+
+        // Find the node with the most edges
+        let maxEdges = -1;
+        let maxNode: Node | null = null;
+
+        edgeCounts.forEach((count, label) => {
+            if (count > maxEdges) {
+                maxEdges = count;
+                maxNode = this.nodes.get(label) || null;
+            }
+        });
+
+        if (maxNode === null) {
+            throw new Error("No nodes with edges found");
+        }
+
+        return maxNode;
+    }
+
 }
