@@ -7,7 +7,7 @@ export class Node implements Drawable {
     pos : Vector2D;
     disp : Vector2D;
 
-    static DRAWING_RADIUS : number = 40;
+    static DRAWING_RADIUS : number = 30;
 
     constructor(label: string, x: number, y: number) {
         this.label = label;
