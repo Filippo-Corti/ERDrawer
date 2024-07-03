@@ -51,15 +51,17 @@ export class GraphDrawer {
                 e.node2.disp.sum(vect);
             }
 
-            //Attract to center
-            for (const [_, u] of this.graph.nodes) {
-                const closestGuidePoint = this.getDiscretizedCoords(u.pos);
-                const gamma: Vector2D = new Vector2D(u.pos.x - closestGuidePoint.x, u.pos.y - closestGuidePoint.y);
-                const gammaAbs: number = gamma.magnitude();
-                const fa: number = f_a(gammaAbs) * 10;
-                const vect = new Vector2D(gamma.x / gammaAbs * fa, gamma.y / gammaAbs * fa);
-                u.disp.sum(vect.negative());
-            }
+            //Attract to discrete coordinates
+            // for (const [_, u] of this.graph.nodes) {
+            //     const closestGuidePoint = this.getDiscretizedCoords(u.pos);
+            //     const gamma: Vector2D = new Vector2D(u.pos.x - closestGuidePoint.x, u.pos.y - closestGuidePoint.y);
+            //     const gammaAbs: number = gamma.magnitude();
+            //     const fa: number = f_a(gammaAbs);
+            //     const vect = new Vector2D(gamma.x / gammaAbs * fa, gamma.y / gammaAbs * fa);
+            //     if (!Number.isNaN(vect.x) && !Number.isNaN(vect.y)) {
+            //         u.disp.sum(vect.negative());
+            //     }
+            // }
 
 
             //Limit max displacement to temperature t and prevent from displacement outside frame
@@ -67,8 +69,7 @@ export class GraphDrawer {
                 const a = Math.min(v.disp.magnitude(), t);
                 const vect = new Vector2D(v.disp.x / v.disp.magnitude() * a, v.disp.y / v.disp.magnitude() * a);
                 v.pos.sum(vect);
-                v.pos.x = Math.min(width - Node.DRAWING_RADIUS, Math.max(0 + Node.DRAWING_RADIUS, v.pos.x));
-                v.pos.y = Math.min(height - Node.DRAWING_RADIUS, Math.max(0 + Node.DRAWING_RADIUS, v.pos.y));
+                v.pos = this.getCoordsWithBoundaries(v.pos);
                 //t = Math.max(1.0, t - 0.25);
             }
         }
@@ -81,9 +82,15 @@ export class GraphDrawer {
         }
     }
 
-    getDiscretizedCoords(v : Vector2D) : Vector2D {
-        const DELTA = 100;
-        return new Vector2D(Math.round(v.x / DELTA) * DELTA, Math.round(v.y / DELTA) * DELTA);
+    getDiscretizedCoords(v: Vector2D): Vector2D {
+        const DELTA = 200;
+        return this.getCoordsWithBoundaries(new Vector2D(Math.round(v.x / DELTA) * DELTA, Math.round(v.y / DELTA) * DELTA));
+    }
+
+    getCoordsWithBoundaries(v: Vector2D): Vector2D {
+        const width = this.drawer.canvas.width;
+        const height = this.drawer.canvas.height;
+        return new Vector2D(Math.min(width - Node.DRAWING_RADIUS, Math.max(0 + Node.DRAWING_RADIUS, v.x)), Math.min(height - Node.DRAWING_RADIUS, Math.max(0 + Node.DRAWING_RADIUS, v.y)));
     }
 
 

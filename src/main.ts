@@ -4,6 +4,20 @@ import { Node } from "./graph/Node";
 import { Graph } from './graph/Graph.ts';
 import { GraphDrawer } from './GraphDrawer.ts';
 
+
+
+var seed = 1;
+function random() : number {
+    var x = Math.sin(seed++) * 10000;
+    return x - Math.floor(x);
+}
+
+function getRandomCoordinate(min: number, max: number) {
+    return Math.floor(random() * (max - min + 1)) + min;
+}
+
+
+
 const drawer = new Drawer("drawing-board");
 const MAX_WIDTH = drawer.canvas.width;
 const MAX_HEIGHT = drawer.canvas.height;
@@ -18,7 +32,6 @@ nodes.push(new Node("F", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoord
 nodes.push(new Node("G", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
 nodes.push(new Node("H", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
 
-console.log(getRandomCoordinate(50, MAX_WIDTH - 50));
 
 const graph = new Graph(nodes);
 
@@ -34,22 +47,10 @@ graph.addEdge("F", "B");
 
 const graphDrawer = new GraphDrawer(drawer, graph);
 graphDrawer.drawGraph();
-
-function getRandomCoordinate(min: number, max: number) {
-    return Math.floor(random() * (max - min + 1)) + min;
-}
-
-var seed = 1;
-function random() : number {
-    var x = Math.sin(seed++) * 10000;
-    return x - Math.floor(x);
-}
-
 const button = document.getElementById("layout-btn")
 
-
 button?.addEventListener("click", () => {
-    graphDrawer.executeFructhermanReingold(20);
+    graphDrawer.executeFructhermanReingold(1000);
+    graphDrawer.discretizeNodesCoordinates();
     graphDrawer.drawGraph();
-    //graphDrawer.discretizeCoordinates();
 });
