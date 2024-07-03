@@ -72,6 +72,8 @@ export class GraphDrawer {
             const vect = new Vector2D(gamma.x / gammaAbs * fa, gamma.y / gammaAbs * fa);
             if (!Number.isNaN(vect.x) && !Number.isNaN(vect.y)) {
                 centralNode.disp.sum(vect.negative());
+            } else {
+                console.log("Ciao");
             }
 
 
@@ -80,11 +82,15 @@ export class GraphDrawer {
             for (const [_, v] of this.graph.nodes) {
                 const a = Math.min(v.disp.magnitude(), t);
                 const vect = new Vector2D(v.disp.x / v.disp.magnitude() * a, v.disp.y / v.disp.magnitude() * a);
-                v.pos.sum(vect);
+                if (!Number.isNaN(vect.x) && !Number.isNaN(vect.y)) {                
+                    v.pos.sum(vect);
+                }
                 v.pos = this.getCoordsWithBoundaries(v.pos);
                 //t = Math.max(1.0, t - 0.25);
             }
         }
+
+        console.log(this.graph.nodes);
 
     }
 

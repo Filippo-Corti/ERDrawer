@@ -6,11 +6,11 @@ import { GraphDrawer } from './GraphDrawer.ts';
 
 
 
-var seed = 1;
+var seed = 8;
 function random() : number {
+    //return Math.random()
     var x = Math.sin(seed++) * 10000;
     return x - Math.floor(x);
-    //return Math.random()
 }
 
 function getRandomCoordinate(min: number, max: number) {
@@ -33,7 +33,6 @@ nodes.push(new Node("F", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoord
 nodes.push(new Node("G", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
 nodes.push(new Node("H", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
 
-
 const graph = new Graph(nodes);
 
 graph.addEdge("A", "B");
@@ -48,10 +47,22 @@ graph.addEdge("F", "B");
 
 const graphDrawer = new GraphDrawer(drawer, graph);
 graphDrawer.drawGraph();
-const button = document.getElementById("layout-btn")
+graphDrawer.drawer.drawGrid();
 
-button?.addEventListener("click", () => {
+const layoutBtn = document.getElementById("layout-btn")
+
+layoutBtn?.addEventListener("click", () => {
     graphDrawer.executeFructhermanReingold(1000);
+    //graphDrawer.discretizeNodesCoordinates();
+    graphDrawer.drawGraph();
+    graphDrawer.drawer.drawGrid();
+});
+
+
+const discretizeBtn = document.getElementById("discretize-btn")
+
+discretizeBtn?.addEventListener("click", () => {
     graphDrawer.discretizeNodesCoordinates();
     graphDrawer.drawGraph();
+    graphDrawer.drawer.drawGrid();
 });
