@@ -8,7 +8,7 @@ import { GraphDrawer } from './GraphDrawer.ts';
 
 var seed = 8;
 function random() : number {
-    //return Math.random()
+    return Math.random()
     var x = Math.sin(seed++) * 10000;
     return x - Math.floor(x);
 }
@@ -47,15 +47,14 @@ graph.addEdge("F", "B");
 
 const graphDrawer = new GraphDrawer(drawer, graph);
 graphDrawer.drawGraph();
-graphDrawer.drawer.drawGrid();
+graphDrawer.drawer.drawGrid(GraphDrawer.DELTA);
 
 const layoutBtn = document.getElementById("layout-btn")
 
 layoutBtn?.addEventListener("click", () => {
     graphDrawer.executeFructhermanReingold(1000);
-    //graphDrawer.discretizeNodesCoordinates();
     graphDrawer.drawGraph();
-    graphDrawer.drawer.drawGrid();
+    graphDrawer.drawer.drawGrid(GraphDrawer.DELTA);
 });
 
 
@@ -64,5 +63,5 @@ const discretizeBtn = document.getElementById("discretize-btn")
 discretizeBtn?.addEventListener("click", () => {
     graphDrawer.discretizeNodesCoordinates();
     graphDrawer.drawGraph();
-    graphDrawer.drawer.drawGrid();
+    graphDrawer.drawer.drawGrid(GraphDrawer.DELTA);
 });

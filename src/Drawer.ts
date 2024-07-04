@@ -2,6 +2,8 @@ export class Drawer {
 
     canvas : HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
+    width: number;
+    height: number;
   
    constructor(canvasId : string) {
         const canvas = document.getElementById(canvasId);
@@ -9,6 +11,8 @@ export class Drawer {
             throw new Error("Invalid ID for the Canvas");
         }
         this.canvas =  canvas as HTMLCanvasElement;
+        this.width = this.canvas.width;
+        this.height = this.canvas.height;
 
         const ctx = this.canvas.getContext("2d");
          if (!(ctx instanceof CanvasRenderingContext2D)) {
@@ -21,21 +25,18 @@ export class Drawer {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
-    drawGrid() : void {
-        const SIZE = 250;
-        const width = this.canvas.width;
-        const height = this.canvas.height;
+    drawGrid(SIZE : number) : void {
         this.ctx.strokeStyle = "red";
-        for (let i = 0; i <= width/SIZE; i++) {
+        for (let i = 0; i <= this.width/SIZE; i++) {
             this.ctx.beginPath();
             this.ctx.moveTo(i*SIZE - SIZE/2, 0);
-            this.ctx.lineTo(i*SIZE - SIZE/2, height);        
+            this.ctx.lineTo(i*SIZE - SIZE/2, this.height);        
             this.ctx.stroke();
         }
-        for (let i = 0; i <= height/SIZE; i++) {
+        for (let i = 0; i <= this.height/SIZE; i++) {
             this.ctx.beginPath();
             this.ctx.moveTo(0, i*SIZE - SIZE/2);
-            this.ctx.lineTo(width, i*SIZE - SIZE/2);        
+            this.ctx.lineTo(this.width, i*SIZE - SIZE/2);        
             this.ctx.stroke();
         }
         this.ctx.strokeStyle = "black";
