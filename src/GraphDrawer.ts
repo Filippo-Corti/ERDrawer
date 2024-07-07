@@ -81,21 +81,16 @@ export class GraphDrawer {
             }
         }
 
-        console.log(this.graph.nodes);
-
     }
 
     discretizeNodesCoordinates(): void {
         const rows = Math.floor(this.drawer.height / GraphDrawer.DELTA + 1);
         const cols = Math.floor(this.drawer.width / GraphDrawer.DELTA + 1);
         var nodesPerSquare : Node[][] = Array.from({ length: rows * cols }, () => []);
-        console.log(nodesPerSquare);
-        console.log(rows, cols);
         for (const [_, v] of this.graph.nodes) {
             const discrCoords = this.getDiscretizedCoords(v.pos, v.size);
             const nodeCol = Math.round(discrCoords.x / GraphDrawer.DELTA);
             const nodeRow = Math.round(discrCoords.y / GraphDrawer.DELTA);
-            console.log(v.label, nodeRow, nodeCol, nodeRow * cols + nodeCol);
             nodesPerSquare[nodeRow * cols + nodeCol].push(v);
         }
 

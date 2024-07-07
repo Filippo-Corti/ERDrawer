@@ -25,7 +25,14 @@ export class Graph implements Drawable {
             throw new Error("Invalid labels");
         }
 
-        this.edges.push(new Edge(n1, n2));
+        
+        const existingEdge = this.edges.find((e) => e.node1.label == label1 && e.node2.label == label2);
+        if (existingEdge) {
+            existingEdge.count++;
+        } else {
+            this.edges.push(new Edge(n1, n2));
+        }
+
     }
 
     draw(ctx: CanvasRenderingContext2D): void {

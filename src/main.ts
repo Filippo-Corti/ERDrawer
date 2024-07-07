@@ -90,6 +90,30 @@ function residentiGraph() : Graph {
     return graph;
 }
 
+function ecommerceGraph(): Graph {
+    let nodes: Node[] = Array();
+    nodes.push(new Node("User", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Product", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Order", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Payment", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Review", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Category", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Cart", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+
+    const graph = new Graph(nodes);
+
+    graph.addEdge("User", "Order");
+    graph.addEdge("User", "Review");
+    graph.addEdge("User", "Cart");
+    graph.addEdge("Order", "Product");
+    graph.addEdge("Order", "Payment");
+    graph.addEdge("Product", "Category");
+    graph.addEdge("Cart", "Product");
+    graph.addEdge("Review", "Product");
+    graph.addEdge("Review", "Product");
+
+    return graph;
+}
 
 
 const drawer = new Drawer("drawing-board");
@@ -99,7 +123,8 @@ const MAX_HEIGHT = drawer.canvas.height;
 //const graph = randomGraph();
 //const graph = libreriaGraph();
 //const graph = calcioGraph();
-const graph = residentiGraph();
+//const graph = residentiGraph();
+const graph = ecommerceGraph();
 const graphDrawer = new GraphDrawer(drawer, graph);
 graphDrawer.drawGraph();
 graphDrawer.drawer.drawGrid(GraphDrawer.DELTA);
@@ -117,6 +142,8 @@ layoutBtn?.addEventListener("click", () => {
 const discretizeBtn = document.getElementById("discretize-btn")
 
 discretizeBtn?.addEventListener("click", () => {
+    graphDrawer.discretizeNodesCoordinates();
+    graphDrawer.executeFructhermanReingold(1000); //Fixes eventually overlapping edges
     graphDrawer.discretizeNodesCoordinates();
     graphDrawer.drawGraph();
     graphDrawer.drawer.drawGrid(GraphDrawer.DELTA);
