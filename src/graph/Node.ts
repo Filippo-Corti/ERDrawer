@@ -16,6 +16,7 @@ export class Node implements Drawable {
 
 
     draw(ctx: CanvasRenderingContext2D): void {
+        const PADDING = 15;
         //Draw Circle
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
@@ -25,7 +26,11 @@ export class Node implements Drawable {
         ctx.stroke();
         //Draw Label
         ctx.fillStyle = "black";
-        ctx.font = this.size + "px serif";
+        let fontSize = this.size;
+        do {
+            ctx.font = fontSize + "px serif";
+            fontSize-=3;
+        } while (ctx.measureText(this.label).width > this.size * 2 - PADDING);
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(this.label, this.pos.x, this.pos.y);
