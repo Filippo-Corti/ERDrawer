@@ -1,0 +1,14 @@
+A. MODELING THE GRAPH LAYOUT:
+
+☐ Count the number of crossings in the result
+☐ Generate X Graphs and pick the one with the least amount of crossings to be shown
+☐ Try to avoid the crossing, if possible, using a path finding algorithm
+☐ Get to a point where the resulting graph looks like it could be a decent ER Diagram
+
+B. DRAW THE ER DIAGRAM
+
+☐ Figure out what's a node and what's an edge
+☐ Create an ER Diagram with only basic Entities and Relationships
+
+...
+
