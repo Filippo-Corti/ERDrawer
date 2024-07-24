@@ -3,8 +3,10 @@ import { Drawer } from './Drawer';
 import { Node } from "./graph/Node";
 import { Graph } from './graph/Graph.ts';
 import { GraphDrawer } from './GraphDrawer.ts';
+import { Segment } from './utils/Segment.ts';
+import { Vector2D } from './utils/Vector2D.ts';
 
-var seed = 8;
+var seed = 0;
 function random() : number {
     return Math.random()
     var x = Math.sin(seed++) * 10000;
@@ -142,9 +144,51 @@ layoutBtn?.addEventListener("click", () => {
 const discretizeBtn = document.getElementById("discretize-btn")
 
 discretizeBtn?.addEventListener("click", () => {
-    graphDrawer.discretizeNodesCoordinates();
-    graphDrawer.executeFructhermanReingold(1000); //Fixes eventually overlapping edges
-    graphDrawer.discretizeNodesCoordinates();
+    drawDiscretizedWithMinCrossings();
+    // graphDrawer.executeFructhermanReingold(1000); //Fixes eventually overlapping edges
+    // graphDrawer.discretizeNodesCoordinates();
+    // graphDrawer.executeFructhermanReingold(1000); //Fixes eventually overlapping edges
+    // graphDrawer.discretizeNodesCoordinates();
+    // graphDrawer.drawGraph();
+    // graphDrawer.drawer.drawGrid(GraphDrawer.DELTA);
+});
+
+
+function drawDiscretizedWithMinCrossings() : void {
+    const TESTS = 1000;
+    let minCrossings = 100;
+    let minGraph = new Graph();
+    Object.assign(minGraph, graphDrawer.graph);
+    for (let i = 0; i < TESTS; i++) {
+        Object.assign(graphDrawer.graph, ecommerceGraph()); // New random graph
+        graphDrawer.executeFructhermanReingold(1000);
+        graphDrawer.discretizeNodesCoordinates();
+        graphDrawer.drawGraph();
+        graphDrawer.drawer.drawGrid(GraphDrawer.DELTA);
+        let crossings = graphDrawer.countCrossings();
+        if (crossings < minCrossings) {
+            minCrossings = crossings;
+            minGraph = new Graph();
+            Object.assign(minGraph, graphDrawer.graph);
+        }
+       // await waitingKeypress();
+    }
+    console.log(minGraph);
+    Object.assign(graphDrawer.graph, minGraph);
     graphDrawer.drawGraph();
     graphDrawer.drawer.drawGrid(GraphDrawer.DELTA);
-});
+    console.log("Found best solution with crossings:", minCrossings);
+}
+
+//For debug
+function waitingKeypress() {
+    return new Promise<void>((resolve) => {
+      document.addEventListener('keydown', onKeyHandler);
+      function onKeyHandler(e: { keyCode: number; }) {
+        if (e.keyCode === 13) {
+          document.removeEventListener('keydown', onKeyHandler);
+          resolve();
+        }
+      }
+    });
+  }

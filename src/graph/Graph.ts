@@ -8,7 +8,8 @@ export class Graph implements Drawable {
     nodes: Map<string, Node>;
     edges: Edge[];
 
-    constructor(nodes: Node[]) {
+
+    constructor(nodes: Node[] = []) {
         this.nodes = new Map<string, Node>;
         nodes.forEach(node => {
             this.nodes.set(node.label, node);

@@ -1,4 +1,6 @@
 import { Drawable } from "../Drawable";
+import { Segment } from "../utils/Segment";
+import { Vector2D } from "../utils/Vector2D";
 import { Node } from "./Node";
 
 export class Edge implements Drawable {
@@ -28,6 +30,19 @@ export class Edge implements Drawable {
             ctx.lineTo(this.node2.pos.x + dx, this.node2.pos.y + dy);
             ctx.stroke();
         }
+    }
+
+    //Returns the Segment corresponding to this Edge. It doesn't take the exact center of the node,
+    // but a point next to it that sits on the edge.
+    //If number > 1, only the "main" segment is returned.
+    getDrawingSegment(): Segment {
+
+        const thetaA = new Vector2D(this.node2.pos.x - this.node1.pos.x, this.node2.pos.y - this.node1.pos.y).phase();
+        const thetaB = new Vector2D(this.node1.pos.x - this.node2.pos.x, this.node1.pos.y - this.node2.pos.y).phase();
+
+        const OFFSET = 1;
+
+        return new Segment(this.node1.pos.x + OFFSET * Math.cos(thetaA), this.node1.pos.y + OFFSET * Math.sin(thetaA), this.node2.pos.x + OFFSET * Math.cos(thetaB), this.node2.pos.y + OFFSET * Math.sin(thetaB));
     }
 
 

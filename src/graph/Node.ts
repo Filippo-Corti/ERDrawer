@@ -1,5 +1,5 @@
 import { Drawable } from "../Drawable";
-import { Vector2D } from "../Vector2D";
+import { Vector2D } from "../utils/Vector2D";
 
 export class Node implements Drawable {
 

@@ -12,6 +12,10 @@ export class Vector2D {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
+    phase() : number {
+        return Math.atan2(this.y, this.x);
+    }
+
     sum(v : Vector2D) {
         this.x += v.x;
         this.y += v.y;
