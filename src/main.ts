@@ -117,6 +117,32 @@ function ecommerceGraph(): Graph {
     return graph;
 }
 
+function salesGraph(): Graph {
+    let nodes: Node[] = Array();
+    nodes.push(new Node("Company", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Item", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Shopping Cart", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Customer", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Shipping", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Credit Card", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("Order", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+    nodes.push(new Node("E-Commerce", getRandomCoordinate(50, MAX_WIDTH - 50), getRandomCoordinate(50, MAX_HEIGHT - 50)));
+
+    const graph = new Graph(nodes);
+
+    graph.addEdge("Company", "Item");
+    graph.addEdge("Shopping Cart", "Item");
+    graph.addEdge("Item", "Order");
+    graph.addEdge("Order", "Shopping Cart");
+    graph.addEdge("Order", "E-Commerce");
+    graph.addEdge("Shipping", "E-Commerce");
+    graph.addEdge("Shipping", "Customer");
+    graph.addEdge("Customer", "Credit Card");
+    graph.addEdge("Item", "Customer");
+
+    return graph;
+}
+
 
 const drawer = new Drawer("drawing-board");
 const MAX_WIDTH = drawer.canvas.width;
@@ -126,7 +152,8 @@ const MAX_HEIGHT = drawer.canvas.height;
 //const graph = libreriaGraph();
 //const graph = calcioGraph();
 //const graph = residentiGraph();
-const graph = ecommerceGraph();
+//const graph = ecommerceGraph();
+const graph = salesGraph();
 const graphDrawer = new GraphDrawer(drawer, graph);
 graphDrawer.drawGraph();
 graphDrawer.drawer.drawGrid(GraphDrawer.DELTA);
@@ -160,7 +187,7 @@ function drawDiscretizedWithMinCrossings() : void {
     let minGraph = new Graph();
     Object.assign(minGraph, graphDrawer.graph);
     for (let i = 0; i < TESTS; i++) {
-        Object.assign(graphDrawer.graph, ecommerceGraph()); // New random graph
+        Object.assign(graphDrawer.graph, salesGraph()); // New random graph
         graphDrawer.executeFructhermanReingold(1000);
         graphDrawer.discretizeNodesCoordinates();
         graphDrawer.drawGraph();
