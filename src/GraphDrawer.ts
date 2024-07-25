@@ -144,17 +144,17 @@ export class GraphDrawer {
     }
 
     //Returns the discrete coordinates of v, within the boundaries of the drawing canvas
-    getDiscretizedCoords(v: Vector2D, borderSize: number): Vector2D {
+    private getDiscretizedCoords(v: Vector2D, borderSize: number): Vector2D {
         return this.getCoordsWithBoundaries(new Vector2D(Math.round(v.x / GraphDrawer.DELTA) * GraphDrawer.DELTA, Math.round(v.y / GraphDrawer.DELTA) * GraphDrawer.DELTA), borderSize);
     }
 
     //Returns coordinates of v making sure that they are within at least borderSize px from the border of the canvas
-    getCoordsWithBoundaries(v: Vector2D, borderSize: number): Vector2D {
+    private getCoordsWithBoundaries(v: Vector2D, borderSize: number): Vector2D {
         return new Vector2D(Math.min(this.drawer.width - borderSize, Math.max(0 + borderSize, v.x)), Math.min(this.drawer.height - borderSize, Math.max(0 + borderSize, v.y)));
     }
 
     //Calculate Radius of a Node based on the size of the canvas and the number of nodes
-    calcNodeSize(): number {
+    private calcNodeSize(): number {
         const minDim = Math.min(this.drawer.width, this.drawer.height);
         const nodesCount = this.graph.nodes.size;
         return Math.min(50, minDim / (2 * nodesCount));

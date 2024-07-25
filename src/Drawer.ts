@@ -42,11 +42,4 @@ export class Drawer {
         this.ctx.strokeStyle = "black";
     }
 
-    /*drawCircle(x : number, y : number, radius : number, color : string = 'rgba(0 0 0 / 1)') : void {
-        this.ctx.strokeStyle = color;
-        this.ctx.beginPath();
-        this.ctx.arc(x, y, radius, 0, Math.PI * 2);
-        this.ctx.stroke();
-    }*/
-
 }

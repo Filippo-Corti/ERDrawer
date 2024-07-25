@@ -11,27 +11,31 @@ const graph = await GraphSerializer.importGraphFromFile('./graphs/' + GRAPH_FILE
 const graphDrawer = new GraphDrawer(drawer, graph);
 graphDrawer.drawGraph();
 
-const layoutBtn = document.getElementById("layout-btn")
-const discretizeBtn = document.getElementById("discretize-btn")
-const exportBtn = document.getElementById("export-btn")
-const importBtn = document.getElementById("import-btn")
 
-layoutBtn?.addEventListener("click", () => {
-    graphDrawer.executeFructhermanReingold(1000, 50);
+// Layout Button
+
+document.getElementById("layout-btn")!.addEventListener("click", () => {
+    graphDrawer.executeFructhermanReingold(1000, 25);
     graphDrawer.drawGraph();
 });
 
-discretizeBtn?.addEventListener("click", () => {
-    graphDrawer.positionElegantly(10000, 200);
+// Discretize Button
+
+document.getElementById("discretize-btn")!.addEventListener("click", () => {
+    graphDrawer.positionElegantly(5000, 1000);
     graphDrawer.drawGraph();
 });
 
-exportBtn?.addEventListener("click", () => {
+// Export Button
+
+document.getElementById("export-btn")!.addEventListener("click", () => {
     const graphJson = GraphSerializer.exportGraph(graphDrawer.graph);
     downloadFile(graphJson, 'graph.json');
 })
 
-importBtn?.addEventListener("click", () => {
+// Import Button
+
+document.getElementById("import-btn")!.addEventListener("click", () => {
     const fileInput = document.getElementById('fileInput') as HTMLInputElement;
     const file = fileInput.files ? fileInput.files[0] : null;
     if (!file)
@@ -46,6 +50,8 @@ importBtn?.addEventListener("click", () => {
     };
     reader.readAsText(file);
 })
+
+// Utils
 
 function downloadFile(content: string, fileName: string) {
     const a = document.createElement('a');

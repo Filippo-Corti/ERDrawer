@@ -52,7 +52,7 @@ export class GraphSerializer {
         .then(response => response.text())
         .then(data => {
             graph = GraphSerializer.importGraph(data);
-            console.log('Loaded Graph from sales.json:', graph);
+            console.log('Loaded Graph from ' + fileName + ': ', graph);
             // You can now use the loaded graph in your application
         })
         .catch(error => console.error('Error loading graph:', error));
