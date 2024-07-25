@@ -19,13 +19,17 @@ export class Graph implements Drawable {
         this.edges = Array();
     }
 
+    addNode(node : Node) : void {
+        this.nodes.set(node.label, node);
+    }
+
     addEdge(label1: string, label2: string): void {
 
         const n1 = this.nodes.get(label1);
         const n2 = this.nodes.get(label2);
 
         if (!n1 || !n2) {
-            throw new Error("Invalid labels");
+            return;
         }
 
 

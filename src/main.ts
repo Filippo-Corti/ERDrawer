@@ -2,6 +2,8 @@ import './style.css'
 import { Drawer } from './Drawer';
 import { GraphDrawer } from './GraphDrawer.ts';
 import { GraphSerializer } from './graph/GraphSerializer.ts';
+import { Node } from './graph/Node.ts';
+import { Random } from './utils/Utils.ts';
 
 
 const GRAPH_FILENAME = 'ecommerce.json';
@@ -49,6 +51,21 @@ document.getElementById("import-btn")!.addEventListener("click", () => {
         graphDrawer.drawGraph();
     };
     reader.readAsText(file);
+})
+
+// Update Canvas Button
+
+document.getElementById("canvas-btn")!.addEventListener("click", () => {
+    graphDrawer.drawer.canvas.width += GraphDrawer.DELTA;
+    graphDrawer.drawGraph();
+})
+
+// Add Node Button
+
+document.getElementById("newnode-btn")!.addEventListener("click", () => {
+    graphDrawer.graph.addNode(new Node("Prova" + Random.getRandom(0, 10), Random.getRandom(50, graphDrawer.drawer.canvas.width - 50), Random.getRandom(50, graphDrawer.drawer.canvas.height - 50)));
+    graphDrawer.graph.addEdge("Prova" + Random.getRandom(0, 10), "Prova" + Random.getRandom(0, 10));
+    graphDrawer.drawGraph();
 })
 
 // Utils
