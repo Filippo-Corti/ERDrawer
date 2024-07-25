@@ -22,7 +22,7 @@ layoutBtn?.addEventListener("click", () => {
 });
 
 discretizeBtn?.addEventListener("click", () => {
-    graphDrawer.positionElegantly();
+    graphDrawer.positionElegantly(100, 1000);
     graphDrawer.drawGraph();
 });
 

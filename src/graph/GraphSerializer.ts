@@ -1,7 +1,6 @@
 import { Graph } from "./Graph";
 import { Node } from "./Node";
 import { Vector2D } from "../utils/Vector2D";
-import * as fs from 'fs';
 
 export class GraphSerializer {
 

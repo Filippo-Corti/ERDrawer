@@ -30,20 +30,18 @@ export class GraphDrawer {
         - Looks geometrically organized (positions are discretized)
         - Avoids crossings (it finds the best disposition out of N tries) 
     */
-    positionElegantly(): void {
-        const MAX_WIDTH = this.drawer.width;
-        const MAX_HEIGHT = this.drawer.height;
+    positionElegantly(numberOfGraphs : number, iterationsPerGraph : number): void {
         const BORDER = 50;
-        const N = 1000;
+
         let minCrossings = 100;
         let minGraph = this.graph.clone();
 
-        for (let i = 0; i < N; i++) {
+        for (let i = 0; i < numberOfGraphs; i++) {
             // Generate New Random Graph 
-            this.graph.randomizePositions(BORDER, MAX_WIDTH - BORDER, BORDER, MAX_HEIGHT - BORDER);
+            this.graph.randomizePositions(BORDER,  this.drawer.width - BORDER, BORDER, this.drawer.height - BORDER);
 
             // Apply the Layout Algorithm
-            this.executeFructhermanReingold(200, BORDER, true);
+            this.executeFructhermanReingold(iterationsPerGraph, BORDER, true);
             this.discretizeNodesCoordinates(BORDER);
 
             // Check if current layout is better than the best one so far
