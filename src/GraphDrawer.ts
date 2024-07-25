@@ -161,6 +161,7 @@ export class GraphDrawer {
     }
 
     //Returns the number of edge pairs that intersect in the current graph disposition
+    // + the number of edges that intersect with a node
     countCrossings(): number {
         let count: number = 0;
         for (let i = 0; i < this.graph.edges.length; i++) {

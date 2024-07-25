@@ -20,14 +20,30 @@ export class Edge implements Drawable {
     draw(ctx: CanvasRenderingContext2D): void {
         const OFFSET_BETWEEN_MULTIEDGES = 15;
         for (let i = 0; i < this.count; i++) {
+            // Calculate offset
             const theta = Math.atan2(this.node2.pos.y - this.node1.pos.y, this.node2.pos.x - this.node1.pos.x);
             const offsetFactor = (i - (this.count - 1) / 2);
             const dx = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
             const dy = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
+
+            // Draw Edge
             ctx.beginPath();
             ctx.moveTo(this.node1.pos.x + dx, this.node1.pos.y + dy);
             ctx.lineTo(this.node2.pos.x + dx, this.node2.pos.y + dy);
             ctx.stroke();
+
+            // Draw Rhombus half way
+            const mx = (this.node2.pos.x + this.node1.pos.x) / 2;
+            const my = (this.node2.pos.y + this.node1.pos.y) / 2;
+            const halfDiag1 = 30, halfDiag2 = 50;
+            ctx.beginPath();
+            ctx.moveTo(mx, my - halfDiag1);
+            ctx.lineTo(mx + halfDiag2, my);
+            ctx.lineTo(mx, my + halfDiag1);
+            ctx.lineTo(mx - halfDiag2, my);
+            ctx.lineTo(mx, my - halfDiag1);
+            ctx.stroke();
+
         }
     }
 

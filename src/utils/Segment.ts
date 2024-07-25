@@ -65,6 +65,7 @@ export class Segment {
         return false;
     }
 
+    // Returns whether this and s are parallel or not
     parallel(s: Segment): boolean {
         const vector1 = new Vector2D(this.b.x - this.a.x, this.b.y - this.a.y);
         const vector2 = new Vector2D(s.b.x - s.a.x, s.b.y - s.a.y);
@@ -72,6 +73,11 @@ export class Segment {
         const crossProduct = vector1.x * vector2.y - vector1.y * vector2.x;
 
         return Math.abs(crossProduct) < 10e-2;
+    }
+
+    // Returns how far point is from the segment. 
+    distanceToPoint(point : Vector2D) : number {
+
     }
 
 }
