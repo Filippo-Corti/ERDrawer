@@ -1,23 +1,39 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Drawing Board</title>
-  </head>
-  <body>
 
-    <div class="flex flex-col justify-center items-center mt-12">
-      <canvas class="border" id="drawing-board" width="1000" height="600"> <!-- Divisible per DELTA and better if there's a central square !!!! -->
-      </canvas>
-      <div class="flex gap-2 mt-4">
-        <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button" id="layout-btn">Layout Graph</button>
-        <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button" id="discretize-btn">Discretize Graph</button>
-      </div>
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Drawing Board</title>
+</head>
+
+<body>
+
+  <div class="flex flex-col justify-center items-center mt-12">
+    <canvas class="border" id="drawing-board" width="1000" height="600">
+      <!-- Divisible by GraphDrawer.DELTA and better if there's a central square !!!! -->
+    </canvas>
+    <div class="flex gap-2 mt-4">
+      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button" id="layout-btn">Layout
+        Graph</button>
+      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button"
+        id="discretize-btn">Discretize Graph</button>
+
     </div>
+    <div class="flex gap-2 mt-4">
+      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button"
+        id="export-btn">Export Graph</button>
+    </div>
+    <div class="flex gap-2 mt-4 items-center">
+      <input type="file" id="fileInput" accept=".json" />
+      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button"
+        id="import-btn">Import Graph</button>
+    </div>
+  </div>
 
 
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
 </html>

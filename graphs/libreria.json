@@ -1,0 +1,69 @@
+{
+  "nodes": [
+    {
+      "label": "Libro",
+      "pos": {
+        "x": 679,
+        "y": 238
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    },
+    {
+      "label": "Copia",
+      "pos": {
+        "x": 101,
+        "y": 510
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    },
+    {
+      "label": "Prestito",
+      "pos": {
+        "x": 476,
+        "y": 308
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    },
+    {
+      "label": "Lettore",
+      "pos": {
+        "x": 601,
+        "y": 152
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    }
+  ],
+  "edges": [
+    {
+      "node1": "Libro",
+      "node2": "Copia",
+      "count": 1
+    },
+    {
+      "node1": "Copia",
+      "node2": "Prestito",
+      "count": 1
+    },
+    {
+      "node1": "Prestito",
+      "node2": "Lettore",
+      "count": 1
+    }
+  ]
+}

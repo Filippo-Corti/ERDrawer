@@ -1,0 +1,91 @@
+{
+  "nodes": [
+    {
+      "label": "Giornata",
+      "pos": {
+        "x": 826,
+        "y": 445
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    },
+    {
+      "label": "Partita",
+      "pos": {
+        "x": 300,
+        "y": 131
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    },
+    {
+      "label": "Arbitro",
+      "pos": {
+        "x": 665,
+        "y": 467
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    },
+    {
+      "label": "Squadra",
+      "pos": {
+        "x": 803,
+        "y": 67
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    },
+    {
+      "label": "Giocatore",
+      "pos": {
+        "x": 684,
+        "y": 360
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    }
+  ],
+  "edges": [
+    {
+      "node1": "Giornata",
+      "node2": "Partita",
+      "count": 1
+    },
+    {
+      "node1": "Partita",
+      "node2": "Arbitro",
+      "count": 1
+    },
+    {
+      "node1": "Partita",
+      "node2": "Squadra",
+      "count": 1
+    },
+    {
+      "node1": "Squadra",
+      "node2": "Giocatore",
+      "count": 1
+    },
+    {
+      "node1": "Partita",
+      "node2": "Giocatore",
+      "count": 1
+    }
+  ]
+}

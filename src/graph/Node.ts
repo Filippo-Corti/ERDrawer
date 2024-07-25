@@ -6,12 +6,13 @@ export class Node implements Drawable {
     label : string;
     pos : Vector2D;
     disp : Vector2D;
-    size : number = 30;
+    size : number;
 
-    constructor(label: string, x: number, y: number) {
+    constructor(label: string, x: number, y: number, size : number = 30) {
         this.label = label;
         this.pos = new Vector2D(x, y);
         this.disp = new Vector2D(0, 0);
+        this.size = size;
     }
 
 

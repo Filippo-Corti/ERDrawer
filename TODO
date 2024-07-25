@@ -4,6 +4,7 @@ A. MODELING THE GRAPH LAYOUT:
 ☑ Generate X Graphs and pick the one with the least amount of crossings to be shown
 ☐ Try to avoid the crossing, if possible, using a path finding algorithm
 ☐ Get to a point where the resulting graph looks like it could be a decent ER Diagram
+☐ Build an import-export system
 
 B. DRAW THE ER DIAGRAM
 

@@ -22,12 +22,46 @@ export class GraphDrawer {
         });
         this.drawer.clear();
         this.graph.draw(this.drawer.ctx);
+        //this.drawer.drawGrid(GraphDrawer.DELTA);
+    }
+
+    /* Positions the Nodes in the Graph in a way that:
+        - Looks harmonious (using Fruchterman-Reingold)
+        - Looks geometrically organized (positions are discretized)
+        - Avoids crossings (it finds the best disposition out of N tries) 
+    */
+    positionElegantly(): void {
+        const MAX_WIDTH = this.drawer.width;
+        const MAX_HEIGHT = this.drawer.height;
+        const BORDER = 50;
+        const N = 1000;
+        let minCrossings = 100;
+        let minGraph = this.graph.clone();
+
+        for (let i = 0; i < N; i++) {
+            // Generate New Random Graph 
+            this.graph.randomizePositions(BORDER, MAX_WIDTH - BORDER, BORDER, MAX_HEIGHT - BORDER);
+
+            // Apply the Layout Algorithm
+            this.executeFructhermanReingold(200, BORDER, true);
+            this.discretizeNodesCoordinates(BORDER);
+
+            // Check if current layout is better than the best one so far
+            let crossings = this.countCrossings();
+            if (crossings < minCrossings) {
+                minCrossings = crossings;
+                minGraph = this.graph.clone();
+            }
+        }
+
+        this.graph = minGraph.clone();
+        console.log("Found best solution with crossings:", minCrossings);
     }
 
     //Base code comes from https://faculty.washington.edu/joelross/courses/archive/s13/cs261/lab/k/fruchterman91graph.pdf
     //Positions Nodes using the Fruchterman-Reingold Algorithm.
     //The node with the most amount of edges is positioned in the center if centerMainNode is set to true
-    executeFructhermanReingold(n: number, centerMainNode: boolean = false): void {
+    executeFructhermanReingold(n: number, borderSize: number, centerMainNode: boolean = false): void {
         const width = this.drawer.canvas.width;
         const height = this.drawer.canvas.height;
         const area = width * height;
@@ -40,7 +74,7 @@ export class GraphDrawer {
         const centralNode = this.graph.getNodeWithMostEdges();
         //Calc Node Sizes so that Boundaries are correct
         this.graph.nodes.forEach(v => {
-            v.size = this.calcNodeSize(); 
+            v.size = this.calcNodeSize();
         });
 
         for (let i = 0; i < n; i++) {
@@ -48,14 +82,15 @@ export class GraphDrawer {
             for (const [_, v] of this.graph.nodes) {
                 v.disp = new Vector2D(0, 0);
                 for (const [_, u] of this.graph.nodes) {
-                    if (v != u) {
-                        const gamma: Vector2D = new Vector2D(v.pos.x - u.pos.x, v.pos.y - u.pos.y);
-                        const gammaAbs: number = gamma.magnitude();
-                        const fr: number = f_r(gammaAbs);
-                        v.disp.sum(new Vector2D(gamma.x / gammaAbs * fr, gamma.y / gammaAbs * fr));
-                    }
+                    if (v == u) continue;
+
+                    const gamma: Vector2D = new Vector2D(v.pos.x - u.pos.x, v.pos.y - u.pos.y);
+                    const gammaAbs: number = gamma.magnitude();
+                    const fr: number = f_r(gammaAbs);
+                    v.disp.sum(new Vector2D(gamma.x / gammaAbs * fr, gamma.y / gammaAbs * fr));
                 }
             }
+
             //Calculate Attractive Forces
             for (const e of this.graph.edges) {
                 const gamma: Vector2D = new Vector2D(e.node1.pos.x - e.node2.pos.x, e.node1.pos.y - e.node2.pos.y);
@@ -66,8 +101,8 @@ export class GraphDrawer {
                 e.node2.disp.sum(vect);
             }
 
+            // Eventually attract main node to center
             if (centerMainNode) {
-                //Attract main node to center
                 const gamma: Vector2D = new Vector2D(centralNode.pos.x - width / 2, centralNode.pos.y - height / 2);
                 const gammaAbs: number = gamma.magnitude();
                 const fa: number = f_a(gammaAbs) * 100;
@@ -77,7 +112,6 @@ export class GraphDrawer {
                 }
             }
 
-
             //Limit max displacement to temperature t and prevent from displacement outside frame
             for (const [_, v] of this.graph.nodes) {
                 const a = Math.min(v.disp.magnitude(), t);
@@ -85,8 +119,7 @@ export class GraphDrawer {
                 if (!Number.isNaN(vect.x) && !Number.isNaN(vect.y)) {
                     v.pos.sum(vect);
                 }
-                v.pos = this.getCoordsWithBoundaries(v.pos, v.size);
-                //t = Math.max(1.0, t - 0.25);
+                v.pos = this.getCoordsWithBoundaries(v.pos, borderSize);
             }
         }
 
@@ -94,12 +127,12 @@ export class GraphDrawer {
 
     //Positions Nodes in a discretized grid.
     //If two Nodes would occupy the same spot, the discretization doesn't happen
-    discretizeNodesCoordinates(): void {
+    discretizeNodesCoordinates(borderSize: number): void {
         const rows = Math.floor(this.drawer.height / GraphDrawer.DELTA + 1);
         const cols = Math.floor(this.drawer.width / GraphDrawer.DELTA + 1);
         var nodesPerSquare: Node[][] = Array.from({ length: rows * cols }, () => []);
         for (const [_, v] of this.graph.nodes) {
-            const discrCoords = this.getDiscretizedCoords(v.pos, v.size);
+            const discrCoords = this.getDiscretizedCoords(v.pos, borderSize);
             const nodeCol = Math.round(discrCoords.x / GraphDrawer.DELTA);
             const nodeRow = Math.round(discrCoords.y / GraphDrawer.DELTA);
             nodesPerSquare[nodeRow * cols + nodeCol].push(v);
@@ -107,12 +140,12 @@ export class GraphDrawer {
 
         //Discretize only if 1 per square
         nodesPerSquare.filter((a) => a.length <= 1).forEach((a) => {
-            a.forEach((node) => node.pos = this.getDiscretizedCoords(node.pos, node.size));
+            a.forEach((node) => node.pos = this.getDiscretizedCoords(node.pos, borderSize));
         })
 
     }
 
-    //Returns the discrete coordinates of v 
+    //Returns the discrete coordinates of v, within the boundaries of the drawing canvas
     getDiscretizedCoords(v: Vector2D, borderSize: number): Vector2D {
         return this.getCoordsWithBoundaries(new Vector2D(Math.round(v.x / GraphDrawer.DELTA) * GraphDrawer.DELTA, Math.round(v.y / GraphDrawer.DELTA) * GraphDrawer.DELTA), borderSize);
     }
@@ -141,11 +174,10 @@ export class GraphDrawer {
                 const s2 = f.getDrawingSegment();
 
                 if (s1.intersects(s2)) {
-                    //console.log(e.node1, e.node2, f.node1, f.node2);
                     if (s1.parallel(s2)) {
-                        count+=999; //This is a crossing we really want to avoid
+                        count += 999; // This is a crossing we really want to avoid
                     } else {
-                        count+=1;
+                        count += 1;
                     }
                 }
 

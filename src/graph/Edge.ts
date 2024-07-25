@@ -17,7 +17,6 @@ export class Edge implements Drawable {
         this.count = count;
     }
 
-
     draw(ctx: CanvasRenderingContext2D): void {
         const OFFSET_BETWEEN_MULTIEDGES = 15;
         for (let i = 0; i < this.count; i++) {

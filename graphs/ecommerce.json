@@ -1,0 +1,130 @@
+{
+  "nodes": [
+    {
+      "label": "User",
+      "pos": {
+        "x": 318,
+        "y": 439
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854
+    },
+    {
+      "label": "Product",
+      "pos": {
+        "x": 644,
+        "y": 524
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854
+    },
+    {
+      "label": "Order",
+      "pos": {
+        "x": 944,
+        "y": 402
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854
+    },
+    {
+      "label": "Payment",
+      "pos": {
+        "x": 387,
+        "y": 473
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854
+    },
+    {
+      "label": "Review",
+      "pos": {
+        "x": 390,
+        "y": 277
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854
+    },
+    {
+      "label": "Category",
+      "pos": {
+        "x": 864,
+        "y": 217
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854
+    },
+    {
+      "label": "Cart",
+      "pos": {
+        "x": 90,
+        "y": 518
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854
+    }
+  ],
+  "edges": [
+    {
+      "node1": "User",
+      "node2": "Order",
+      "count": 1
+    },
+    {
+      "node1": "User",
+      "node2": "Review",
+      "count": 1
+    },
+    {
+      "node1": "User",
+      "node2": "Cart",
+      "count": 1
+    },
+    {
+      "node1": "Order",
+      "node2": "Product",
+      "count": 1
+    },
+    {
+      "node1": "Order",
+      "node2": "Payment",
+      "count": 1
+    },
+    {
+      "node1": "Product",
+      "node2": "Category",
+      "count": 1
+    },
+    {
+      "node1": "Cart",
+      "node2": "Product",
+      "count": 1
+    },
+    {
+      "node1": "Review",
+      "node2": "Product",
+      "count": 2
+    }
+  ]
+}

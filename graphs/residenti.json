@@ -1,0 +1,52 @@
+{
+  "nodes": [
+    {
+      "label": "Cittadino",
+      "pos": {
+        "x": 717,
+        "y": 247
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    },
+    {
+      "label": "Residente",
+      "pos": {
+        "x": 469,
+        "y": 90
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    },
+    {
+      "label": "Famiglia",
+      "pos": {
+        "x": 715,
+        "y": 58
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 50
+    }
+  ],
+  "edges": [
+    {
+      "node1": "Cittadino",
+      "node2": "Residente",
+      "count": 1
+    },
+    {
+      "node1": "Residente",
+      "node2": "Famiglia",
+      "count": 2
+    }
+  ]
+}
