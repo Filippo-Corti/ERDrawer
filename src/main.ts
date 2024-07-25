@@ -4,7 +4,7 @@ import { GraphDrawer } from './GraphDrawer.ts';
 import { GraphSerializer } from './graph/GraphSerializer.ts';
 
 
-const GRAPH_FILENAME = 'sales.json';
+const GRAPH_FILENAME = 'ecommerce.json';
 
 const drawer = new Drawer("drawing-board");
 const graph = await GraphSerializer.importGraphFromFile('./graphs/' + GRAPH_FILENAME);
@@ -22,7 +22,7 @@ layoutBtn?.addEventListener("click", () => {
 });
 
 discretizeBtn?.addEventListener("click", () => {
-    graphDrawer.positionElegantly(100, 1000);
+    graphDrawer.positionElegantly(10000, 200);
     graphDrawer.drawGraph();
 });
 
