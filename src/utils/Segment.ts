@@ -69,15 +69,43 @@ export class Segment {
     parallel(s: Segment): boolean {
         const vector1 = new Vector2D(this.b.x - this.a.x, this.b.y - this.a.y);
         const vector2 = new Vector2D(s.b.x - s.a.x, s.b.y - s.a.y);
-    
+
         const crossProduct = vector1.x * vector2.y - vector1.y * vector2.x;
 
         return Math.abs(crossProduct) < 10e-2;
     }
 
     // Returns how far point is from the segment. 
-    distanceToPoint(point : Vector2D) : number {
+    distanceToPoint(point: Vector2D): number {
+        var A = point.x - this.a.x;
+        var B = point.y - this.a.y;
+        var C = this.b.x - this.a.x;
+        var D = this.b.y - this.a.y;
 
+        var dot = A * C + B * D;
+        var len_sq = C * C + D * D;
+        var param = -1;
+        if (len_sq != 0) //in case of 0 length line
+            param = dot / len_sq;
+
+        var xx, yy;
+
+        if (param < 0) {
+            xx = this.a.x;
+            yy = this.a.y;
+        }
+        else if (param > 1) {
+            xx = this.b.x;
+            yy = this.b.y;
+        }
+        else {
+            xx = this.a.x + param * C;
+            yy = this.a.y + param * D;
+        }
+
+        var dx = point.x - xx;
+        var dy = point.y - yy;
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
 }
