@@ -1,6 +1,6 @@
 import './style.css'
 import { Drawer } from './Drawer';
-import { GraphDrawer } from './GraphDrawer.ts';
+import { GraphDrawer } from './graph/GraphDrawer.ts';
 import { GraphSerializer } from './graph/GraphSerializer.ts';
 import { Node } from './graph/Node.ts';
 import { Random } from './utils/Utils.ts';
@@ -24,7 +24,7 @@ document.getElementById("layout-btn")!.addEventListener("click", () => {
 // Discretize Button
 
 document.getElementById("discretize-btn")!.addEventListener("click", () => {
-    graphDrawer.positionElegantly(5000, 100);
+    graphDrawer.positionElegantly(5000, 200);
     graphDrawer.drawGraph();
 });
 

@@ -1,7 +1,7 @@
-import { Drawer } from "./Drawer";
-import { Vector2D } from "./utils/Vector2D";
-import { Graph } from "./graph/Graph";
-import { Node } from "./graph/Node";
+import { Drawer } from "../Drawer";
+import { Vector2D } from "../utils/Vector2D";
+import { Graph } from "./Graph";
+import { Node } from "./Node";
 
 export class GraphDrawer {
 

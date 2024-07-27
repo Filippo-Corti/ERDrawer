@@ -1,4 +1,4 @@
-import { Drawable } from "../Drawable";
+import { Drawable } from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
 import { Vector2D } from "../utils/Vector2D";
 import { Node } from "./Node";
