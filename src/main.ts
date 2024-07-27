@@ -4,12 +4,14 @@ import { GraphDrawer } from './graph/GraphDrawer.ts';
 import { GraphSerializer } from './graph/GraphSerializer.ts';
 import { Node } from './graph/Node.ts';
 import { Random } from './utils/Utils.ts';
+import { ERDiagramSerializer } from './erdiagram/ERDiagramSerializer.ts';
 
 
 const GRAPH_FILENAME = 'ecommerce.json';
 
 const drawer = new Drawer("drawing-board");
-const graph = await GraphSerializer.importGraphFromFile('./graphs/' + GRAPH_FILENAME);
+//const graph = await GraphSerializer.importGraphFromFile('./graphs/' + GRAPH_FILENAME);
+const graph = await ERDiagramSerializer.importGraphFromFile('./graphs/' + GRAPH_FILENAME);
 const graphDrawer = new GraphDrawer(drawer, graph);
 graphDrawer.drawGraph();
 

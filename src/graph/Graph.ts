@@ -3,6 +3,7 @@ import { Edge } from "./Edge";
 import { Drawable } from "../utils/Drawable";
 import { Random } from "../utils/Utils";
 import { Vector2D } from "../utils/Vector2D";
+import { Entity } from "../erdiagram/Entity";
 
 
 export class Graph implements Drawable {
@@ -19,7 +20,7 @@ export class Graph implements Drawable {
         this.edges = Array();
     }
 
-    addNode(node : Node) : void {
+    addNode(node: Node): void {
         this.nodes.set(node.label, node);
     }
 
@@ -94,10 +95,18 @@ export class Graph implements Drawable {
 
     //Deep copies the Graph
     clone(): Graph {
-        const newNodes : Node[] = [];
+        const newNodes: Node[] = [];
 
         this.nodes.forEach((node, _) => {
-            const newNode = new Node(node.label, node.pos.x, node.pos.y);
+            let newNode: Node;
+            switch (true) {
+                case node instanceof Entity:
+                    newNode = new Entity(node.label, node.pos.x, node.pos.y);
+                    break;
+                default:
+                    newNode = new Node(node.label, node.pos.x, node.pos.y);
+                    break;
+            }
             newNodes.push(newNode);
         });
 
