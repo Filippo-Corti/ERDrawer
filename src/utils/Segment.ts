@@ -10,6 +10,7 @@ export class Segment {
         this.b = new Vector2D(x2, y2);
     }
 
+    // Returns whether this and s intersect.
     // From https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
     intersects(s: Segment): boolean {
 
@@ -76,6 +77,7 @@ export class Segment {
     }
 
     // Returns how far point is from the segment. 
+    // From https://stackoverflow.com/questions/849211/shortest-distance-between-a-point-and-a-line-segment
     distanceToPoint(point: Vector2D): number {
         var A = point.x - this.a.x;
         var B = point.y - this.a.y;
