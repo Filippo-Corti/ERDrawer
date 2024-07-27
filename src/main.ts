@@ -24,7 +24,7 @@ document.getElementById("layout-btn")!.addEventListener("click", () => {
 // Discretize Button
 
 document.getElementById("discretize-btn")!.addEventListener("click", () => {
-    graphDrawer.positionElegantly(5000, 1000);
+    graphDrawer.positionElegantly(5000, 100);
     graphDrawer.drawGraph();
 });
 

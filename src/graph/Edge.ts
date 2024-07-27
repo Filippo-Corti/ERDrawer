@@ -33,16 +33,16 @@ export class Edge implements Drawable {
             ctx.stroke();
 
             // Draw Rhombus half way
-            // const mx = (this.node2.pos.x + this.node1.pos.x) / 2;
-            // const my = (this.node2.pos.y + this.node1.pos.y) / 2;
-            // const halfDiag1 = 30, halfDiag2 = 50;
-            // ctx.beginPath();
-            // ctx.moveTo(mx, my - halfDiag1);
-            // ctx.lineTo(mx + halfDiag2, my);
-            // ctx.lineTo(mx, my + halfDiag1);
-            // ctx.lineTo(mx - halfDiag2, my);
-            // ctx.lineTo(mx, my - halfDiag1);
-            // ctx.stroke();
+            const mx = (this.node2.pos.x + this.node1.pos.x) / 2;
+            const my = (this.node2.pos.y + this.node1.pos.y) / 2;
+            const halfDiag1 = 30, halfDiag2 = 50;
+            ctx.beginPath();
+            ctx.moveTo(mx, my - halfDiag1);
+            ctx.lineTo(mx + halfDiag2, my);
+            ctx.lineTo(mx, my + halfDiag1);
+            ctx.lineTo(mx - halfDiag2, my);
+            ctx.lineTo(mx, my - halfDiag1);
+            ctx.stroke();
 
         }
     }

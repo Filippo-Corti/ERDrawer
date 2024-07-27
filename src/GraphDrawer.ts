@@ -29,6 +29,7 @@ export class GraphDrawer {
         - Looks harmonious (using Fruchterman-Reingold)
         - Looks geometrically organized (positions are discretized)
         - Avoids crossings (it finds the best disposition out of N tries) 
+        - Avoids edges passing across nodes
     */
     positionElegantly(numberOfGraphs : number, iterationsPerGraph : number): void {
         const BORDER = 50;
@@ -46,7 +47,7 @@ export class GraphDrawer {
 
             // Check if current layout is better than the best one so far
             let crossings = this.countCrossings();
-            if (crossings < minCrossings) {
+            if (crossings < minCrossings && !this.doesAnyEdgeCrossANode()) {
                 minCrossings = crossings;
                 minGraph = this.graph.clone();
             }
@@ -186,5 +187,19 @@ export class GraphDrawer {
     }
 
 
+    //Returns whether an Edge is crossing a Node or not.
+    doesAnyEdgeCrossANode() : boolean {
+        for (const e of this.graph.edges) {
+            for (const [_, v] of this.graph.nodes) {
+                if (v == e.node1 || v == e.node2) continue;
+
+                if (e.getDrawingSegment().distanceToPoint(v.pos) < v.size) {
+                    //console.log("Distance between the edge " + e.node1.label + " - " + e.node2.label + " and the node " + v.label + " is too short.");
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
 }
