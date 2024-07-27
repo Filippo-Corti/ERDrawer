@@ -188,12 +188,12 @@ export class GraphDrawer {
 
 
     //Returns whether an Edge is crossing a Node or not.
-    doesAnyEdgeCrossANode() : boolean {
+    doesAnyEdgeCrossANode(minOffset : number = 50) : boolean {
         for (const e of this.graph.edges) {
             for (const [_, v] of this.graph.nodes) {
                 if (v == e.node1 || v == e.node2) continue;
 
-                if (e.getDrawingSegment().distanceToPoint(v.pos) < v.size) {
+                if (e.getDrawingSegment().distanceToPoint(v.pos) < v.size + minOffset) {
                     //console.log("Distance between the edge " + e.node1.label + " - " + e.node2.label + " and the node " + v.label + " is too short.");
                     return true;
                 }
