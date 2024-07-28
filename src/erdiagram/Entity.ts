@@ -3,7 +3,7 @@ import { Node } from "../graph/Node";
 export class Entity extends Node {
 
     draw(ctx: CanvasRenderingContext2D): void {
-        const PADDING = (this.label.length < 5) ? 15 : 4;
+        const PADDING = 25;
         const dimX = this.size, dimY = this.size * 3/5;
         //Draw Rectangle
         ctx.fillStyle = "white";
@@ -22,7 +22,7 @@ export class Entity extends Node {
         do {
             ctx.font = fontSize + "px serif";
             fontSize-=3;
-        } while (ctx.measureText(this.label).width > (this.size - PADDING) * 2);
+        } while (ctx.measureText(this.label).width > (dimX - PADDING) * 2);
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(this.label, this.pos.x, this.pos.y);

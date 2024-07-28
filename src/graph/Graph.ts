@@ -4,6 +4,7 @@ import { Drawable } from "../utils/Drawable";
 import { Random } from "../utils/Utils";
 import { Vector2D } from "../utils/Vector2D";
 import { Entity } from "../erdiagram/Entity";
+import { BinaryRelationship } from "../erdiagram/BinaryRelationship";
 
 
 export class Graph implements Drawable {
@@ -24,7 +25,7 @@ export class Graph implements Drawable {
         this.nodes.set(node.label, node);
     }
 
-    addEdge(label1: string, label2: string, count : number = 1): void {
+    addEdge(label1: string, label2: string, count: number = 1, labels: string[] = []): void {
 
         const n1 = this.nodes.get(label1);
         const n2 = this.nodes.get(label2);
@@ -36,9 +37,9 @@ export class Graph implements Drawable {
 
         const existingEdge = this.edges.find((e) => e.node1.label == label1 && e.node2.label == label2);
         if (existingEdge) {
-            existingEdge.count+=count;
+            existingEdge.count += count;
         } else {
-            this.edges.push(new Edge(n1, n2, count));
+            this.edges.push(new BinaryRelationship(n1, n2, count, labels)); //Needs a FIX
         }
 
     }
@@ -112,7 +113,15 @@ export class Graph implements Drawable {
 
         const newGraph = new Graph(newNodes);
         this.edges.forEach(edge => {
-            newGraph.addEdge(edge.node1.label, edge.node2.label, edge.count);
+            switch (true) {
+                case edge instanceof BinaryRelationship:
+                    const edgeAsBR = edge as BinaryRelationship;
+                    newGraph.addEdge(edge.node1.label, edge.node2.label, edge.count, edgeAsBR.labels);
+                    break;
+                default:
+                    newGraph.addEdge(edge.node1.label, edge.node2.label, edge.count);
+                    break;
+            }
         });
 
         return newGraph;

@@ -23,10 +23,10 @@ export class ERDiagramSerializer {
     //     return JSON.stringify(serializedGraph, null, 2);
     // }
 
-    static importDiagram(json : string) : Graph {
+    static importDiagram(json: string): Graph {
         const parsedData = JSON.parse(json);
 
-        const nodes : Node[] = [];
+        const nodes: Node[] = [];
         parsedData.nodes.forEach((nodeData: any) => {
             const node = new Entity(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
             node.disp = new Vector2D(nodeData.disp.x, nodeData.disp.y);
@@ -37,10 +37,9 @@ export class ERDiagramSerializer {
 
         parsedData.edges.forEach((edgeData: any) => {
             const node1 = graph.nodes.get(edgeData.node1);
-            const node2 =  graph.nodes.get(edgeData.node2);
+            const node2 = graph.nodes.get(edgeData.node2);
             if (node1 && node2) {
-                for (let i = 0; i < edgeData.count; i++) 
-                    graph.addEdge(node1.label, node2.label);
+                graph.addEdge(node1.label, node2.label, edgeData.count, edgeData.labels);
             }
         });
 
@@ -48,16 +47,16 @@ export class ERDiagramSerializer {
     }
 
     // Just for developement 
-    static async importGraphFromFile(fileName : string) : Promise<Graph> {
-        let graph : Graph = new Graph();
+    static async importGraphFromFile(fileName: string): Promise<Graph> {
+        let graph: Graph = new Graph();
         await fetch(fileName)
-        .then(response => response.text())
-        .then(data => {
-            graph = ERDiagramSerializer.importDiagram(data);
-            console.log('Loaded Graph from ' + fileName + ': ', graph);
-            // You can now use the loaded graph in your application
-        })
-        .catch(error => console.error('Error loading graph:', error));
+            .then(response => response.text())
+            .then(data => {
+                graph = ERDiagramSerializer.importDiagram(data);
+                console.log('Loaded Graph from ' + fileName + ': ', graph);
+                // You can now use the loaded graph in your application
+            })
+            .catch(error => console.error('Error loading graph:', error));
         return graph;
     }
 

@@ -65,27 +65,32 @@
       {
         "node1": "Persona",
         "node2": "Lezione",
-        "count": 2
+        "count": 2,
+        "labels": ["Tiene", "Segue"]
       },
       {
         "node1": "Persona",
         "node2": "Gruppo",
-        "count": 1
+        "count": 1,
+        "labels": ["Appartiene"]
       },
       {
         "node1": "Gruppo",
         "node2": "Tesina",
-        "count": 1
+        "count": 1,
+        "labels": ["Svolge"]
       },
       {
         "node1": "Tesina",
         "node2": "Argomento",
-        "count": 1
+        "count": 1,
+        "labels": ["Riguarda"]
       },
       {
         "node1": "Lezione",
         "node2": "Argomento",
-        "count": 1
+        "count": 1,
+        "labels": ["Riguarda"]
       }
     ]
   }
