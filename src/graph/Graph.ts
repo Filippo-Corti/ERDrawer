@@ -24,7 +24,7 @@ export class Graph implements Drawable {
         this.nodes.set(node.label, node);
     }
 
-    addEdge(label1: string, label2: string): void {
+    addEdge(label1: string, label2: string, count : number = 1): void {
 
         const n1 = this.nodes.get(label1);
         const n2 = this.nodes.get(label2);
@@ -36,9 +36,9 @@ export class Graph implements Drawable {
 
         const existingEdge = this.edges.find((e) => e.node1.label == label1 && e.node2.label == label2);
         if (existingEdge) {
-            existingEdge.count++;
+            existingEdge.count+=count;
         } else {
-            this.edges.push(new Edge(n1, n2));
+            this.edges.push(new Edge(n1, n2, count));
         }
 
     }
@@ -112,7 +112,7 @@ export class Graph implements Drawable {
 
         const newGraph = new Graph(newNodes);
         this.edges.forEach(edge => {
-            newGraph.addEdge(edge.node1.label, edge.node2.label);
+            newGraph.addEdge(edge.node1.label, edge.node2.label, edge.count);
         });
 
         return newGraph;

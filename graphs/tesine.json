@@ -1,0 +1,91 @@
+{
+    "nodes": [
+      {
+        "label": "Persona",
+        "pos": {
+          "x": 318,
+          "y": 439
+        },
+        "disp": {
+          "x": 0,
+          "y": 0
+        },
+        "size": 42.857142857142854
+      },
+      {
+        "label": "Lezione",
+        "pos": {
+          "x": 644,
+          "y": 524
+        },
+        "disp": {
+          "x": 0,
+          "y": 0
+        },
+        "size": 42.857142857142854
+      },
+      {
+        "label": "Argomento",
+        "pos": {
+          "x": 944,
+          "y": 402
+        },
+        "disp": {
+          "x": 0,
+          "y": 0
+        },
+        "size": 42.857142857142854
+      },
+      {
+        "label": "Gruppo",
+        "pos": {
+          "x": 387,
+          "y": 473
+        },
+        "disp": {
+          "x": 0,
+          "y": 0
+        },
+        "size": 42.857142857142854
+      },
+      {
+        "label": "Tesina",
+        "pos": {
+          "x": 390,
+          "y": 277
+        },
+        "disp": {
+          "x": 0,
+          "y": 0
+        },
+        "size": 42.857142857142854
+      }
+    ],
+    "edges": [
+      {
+        "node1": "Persona",
+        "node2": "Lezione",
+        "count": 2
+      },
+      {
+        "node1": "Persona",
+        "node2": "Gruppo",
+        "count": 1
+      },
+      {
+        "node1": "Gruppo",
+        "node2": "Tesina",
+        "count": 1
+      },
+      {
+        "node1": "Tesina",
+        "node2": "Argomento",
+        "count": 1
+      },
+      {
+        "node1": "Lezione",
+        "node2": "Argomento",
+        "count": 1
+      }
+    ]
+  }

@@ -7,7 +7,7 @@ import { Random } from './utils/Utils.ts';
 import { ERDiagramSerializer } from './erdiagram/ERDiagramSerializer.ts';
 
 
-const GRAPH_FILENAME = 'ecommerce.json';
+const GRAPH_FILENAME = 'tesine.json';
 
 const drawer = new Drawer("drawing-board");
 //const graph = await GraphSerializer.importGraphFromFile('./graphs/' + GRAPH_FILENAME);
@@ -28,6 +28,7 @@ document.getElementById("layout-btn")!.addEventListener("click", () => {
 document.getElementById("discretize-btn")!.addEventListener("click", () => {
     graphDrawer.positionElegantly(5000, 200);
     graphDrawer.drawGraph();
+    console.log(graphDrawer.graph);
 });
 
 // Export Button
