@@ -42,4 +42,11 @@ export class Drawer {
         this.ctx.strokeStyle = "black";
     }
 
+    drawPoint(x: number, y: number, size: number = 5, color: string = 'red'): void {
+        this.ctx.fillStyle = color;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, size, 0, 2 * Math.PI, true);
+        this.ctx.fill();
+    }
+
 }

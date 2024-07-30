@@ -1,4 +1,5 @@
 import { Drawable } from "../utils/Drawable";
+import { Segment } from "../utils/Segment";
 import { Vector2D } from "../utils/Vector2D";
 
 export class Node implements Drawable {
@@ -35,6 +36,16 @@ export class Node implements Drawable {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(this.label, this.pos.x, this.pos.y);
+    }
+
+    // For normal Nodes, the connection point is only the central one 
+    occupyClosestConnectionPoint(point : Vector2D) : Vector2D {
+        return this.pos;
+    }
+
+    // For normal Nodes, the connection point is only the central one 
+    occupyConnectionPointBySegment(segment : Segment) : Vector2D | null {
+        return this.pos;
     }
 
     clone() : Node {

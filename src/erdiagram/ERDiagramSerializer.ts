@@ -1,4 +1,3 @@
-import { Graph } from "../graph/Graph";
 import { Node } from "../graph/Node";
 import { Vector2D } from "../utils/Vector2D";
 import { Entity } from "./Entity";

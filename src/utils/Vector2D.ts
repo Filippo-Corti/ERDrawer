@@ -25,4 +25,8 @@ export class Vector2D {
         return new Vector2D(-this.x, -this.y);
     }
 
+    distanceTo(v : Vector2D) : number {
+        return Math.hypot(v.x - this.x, v.y - this.y);
+    }
+
 };

@@ -19,20 +19,23 @@ export class Edge implements Drawable {
 
     draw(ctx: CanvasRenderingContext2D): void {
         const OFFSET_BETWEEN_MULTIEDGES = 100; //In the center
-        const mx = (this.node2.pos.x + this.node1.pos.x) / 2;
-        const my = (this.node2.pos.y + this.node1.pos.y) / 2;
+        const pos1 = this.node1.occupyClosestConnectionPoint(this.node1.pos);
+        const pos2 = this.node2.occupyClosestConnectionPoint(this.node2.pos);
+
+        const mx = (pos2.x + pos1.x) / 2;
+        const my = (pos2.y + pos1.y) / 2;
         for (let i = 0; i < this.count; i++) {
             // Calculate offset
-            const theta = Math.atan2(this.node2.pos.y - this.node1.pos.y, this.node2.pos.x - this.node1.pos.x);
+            const theta = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x);
             const offsetFactor = (i - (this.count - 1) / 2);
             const dx = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
             const dy = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
 
             // Draw Edge
             ctx.beginPath();
-            ctx.moveTo(this.node1.pos.x, this.node1.pos.y);
+            ctx.moveTo(pos1.x, pos1.y);
             ctx.lineTo(mx + dx, my + dy);
-            ctx.lineTo(this.node2.pos.x, this.node2.pos.y);
+            ctx.lineTo(pos2.x, pos2.y);
             ctx.stroke();
 
         }

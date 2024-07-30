@@ -21,20 +21,37 @@ export class BinaryRelationship extends Edge {
     draw(ctx: CanvasRenderingContext2D): void {
         const OFFSET_BETWEEN_MULTIEDGES = 150; //In the center
         const PADDING = 15;
-        const mx = (this.node2.pos.x + this.node1.pos.x) / 2;
-        const my = (this.node2.pos.y + this.node1.pos.y) / 2;
+        const pos1 = this.node1.occupyConnectionPointBySegment(this.getDrawingSegment());
+        const pos2 = this.node2.occupyConnectionPointBySegment(this.getDrawingSegment());
+
+        if (!pos1 || !pos2) {
+            console.log(pos1, pos2);
+            throw new Error("Couldn't find a Connection Point!");
+        }
+
+        //Drawing points for debug
+        ctx.fillStyle = 'red';
+        ctx.beginPath();
+        ctx.arc(pos1.x, pos1.y, 5, 0, 2 * Math.PI, true);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(pos2.x, pos2.y, 5, 0, 2 * Math.PI, true);
+        ctx.fill();
+
+        const mx = (pos2.x + pos1.x) / 2;
+        const my = (pos2.y + pos1.y) / 2;
         for (let i = 0; i < this.count; i++) {
             // Calculate offset
-            const theta = Math.atan2(this.node2.pos.y - this.node1.pos.y, this.node2.pos.x - this.node1.pos.x);
+            const theta = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x);
             const offsetFactor = (i - (this.count - 1) / 2);
             const dx = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
             const dy = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
 
             // Draw Edge
             ctx.beginPath();
-            ctx.moveTo(this.node1.pos.x, this.node1.pos.y);
+            ctx.moveTo(pos1.x, pos1.y);
             ctx.lineTo(mx + dx, my + dy);
-            ctx.lineTo(this.node2.pos.x, this.node2.pos.y);
+            ctx.lineTo(pos2.x, pos2.y);
             ctx.stroke();
 
             // Draw Rhombus half way

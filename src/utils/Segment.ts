@@ -10,6 +10,10 @@ export class Segment {
         this.b = new Vector2D(x2, y2);
     }
 
+    static fromVectors(a : Vector2D, b : Vector2D) : Segment {
+        return new Segment(a.x, a.y, b.x, b.y);
+    }
+
     // Returns whether this and s intersect.
     // From https://www.geeksforgeeks.org/check-if-two-given-line-segments-intersect/
     intersects(s: Segment): boolean {
@@ -40,6 +44,31 @@ export class Segment {
 
         return false; // Doesn't fall in any of the above cases 
     }
+
+    // Returns the intersection point between the segments this and s.
+    getIntersection(s: Segment): Vector2D | null {
+        if (!this.intersects(s)) return null;
+
+        // Segment this represented as a1x + b1y = c1
+        let a1 = this.b.y - this.a.y;
+        let b1 = this.a.x - this.b.x;
+        let c1 = a1 * this.a.x + b1 * this.a.y;
+
+        // Segment s represented as a2x + b2y = c2
+        let a2 = s.b.y - s.a.y;
+        let b2 = s.a.x - s.b.x;
+        let c2 = a2 * s.a.x + b2 * s.a.y;
+
+        // Solve as Matrix using Cramer's Rule
+        let determinant = a1 * b2 - a2 * b1;
+        if (determinant == 0) return null;
+        let x = (b2 * c1 - b1 * c2) / determinant;
+        let y = (a1 * c2 - a2 * c1) / determinant;
+
+        return new Vector2D(x, y);
+    }
+
+
 
     // To find orientation of ordered triplet (p, q, r). 
     // The function returns following values 
