@@ -11,5 +11,11 @@ B. DRAW THE ER DIAGRAM
 ☐ Figure out what's a node and what's an edge
 ☐ Create an ER Diagram with only basic Entities and Relationships
 
+C. IMPROVE LAYOUT CHOICE:
+
+☐ Avoid relationship rhombuses to overlap
+☐ Favor straight lines
+☐ Favor symmetries
+
 ...
 

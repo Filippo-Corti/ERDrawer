@@ -39,7 +39,8 @@ export class ERDiagramSerializer {
             const node1 = graph.nodes.get(edgeData.node1);
             const node2 = graph.nodes.get(edgeData.node2);
             if (node1 && node2) {
-                graph.addEdge(node1.label, node2.label, edgeData.count, edgeData.labels);
+                for (let i = 0; i < edgeData.count; i++)
+                    graph.addEdge(node1.label, node2.label, edgeData.labels[i]);
             }
         });
 
@@ -54,7 +55,6 @@ export class ERDiagramSerializer {
             .then(data => {
                 graph = ERDiagramSerializer.importDiagram(data);
                 console.log('Loaded Graph from ' + fileName + ': ', graph);
-                // You can now use the loaded graph in your application
             })
             .catch(error => console.error('Error loading graph:', error));
         return graph;

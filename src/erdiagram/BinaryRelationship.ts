@@ -20,6 +20,7 @@ export class BinaryRelationship extends Edge {
 
     draw(ctx: CanvasRenderingContext2D): void {
         const OFFSET_BETWEEN_MULTIEDGES = 150; //In the center
+        const PADDING = 15;
         const mx = (this.node2.pos.x + this.node1.pos.x) / 2;
         const my = (this.node2.pos.y + this.node1.pos.y) / 2;
         for (let i = 0; i < this.count; i++) {
@@ -28,7 +29,6 @@ export class BinaryRelationship extends Edge {
             const offsetFactor = (i - (this.count - 1) / 2);
             const dx = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
             const dy = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
-            const PADDING = (this.labels[i].length < 5) ? 15 : 4;
 
             // Draw Edge
             ctx.beginPath();

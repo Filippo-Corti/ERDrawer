@@ -3,8 +3,9 @@ import { Node } from "../graph/Node";
 export class Entity extends Node {
 
     draw(ctx: CanvasRenderingContext2D): void {
-        const PADDING = 25;
+        const PADDING = 15;
         const dimX = this.size, dimY = this.size * 3/5;
+        
         //Draw Rectangle
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
@@ -16,6 +17,7 @@ export class Entity extends Node {
         ctx.lineTo(this.pos.x - dimX, this.pos.y - dimY);
         ctx.fill();
         ctx.stroke();
+
         //Draw Label
         ctx.fillStyle = "black";
         let fontSize = this.size;

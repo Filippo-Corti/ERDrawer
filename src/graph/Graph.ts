@@ -25,7 +25,7 @@ export class Graph implements Drawable {
         this.nodes.set(node.label, node);
     }
 
-    addEdge(label1: string, label2: string, count: number = 1, labels: string[] = []): void {
+    addEdge(label1: string, label2: string, label? : string): void {
 
         const n1 = this.nodes.get(label1);
         const n2 = this.nodes.get(label2);
@@ -34,12 +34,16 @@ export class Graph implements Drawable {
             return;
         }
 
-
         const existingEdge = this.edges.find((e) => e.node1.label == label1 && e.node2.label == label2);
         if (existingEdge) {
-            existingEdge.count += count;
+            existingEdge.count++;
+            if (label) {
+                (existingEdge as BinaryRelationship).labels.push(label);
+            }
         } else {
-            this.edges.push(new BinaryRelationship(n1, n2, count, labels)); //Needs a FIX
+            if (label) {
+                this.edges.push(new BinaryRelationship(n1, n2, 1, [label]));
+            }
         }
 
     }
@@ -116,10 +120,12 @@ export class Graph implements Drawable {
             switch (true) {
                 case edge instanceof BinaryRelationship:
                     const edgeAsBR = edge as BinaryRelationship;
-                    newGraph.addEdge(edge.node1.label, edge.node2.label, edge.count, edgeAsBR.labels);
+                    for (let i = 0; i < edge.count; i++)
+                        newGraph.addEdge(edge.node1.label, edge.node2.label, edgeAsBR.labels[i]);
                     break;
                 default:
-                    newGraph.addEdge(edge.node1.label, edge.node2.label, edge.count);
+                    for (let i = 0; i < edge.count; i++)
+                        newGraph.addEdge(edge.node1.label, edge.node2.label);
                     break;
             }
         });
