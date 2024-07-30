@@ -2,6 +2,7 @@ import { Graph } from "../graph/Graph";
 import { Node } from "../graph/Node";
 import { Vector2D } from "../utils/Vector2D";
 import { Entity } from "./Entity";
+import { ERDiagram } from "./ERDiagram";
 
 export class ERDiagramSerializer {
 
@@ -23,40 +24,56 @@ export class ERDiagramSerializer {
     //     return JSON.stringify(serializedGraph, null, 2);
     // }
 
-    static importDiagram(json: string): Graph {
+    static importDiagram(json: string): ERDiagram {
         const parsedData = JSON.parse(json);
 
         const nodes: Node[] = [];
         parsedData.nodes.forEach((nodeData: any) => {
-            const node = new Entity(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
-            node.disp = new Vector2D(nodeData.disp.x, nodeData.disp.y);
-            nodes.push(node);
+            let node : Node;
+            switch (nodeData.type) {
+                case "Node":
+                    node = new Node(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
+                    break;
+                case "Entity":
+                    node = new Entity(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
+                    break;
+            }
+            node!.disp = new Vector2D(nodeData.disp.x, nodeData.disp.y);
+            nodes.push(node!);
         });
 
-        const graph = new Graph(nodes);
+        const erDiagram = new ERDiagram(nodes);
 
         parsedData.edges.forEach((edgeData: any) => {
-            const node1 = graph.nodes.get(edgeData.node1);
-            const node2 = graph.nodes.get(edgeData.node2);
+            const node1 = erDiagram.nodes.get(edgeData.node1);
+            const node2 = erDiagram.nodes.get(edgeData.node2);
             if (node1 && node2) {
-                for (let i = 0; i < edgeData.count; i++)
-                    graph.addEdge(node1.label, node2.label, edgeData.labels[i]);
+                for (let i = 0; i < edgeData.count; i++) {
+                    switch (edgeData.type) {
+                        case "BinaryRelationship":
+                            erDiagram.addBinaryRelationship(node1.label, node2.label, edgeData.labels[i]);
+                            break;
+                        case "Edge":
+                            erDiagram.addEdge(node1.label, node2.label);
+                            break;
+                    }
+                }
             }
         });
 
-        return graph;
+        return erDiagram;
     }
 
     // Just for developement 
-    static async importGraphFromFile(fileName: string): Promise<Graph> {
-        let graph: Graph = new Graph();
+    static async importGraphFromLocalFile(fileName: string): Promise<ERDiagram> {
+        let graph: ERDiagram = new ERDiagram();
         await fetch(fileName)
             .then(response => response.text())
             .then(data => {
                 graph = ERDiagramSerializer.importDiagram(data);
-                console.log('Loaded Graph from ' + fileName + ': ', graph);
+                console.log('Loaded ER Diagram from ' + fileName + ': ', graph);
             })
-            .catch(error => console.error('Error loading graph:', error));
+            .catch(error => console.error('Error loading ER Diagram:', error));
         return graph;
     }
 

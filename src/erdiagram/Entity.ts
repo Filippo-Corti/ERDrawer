@@ -1,11 +1,12 @@
 import { Node } from "../graph/Node";
+import { Vector2D } from "../utils/Vector2D";
 
 export class Entity extends Node {
 
     draw(ctx: CanvasRenderingContext2D): void {
         const PADDING = 15;
         const dimX = this.size, dimY = this.size * 3/5;
-        
+
         //Draw Rectangle
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
@@ -28,5 +29,11 @@ export class Entity extends Node {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(this.label, this.pos.x, this.pos.y);
+    }
+
+    clone() : Entity {
+        const newNode = new Entity(this.label, this.pos.x, this.pos.y, this.size);
+        newNode.disp = new Vector2D(this.disp.x, this.disp.y);
+        return newNode;
     }
 }

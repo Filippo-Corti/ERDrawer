@@ -31,12 +31,14 @@ export class GraphDrawer {
         - Avoids crossings (it finds the best disposition out of N tries) 
         - Avoids edges passing across nodes
     */
-    positionElegantly(numberOfGraphs : number, iterationsPerGraph : number): void {
+    layoutGraph(numberOfGraphs : number, iterationsPerGraph : number): void {
         const BORDER = 80;
 
         let minCrossings = 100;
         let minGraph = this.graph.clone();
 
+        console.log(this.graph.constructor.name);
+        console.log(minGraph.constructor.name);
         for (let i = 0; i < numberOfGraphs; i++) {
             // Generate New Random Graph 
             this.graph.randomizePositions(BORDER,  this.drawer.width - BORDER, BORDER, this.drawer.height - BORDER);

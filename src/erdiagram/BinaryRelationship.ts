@@ -62,4 +62,11 @@ export class BinaryRelationship extends Edge {
 
         }
     }
+ 
+
+    clone() : BinaryRelationship {
+        return new BinaryRelationship(this.node1, this.node2, this.count, this.labels);
+    }
+
+
 }

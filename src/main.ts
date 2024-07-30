@@ -11,7 +11,7 @@ const GRAPH_FILENAME = 'tesine.json';
 
 const drawer = new Drawer("drawing-board");
 //const graph = await GraphSerializer.importGraphFromFile('./graphs/' + GRAPH_FILENAME);
-const graph = await ERDiagramSerializer.importGraphFromFile('./graphs/' + GRAPH_FILENAME);
+const graph = await ERDiagramSerializer.importGraphFromLocalFile('./graphs/' + GRAPH_FILENAME);
 const graphDrawer = new GraphDrawer(drawer, graph);
 graphDrawer.drawGraph();
 
@@ -26,7 +26,7 @@ document.getElementById("layout-btn")!.addEventListener("click", () => {
 // Discretize Button
 
 document.getElementById("discretize-btn")!.addEventListener("click", () => {
-    graphDrawer.positionElegantly(5000, 200);
+    graphDrawer.layoutGraph(5000, 200);
     graphDrawer.drawGraph();
     console.log(graphDrawer.graph);
 });

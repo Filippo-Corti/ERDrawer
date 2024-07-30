@@ -37,5 +37,10 @@ export class Node implements Drawable {
         ctx.fillText(this.label, this.pos.x, this.pos.y);
     }
 
+    clone() : Node {
+        const newNode = new Node(this.label, this.pos.x, this.pos.y, this.size);
+        newNode.disp = new Vector2D(this.disp.x, this.disp.y);
+        return newNode;
+    }
 
 }

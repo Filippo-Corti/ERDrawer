@@ -51,5 +51,9 @@ export class Edge implements Drawable {
         return new Segment(this.node1.pos.x + OFFSET * Math.cos(thetaA), this.node1.pos.y + OFFSET * Math.sin(thetaA), this.node2.pos.x + OFFSET * Math.cos(thetaB), this.node2.pos.y + OFFSET * Math.sin(thetaB));
     }
 
+    clone() : Edge {
+        return new Edge(this.node1, this.node2, this.count);
+    }
+
 
 }
