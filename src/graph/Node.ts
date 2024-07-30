@@ -39,12 +39,12 @@ export class Node implements Drawable {
     }
 
     // For normal Nodes, the connection point is only the central one 
-    occupyClosestConnectionPoint(point : Vector2D) : Vector2D {
+    occupyClosestConnectionPoint(_point : Vector2D) : Vector2D {
         return this.pos;
     }
 
     // For normal Nodes, the connection point is only the central one 
-    occupyConnectionPointBySegment(segment : Segment) : Vector2D | null {
+    occupyConnectionPointBySegment(_segment : Segment) : Vector2D | null {
         return this.pos;
     }
 

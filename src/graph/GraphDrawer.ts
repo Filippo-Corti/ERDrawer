@@ -37,8 +37,6 @@ export class GraphDrawer {
         let minCrossings = 100;
         let minGraph = this.graph.clone();
 
-        console.log(this.graph.constructor.name);
-        console.log(minGraph.constructor.name);
         for (let i = 0; i < numberOfGraphs; i++) {
             // Generate New Random Graph 
             this.graph.randomizePositions(BORDER,  this.drawer.width - BORDER, BORDER, this.drawer.height - BORDER);
