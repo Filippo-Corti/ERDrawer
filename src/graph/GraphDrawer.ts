@@ -41,7 +41,6 @@ export class GraphDrawer {
             // Generate New Random Graph 
             this.graph.randomizePositions(BORDER,  this.drawer.width - BORDER, BORDER, this.drawer.height - BORDER);
 
-
             // Apply the Layout Algorithm
             this.executeFructhermanReingold(iterationsPerGraph, BORDER, true);
             this.discretizeNodesCoordinates(BORDER);
@@ -60,8 +59,7 @@ export class GraphDrawer {
         }
 
         this.graph = minGraph.clone();
-        console.log("Found best solution with crossings:", minCrossings);
-    }
+}
 
     //Base code comes from https://faculty.washington.edu/joelross/courses/archive/s13/cs261/lab/k/fruchterman91graph.pdf
     //Positions Nodes using the Fruchterman-Reingold Algorithm.
