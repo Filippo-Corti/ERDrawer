@@ -64,6 +64,19 @@
           "y": 0
         },
         "size": 42.857142857142854
+      },
+      {
+        "type": "Entity",
+        "label": "Test",
+        "pos": {
+          "x": 390,
+          "y": 277
+        },
+        "disp": {
+          "x": 0,
+          "y": 0
+        },
+        "size": 42.857142857142854
       }
     ],
     "edges": [
@@ -101,6 +114,24 @@
         "node2": "Argomento",
         "count": 1,
         "labels": ["Riguarda"]
+      },
+      {
+        "type": "Edge",
+        "node1": "Lezione",
+        "node2": "Tesina",
+        "count": 1
+      },
+      {
+        "type": "Edge",
+        "node1": "Lezione",
+        "node2": "Gruppo",
+        "count": 3
+      },
+      {
+        "type": "Edge",
+        "node1": "Lezione",
+        "node2": "Test",
+        "count": 1
       }
     ]
   }

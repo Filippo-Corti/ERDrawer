@@ -31,16 +31,16 @@ export class Segment {
         }
         // Special Cases 
         // this.a, this.b and s.a are collinear and s.a lies on segment this.a-this.b 
-        if (o1 == 0 && this.onSegment(this.a, s.a, this.b)) return true;
+        if (o1 == 0 && Segment.onSegment(this.a, s.a, this.b)) return true;
 
         // this.a, this.b and s.b are collinear and s.b lies on segment this.a-this.b 
-        if (o2 == 0 && this.onSegment(this.a, s.b, this.b)) return true;
+        if (o2 == 0 && Segment.onSegment(this.a, s.b, this.b)) return true;
 
         // s.a, s.b and this.a are collinear and this.a lies on segment s.a-s.b 
-        if (o3 == 0 && this.onSegment(s.a, this.a, s.b)) return true;
+        if (o3 == 0 && Segment.onSegment(s.a, this.a, s.b)) return true;
 
         // s.a, s.b and this.b are collinear and this.b lies on segment s.a-s.b 
-        if (o4 == 0 && this.onSegment(s.a, this.b, s.b)) return true;
+        if (o4 == 0 && Segment.onSegment(s.a, this.b, s.b)) return true;
 
         return false; // Doesn't fall in any of the above cases 
     }
@@ -87,12 +87,17 @@ export class Segment {
 
     // Given three collinear points p, q, r, the function checks if 
     // point q lies on line segment 'pr' 
-    onSegment(p: Vector2D, q: Vector2D, r: Vector2D) {
-        if (q.x <= Math.max(p.x, r.x) && q.x >= Math.min(p.x, r.x) &&
-            q.y <= Math.max(p.y, r.y) && q.y >= Math.min(p.y, r.y))
+    static onSegment(p: Vector2D, q: Vector2D, r: Vector2D, tolerance: number = 1e-5): boolean {
+        if (q.x <= Math.max(p.x, r.x) + tolerance && q.x >= Math.min(p.x, r.x) - tolerance &&
+            q.y <= Math.max(p.y, r.y) + tolerance && q.y >= Math.min(p.y, r.y) - tolerance) {
             return true;
-
+        }
         return false;
+    }
+
+    // Returns whether p is on this
+    contains(p : Vector2D) {
+        return Segment.onSegment(this.a, p, this.b);
     }
 
     // Returns whether this and s are parallel or not

@@ -4,13 +4,13 @@ import { Vector2D } from "../utils/Vector2D";
 
 export class Entity extends Node {
 
-    halfSizeX : number = 50;
-    halfSizeY : number = 30;
-    connectionPoints : Map<string, boolean>; // Vector2D Hashcode to boolean
-    deltaConnectionPointsX : number = this.halfSizeX;
-    deltaConnectionPointsY : number = this.halfSizeY;
+    halfSizeX: number = 50;
+    halfSizeY: number = 30;
+    connectionPoints: Map<string, boolean>; // Vector2D Hashcode to boolean
+    deltaConnectionPointsX: number = this.halfSizeX;
+    deltaConnectionPointsY: number = this.halfSizeY;
 
-    constructor(label: string, x: number, y: number, size : number = 30) {
+    constructor(label: string, x: number, y: number, size: number = 30) {
         super(label, x, y, size);
         this.connectionPoints = new Map<string, boolean>;
     }
@@ -35,17 +35,17 @@ export class Entity extends Node {
         let fontSize = this.size;
         do {
             ctx.font = fontSize + "px serif";
-            fontSize-=3;
+            fontSize -= 3;
         } while (ctx.measureText(this.label).width > (this.halfSizeX - PADDING) * 2);
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(this.label, this.pos.x, this.pos.y);
 
-       // console.log(this.label, this.connectionPoints);
+        // console.log(this.label, this.connectionPoints);
     }
 
     // Returns 4 corners of the rectangle. Order is TR, TL, BR, BL.
-    getRectangleBoundaries() : Vector2D[] {
+    getRectangleBoundaries(): Vector2D[] {
         return [
             new Vector2D(this.pos.x - this.halfSizeX, this.pos.y - this.halfSizeY), //Top Right
             new Vector2D(this.pos.x + this.halfSizeX, this.pos.y - this.halfSizeY), //Top Left
@@ -55,7 +55,7 @@ export class Entity extends Node {
     }
 
     // Returns 4 segments of the rectangle. Order is TOP - RIGHT - BOTTOM - LEFT.
-    getRectangleSegments() : Segment[] {
+    getRectangleSegments(): Segment[] {
         const corners = this.getRectangleBoundaries();
         return [
             Segment.fromVectors(corners[0], corners[1]),
@@ -64,9 +64,22 @@ export class Entity extends Node {
             Segment.fromVectors(corners[3], corners[0]),
         ];
     }
- 
+
+    // Returns the segment of the rectangle on which p stands on
+    getRectangleSegmentByPoint(point : Vector2D) : Segment | null {
+        const segments = this.getRectangleSegments();
+
+        for(const s of segments) {
+            if (s.contains(point)) {
+                return s;
+            }
+        }
+
+        return null;
+    } 
+
     // Corners are not included. Not in order
-    getAllConnectionPoints() : Vector2D[] {
+    getAllConnectionPoints(): Vector2D[] {
         const corners = this.getRectangleBoundaries();
         const connPoints = [];
 
@@ -84,29 +97,39 @@ export class Entity extends Node {
     }
 
     // Occupies closest connection point to point, that is not already occupied.
-    // It then returns the occupied connection point
-    occupyClosestConnectionPoint(point : Vector2D) : Vector2D {
+    // Point needs to be sitting on one of the segments of the Entity.
+    // Only Connection Points standing on that segment are considered
+    // It then returns the occupied connection point.
+    occupyClosestConnectionPoint(point: Vector2D): Vector2D {
         const connPoints = this.getAllConnectionPoints();
-        let minPoint = connPoints[0];
-        let minDist = connPoints[0].distanceTo(point);
+        const sittingOnSegment = this.getRectangleSegmentByPoint(point);
+        if (!sittingOnSegment) {
+            console.log(this, point);
+            throw new Error("The point is not on any segment of the entity");
+        }
+        let minPoint = null;
+        let minDist = Number.MAX_VALUE;
 
-        //console.log(this.label, point);
-
-        for (let i = 1; i < connPoints.length; i++) {
+        for (let i = 0; i < connPoints.length; i++) {
             let dist = connPoints[i].distanceTo(point);
-            if (dist < minDist && !this.connectionPoints.has(connPoints[i].toString())) {
+            if (dist < minDist && sittingOnSegment.contains(connPoints[i]) && !this.connectionPoints.has(connPoints[i].toString())) {
                 minDist = dist;
                 minPoint = connPoints[i];
             }
         }
 
+        // If no point is found, reduce deltas and try again
+        if (!minPoint) {
+            this.reduceDeltas();
+            return this.occupyClosestConnectionPoint(point);
+        }
 
         this.connectionPoints.set(minPoint.toString(), true);
         return minPoint;
     }
 
-    // Returns the point where the edge and the rectangle constituting the entity intersect
-    getEdgeIntersectingPoint(edgeSegment : Segment) : Vector2D | null {
+    // Returns the point where the edge and the rectangle of the entity intersect
+    getEdgeIntersectingPoint(edgeSegment: Segment): Vector2D | null {
         const segments = this.getRectangleSegments();
 
         for (let s of segments) {
@@ -119,7 +142,7 @@ export class Entity extends Node {
 
     // Occupies closest connection point to the Segment segment.
     // It then returns the occupied connection point
-    occupyConnectionPointBySegment(segment : Segment) : Vector2D | null {
+    occupyConnectionPointBySegment(segment: Segment): Vector2D | null {
         const p = this.getEdgeIntersectingPoint(segment);
         if (!p) {
             return null;
@@ -127,19 +150,27 @@ export class Entity extends Node {
         return this.occupyClosestConnectionPoint(p);
     }
 
-    // For normal Nodes, nothing happens
-    resetConnectionPoints() : void {
+    // Empty Connection Points map and reset deltas
+    resetConnectionPoints(): void {
         this.connectionPoints = new Map<string, boolean>;
+        this.deltaConnectionPointsX = this.halfSizeX;
+        this.deltaConnectionPointsY = this.halfSizeY;
+    }
+
+    // Sets the length between two connection points to half the previous value
+    reduceDeltas(): void {
+        this.deltaConnectionPointsX /= 2;
+        this.deltaConnectionPointsY /= 2;
     }
 
 
-    clone() : Entity {
+    clone(): Entity {
         const newNode = new Entity(this.label, this.pos.x, this.pos.y, this.size);
         newNode.disp = new Vector2D(this.disp.x, this.disp.y);
         newNode.deltaConnectionPointsX = this.deltaConnectionPointsX;
         newNode.deltaConnectionPointsY = this.deltaConnectionPointsY;
         const newConnPoints = new Map<string, boolean>;
-        this.connectionPoints.forEach((v, k) => newConnPoints.set(k , v));
+        this.connectionPoints.forEach((v, k) => newConnPoints.set(k, v));
         newNode.connectionPoints = newConnPoints;
         return newNode;
     }
