@@ -38,19 +38,20 @@ export class GraphDrawer {
         let minGraph = this.graph.clone();
 
         for (let i = 0; i < numberOfGraphs; i++) {
-
-            // Reset Nodes and Edges
-            this.graph.nodes.forEach((n) => n.resetConnectionPoints());
-            this.graph.edges.forEach((e) => e.calculateNewVertices());
-
             // Generate New Random Graph 
             this.graph.randomizePositions(BORDER,  this.drawer.width - BORDER, BORDER, this.drawer.height - BORDER);
+
 
             // Apply the Layout Algorithm
             this.executeFructhermanReingold(iterationsPerGraph, BORDER, true);
             this.discretizeNodesCoordinates(BORDER);
 
-            // Check if current layout is better than the best one so far
+            // Reset Nodes connection points
+            this.graph.nodes.forEach((n) => n.resetConnectionPoints());
+            // Calculate Edges positions (based on new nodes positions!)
+            this.graph.edges.forEach((e) => e.calculateNewVertices());
+
+            // Check if current layout is better than the best one so far (the new edge positions are used!)
             let crossings = this.countCrossings();
             if (crossings < minCrossings && !this.doesAnyEdgeCrossANode()) {
                 minCrossings = crossings;

@@ -30,7 +30,6 @@ export class ERDiagram extends Graph {
         const newNodes: Map<string, Node> = new Map<string, Node>;
         const newEdges: Edge[] = [];
 
-
         this.nodes.forEach((node, _) => {
             newNodes.set(node.label, node.clone());
         });

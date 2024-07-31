@@ -9,17 +9,35 @@ export class Edge implements Drawable {
     node2: Node;
     count: number;
     //Vertex 1 and 2 are the extreme points of the edge
-    vertex1 : Vector2D; 
-    vertex2 : Vector2D;
+    vertex1: Vector2D;
+    vertex2: Vector2D;
 
     static DRAWING_RADIUS: number = 50;
 
-    constructor(node1: Node, node2: Node, count: number = 1) {
+    constructor(node1: Node, node2: Node, count: number = 1, vertex1?: Vector2D, vertex2?: Vector2D) {
         this.node1 = node1;
         this.node2 = node2;
         this.count = count;
-        this.vertex1 = this.node1.occupyClosestConnectionPoint(this.node1.pos);
-        this.vertex2 = this.node2.occupyClosestConnectionPoint(this.node2.pos);
+
+        //Vertex are initialized based on the segment that connects central positions of node1 and node2
+
+        let v1: Vector2D | null = null, v2: Vector2D | null = null;
+        if (!vertex1) {
+            v1 = this.node1.occupyConnectionPointBySegment(Segment.fromVectors(node1.pos, node2.pos));
+            if (!v1) {
+                throw new Error("Error finding a connection point for the edge");
+            }
+        }
+
+        if (!vertex2) {
+            v2 = this.node2.occupyConnectionPointBySegment(Segment.fromVectors(node1.pos, node2.pos));
+            if (!v2) {
+                throw new Error("Error finding a connection point for the edge");
+            }
+        }
+
+        this.vertex1 = vertex1 ? vertex1 : v1!;
+        this.vertex2 = vertex2 ? vertex2 : v2!;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -43,9 +61,17 @@ export class Edge implements Drawable {
         }
     }
 
-    calculateNewVertices() : void {
-        this.vertex1 = this.node1.occupyClosestConnectionPoint(this.node1.pos);
-        this.vertex2 = this.node2.occupyClosestConnectionPoint(this.node2.pos);
+    //Vertex are calculated based on the segment that connects central positions of node1 and node2
+    calculateNewVertices(): void {
+        const v1 = this.node1.occupyConnectionPointBySegment(Segment.fromVectors(this.node1.pos, this.node2.pos));
+        const v2 = this.node2.occupyConnectionPointBySegment(Segment.fromVectors(this.node1.pos, this.node2.pos));
+
+        if (!v1 || !v2) {
+            throw new Error("Error finding a connection point for the edge");
+        }
+
+        this.vertex1 = v1;
+        this.vertex2 = v2;
     }
 
     //Returns the Segment corresponding to this Edge. It doesn't take the exact center of the node,
@@ -57,14 +83,16 @@ export class Edge implements Drawable {
 
         const OFFSET = 1;
 
+        if (!this.vertex1 || !this.vertex2) {
+            this.calculateNewVertices();
+        }
+
         return Segment.fromVectors(this.vertex1, this.vertex2);
         return new Segment(this.vertex1.x + OFFSET * Math.cos(thetaA), this.vertex1.y + OFFSET * Math.sin(thetaA), this.vertex2.x + OFFSET * Math.cos(thetaB), this.vertex2.y + OFFSET * Math.sin(thetaB));
     }
 
-    clone() : Edge {
-        const newEdge = new Edge(this.node1, this.node2, this.count);
-        newEdge.vertex1 = this.vertex1;
-        newEdge.vertex2 = this.vertex2;
+    clone(): Edge {
+        const newEdge = new Edge(this.node1, this.node2, this.count, this.vertex1, this.vertex2);
         return newEdge;
     }
 

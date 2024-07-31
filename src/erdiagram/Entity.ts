@@ -41,7 +41,7 @@ export class Entity extends Node {
         ctx.textBaseline = "middle";
         ctx.fillText(this.label, this.pos.x, this.pos.y);
 
-        //console.log(this.label, this.connectionPoints);
+       // console.log(this.label, this.connectionPoints);
     }
 
     // Returns 4 corners of the rectangle. Order is TR, TL, BR, BL.
@@ -90,6 +90,8 @@ export class Entity extends Node {
         let minPoint = connPoints[0];
         let minDist = connPoints[0].distanceTo(point);
 
+        //console.log(this.label, point);
+
         for (let i = 1; i < connPoints.length; i++) {
             let dist = connPoints[i].distanceTo(point);
             if (dist < minDist && !this.connectionPoints.has(connPoints[i].toString())) {
@@ -97,6 +99,7 @@ export class Entity extends Node {
                 minPoint = connPoints[i];
             }
         }
+
 
         this.connectionPoints.set(minPoint.toString(), true);
         return minPoint;
@@ -133,6 +136,11 @@ export class Entity extends Node {
     clone() : Entity {
         const newNode = new Entity(this.label, this.pos.x, this.pos.y, this.size);
         newNode.disp = new Vector2D(this.disp.x, this.disp.y);
+        newNode.deltaConnectionPointsX = this.deltaConnectionPointsX;
+        newNode.deltaConnectionPointsY = this.deltaConnectionPointsY;
+        const newConnPoints = new Map<string, boolean>;
+        this.connectionPoints.forEach((v, k) => newConnPoints.set(k , v));
+        newNode.connectionPoints = newConnPoints;
         return newNode;
     }
 }

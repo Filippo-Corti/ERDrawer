@@ -83,6 +83,23 @@ function downloadFile(content: string, fileName: string) {
 
 
 //For debug
+
+document.getElementById("addpoint-form")!.addEventListener("submit", (event) => addPoint(event));
+
+function addPoint(event : Event) : boolean {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const x = parseInt(formData.get("x") as string);
+    const y = parseInt(formData.get("y") as string);
+
+    console.log(x, y);
+
+    graphDrawer.drawer.drawPoint(x, y, undefined, "green");
+    return false;
+}
+
 function waitingKeypress() {
     return new Promise<void>((resolve) => {
         document.addEventListener('keydown', onKeyHandler);

@@ -22,21 +22,29 @@
 
     </div>
     <div class="flex gap-2 mt-4">
-      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button"
-        id="export-btn">Export Graph</button>
+      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button" id="export-btn">Export
+        Graph</button>
     </div>
     <div class="flex gap-2 mt-4 items-center">
       <input type="file" id="fileInput" accept=".json" />
-      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button"
-        id="import-btn">Import Graph</button>
+      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button" id="import-btn">Import
+        Graph</button>
     </div>
     <div class="flex gap-2 mt-4">
-      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button"
-        id="canvas-btn">Update Canvas Size</button>
+      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button" id="canvas-btn">Update
+        Canvas Size</button>
     </div>
     <div class="flex gap-2 mt-4">
-      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button"
-        id="newnode-btn">Add Node</button>
+      <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="button" id="newnode-btn">Add
+        Node</button>
+    </div>
+    <div class="flex gap-2 mt-4">
+      <form id="addpoint-form">
+        <input class="border" type="number" name="x" id="x">
+        <input class="border" type="number" name="y" id="y">
+        <button class="px-3 py-2 border rounded-md hover:bg-black hover:text-white" type="submit" id="newnode-btn">Add
+          Point (For Debug)</button>
+      </form>
     </div>
   </div>
 

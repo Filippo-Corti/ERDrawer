@@ -1,12 +1,13 @@
 import { Edge } from "../graph/Edge";
 import { Node } from "../graph/Node";
+import { Vector2D } from "../utils/Vector2D";
 
 export class BinaryRelationship extends Edge {
 
     labels: string[];
 
-    constructor(node1: Node, node2: Node, count: number = 1, labels: string[]) {
-        super(node1, node2, count);
+    constructor(node1: Node, node2: Node, count: number = 1, labels: string[], vertex1? : Vector2D, vertex2? : Vector2D) {
+        super(node1, node2, count, vertex1, vertex2);
         this.labels = [];
         if (labels.length < count) {
             console.log(node1.label, node2.label, count, labels);
@@ -15,8 +16,6 @@ export class BinaryRelationship extends Edge {
         for (let i = 0; i < count; i++) {
             this.labels.push(labels[i]);
         }
-        this.vertex1 = this.node1.occupyClosestConnectionPoint(this.node1.pos);
-        this.vertex2 = this.node2.occupyClosestConnectionPoint(this.node2.pos);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -81,7 +80,7 @@ export class BinaryRelationship extends Edge {
  
 
     clone() : BinaryRelationship {
-        return new BinaryRelationship(this.node1, this.node2, this.count, this.labels);
+        return new BinaryRelationship(this.node1, this.node2, this.count, this.labels, this.vertex1, this.vertex2);
     }
 
 
