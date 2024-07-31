@@ -38,6 +38,11 @@ export class GraphDrawer {
         let minGraph = this.graph.clone();
 
         for (let i = 0; i < numberOfGraphs; i++) {
+
+            // Reset Nodes and Edges
+            this.graph.nodes.forEach((n) => n.resetConnectionPoints());
+            this.graph.edges.forEach((e) => e.calculateNewVertices());
+
             // Generate New Random Graph 
             this.graph.randomizePositions(BORDER,  this.drawer.width - BORDER, BORDER, this.drawer.height - BORDER);
 

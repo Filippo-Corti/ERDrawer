@@ -28,7 +28,6 @@ document.getElementById("layout-btn")!.addEventListener("click", () => {
 document.getElementById("discretize-btn")!.addEventListener("click", () => {
     graphDrawer.layoutGraph(5000, 200);
     graphDrawer.drawGraph();
-    console.log(graphDrawer.graph);
 });
 
 // Export Button

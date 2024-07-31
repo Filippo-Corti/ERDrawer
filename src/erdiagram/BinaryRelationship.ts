@@ -15,42 +15,42 @@ export class BinaryRelationship extends Edge {
         for (let i = 0; i < count; i++) {
             this.labels.push(labels[i]);
         }
+        this.vertex1 = this.node1.occupyClosestConnectionPoint(this.node1.pos);
+        this.vertex2 = this.node2.occupyClosestConnectionPoint(this.node2.pos);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
         const OFFSET_BETWEEN_MULTIEDGES = 150; //In the center
         const PADDING = 15;
-        const pos1 = this.node1.occupyConnectionPointBySegment(this.getDrawingSegment());
-        const pos2 = this.node2.occupyConnectionPointBySegment(this.getDrawingSegment());
 
-        if (!pos1 || !pos2) {
-            console.log(pos1, pos2);
+        if (!this.vertex1 || !this.vertex2) {
+            console.log(this.vertex1, this.vertex2);
             throw new Error("Couldn't find a Connection Point!");
         }
 
         //Drawing points for debug
         ctx.fillStyle = 'red';
         ctx.beginPath();
-        ctx.arc(pos1.x, pos1.y, 5, 0, 2 * Math.PI, true);
+        ctx.arc(this.vertex1.x, this.vertex1.y, 5, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.beginPath();
-        ctx.arc(pos2.x, pos2.y, 5, 0, 2 * Math.PI, true);
+        ctx.arc(this.vertex2.x, this.vertex2.y, 5, 0, 2 * Math.PI, true);
         ctx.fill();
 
-        const mx = (pos2.x + pos1.x) / 2;
-        const my = (pos2.y + pos1.y) / 2;
+        const mx = (this.vertex2.x + this.vertex1.x) / 2;
+        const my = (this.vertex2.y + this.vertex1.y) / 2;
         for (let i = 0; i < this.count; i++) {
             // Calculate offset
-            const theta = Math.atan2(pos2.y - pos1.y, pos2.x - pos1.x);
+            const theta = Math.atan2(this.vertex2.y - this.vertex1.y, this.vertex2.x - this.vertex1.x);
             const offsetFactor = (i - (this.count - 1) / 2);
             const dx = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
             const dy = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
 
             // Draw Edge
             ctx.beginPath();
-            ctx.moveTo(pos1.x, pos1.y);
+            ctx.moveTo(this.vertex1.x, this.vertex1.y);
             ctx.lineTo(mx + dx, my + dy);
-            ctx.lineTo(pos2.x, pos2.y);
+            ctx.lineTo(this.vertex2.x, this.vertex2.y);
             ctx.stroke();
 
             // Draw Rhombus half way

@@ -29,4 +29,8 @@ export class Vector2D {
         return Math.hypot(v.x - this.x, v.y - this.y);
     }
 
+    toString() : string {
+        return this.x + ";" + this.y;
+    }
+
 };

@@ -16,7 +16,6 @@ export class Node implements Drawable {
         this.size = size;
     }
 
-
     draw(ctx: CanvasRenderingContext2D): void {
         const PADDING = (this.label.length < 5) ? 15 : 4;
         //Draw Circle
@@ -46,6 +45,10 @@ export class Node implements Drawable {
     // For normal Nodes, the connection point is only the central one 
     occupyConnectionPointBySegment(_segment : Segment) : Vector2D | null {
         return this.pos;
+    }
+
+    // For normal Nodes, nothing happens
+    resetConnectionPoints() : void {
     }
 
     clone() : Node {

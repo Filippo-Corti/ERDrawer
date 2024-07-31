@@ -6,13 +6,13 @@ export class Entity extends Node {
 
     halfSizeX : number = 50;
     halfSizeY : number = 30;
-    connectionPoints : Map<Vector2D, boolean>;
+    connectionPoints : Map<string, boolean>; // Vector2D Hashcode to boolean
     deltaConnectionPointsX : number = this.halfSizeX;
     deltaConnectionPointsY : number = this.halfSizeY;
 
     constructor(label: string, x: number, y: number, size : number = 30) {
         super(label, x, y, size);
-        this.connectionPoints = new Map<Vector2D, boolean>;
+        this.connectionPoints = new Map<string, boolean>;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -40,6 +40,8 @@ export class Entity extends Node {
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(this.label, this.pos.x, this.pos.y);
+
+        //console.log(this.label, this.connectionPoints);
     }
 
     // Returns 4 corners of the rectangle. Order is TR, TL, BR, BL.
@@ -63,17 +65,17 @@ export class Entity extends Node {
         ];
     }
  
-    // Corners are included. Not in order
+    // Corners are not included. Not in order
     getAllConnectionPoints() : Vector2D[] {
         const corners = this.getRectangleBoundaries();
         const connPoints = [];
 
-        for (let x = corners[0].x; x <= corners[1].x; x += this.deltaConnectionPointsX) {
+        for (let x = corners[0].x + this.deltaConnectionPointsX; x < corners[1].x; x += this.deltaConnectionPointsX) {
             connPoints.push(new Vector2D(x, corners[0].y));
             connPoints.push(new Vector2D(x, corners[2].y));
         }
 
-        for (let y = corners[0].y; y <= corners[2].y; y += this.deltaConnectionPointsY) {
+        for (let y = corners[0].y + this.deltaConnectionPointsY; y < corners[2].y; y += this.deltaConnectionPointsY) {
             connPoints.push(new Vector2D(corners[0].x, y));
             connPoints.push(new Vector2D(corners[1].x, y));
         }
@@ -90,13 +92,13 @@ export class Entity extends Node {
 
         for (let i = 1; i < connPoints.length; i++) {
             let dist = connPoints[i].distanceTo(point);
-            if (dist < minDist && !this.connectionPoints.has(connPoints[i])) {
+            if (dist < minDist && !this.connectionPoints.has(connPoints[i].toString())) {
                 minDist = dist;
                 minPoint = connPoints[i];
             }
         }
 
-        this.connectionPoints.set(minPoint, true);
+        this.connectionPoints.set(minPoint.toString(), true);
         return minPoint;
     }
 
@@ -120,6 +122,11 @@ export class Entity extends Node {
             return null;
         }
         return this.occupyClosestConnectionPoint(p);
+    }
+
+    // For normal Nodes, nothing happens
+    resetConnectionPoints() : void {
+        this.connectionPoints = new Map<string, boolean>;
     }
 
 
