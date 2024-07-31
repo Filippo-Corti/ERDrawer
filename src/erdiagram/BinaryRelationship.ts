@@ -1,7 +1,6 @@
 import { Edge } from "../graph/Edge";
 import { Node } from "../graph/Node";
 
-
 export class BinaryRelationship extends Edge {
 
     labels: string[];
