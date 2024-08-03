@@ -48,7 +48,6 @@ export class Entity extends Node {
 
         for (let attribute of this.attributes) {
             const attrData = this.findAttributePosition(attribute.startingPoint);
-            console.log(attrData);
             attribute.startingPoint = attrData[0];
             attribute.direction = attrData[1];
             attribute.draw(ctx);

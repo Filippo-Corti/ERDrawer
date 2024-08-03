@@ -32,7 +32,7 @@ export class GraphDrawer {
         - Avoids edges passing across nodes
     */
     layoutGraph(numberOfGraphs : number, iterationsPerGraph : number): void {
-        const BORDER = 80;
+        const BORDER = 200;
 
         let minCrossings = 100;
         let minGraph = this.graph.clone();

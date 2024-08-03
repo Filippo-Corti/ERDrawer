@@ -26,7 +26,7 @@
           "y": 0
         },
         "size": 42.857142857142854,
-        "attributes": ["Ciao", "Come"] 
+        "attributes": ["Ola", "Comoes"] 
       },
       {
         "type": "Entity",
@@ -53,7 +53,7 @@
           "y": 0
         },
         "size": 42.857142857142854,
-        "attributes": ["Ciao", "Come", "A", "B", "C"] 
+        "attributes": ["Basta", "Oaic", "A", "B", "C"] 
       },
       {
         "type": "Entity",

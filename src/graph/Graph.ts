@@ -91,6 +91,16 @@ export class Graph implements Drawable {
         });
     }
 
+    getEdgesByNode(label : string) : Edge[] {
+        const connectingEdges : Edge[] = [];
+        this.edges.forEach((e) => {
+            if (e.node1.label == label || e.node2.label == label) {
+                connectingEdges.push(e);
+            }
+        });
+        return connectingEdges;
+    }
+
     //Deep copies the Graph
     clone(): Graph {
         const newNodes: Node[] = [];
