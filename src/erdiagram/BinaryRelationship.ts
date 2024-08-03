@@ -1,6 +1,7 @@
 import { Edge } from "../graph/Edge";
 import { Node } from "../graph/Node";
 import { Vector2D } from "../utils/Vector2D";
+import { Entity } from "./Entity";
 
 export class BinaryRelationship extends Edge {
 
@@ -21,6 +22,7 @@ export class BinaryRelationship extends Edge {
     draw(ctx: CanvasRenderingContext2D): void {
         const OFFSET_BETWEEN_MULTIEDGES = 150; //In the center
         const PADDING = 15;
+        const corners = this.getCorners();
 
         if (!this.vertex1 || !this.vertex2) {
             throw new Error("Couldn't find a Connection Point!");
@@ -38,7 +40,9 @@ export class BinaryRelationship extends Edge {
             // Draw Edge
             ctx.beginPath();
             ctx.moveTo(this.vertex1.x, this.vertex1.y);
+            ctx.lineTo(corners[0].x, corners[0].y);
             ctx.lineTo(mx + dx, my + dy);
+            ctx.lineTo(corners[1].x, corners[1].y);
             ctx.lineTo(this.vertex2.x, this.vertex2.y);
             ctx.stroke();
 
@@ -66,6 +70,17 @@ export class BinaryRelationship extends Edge {
             ctx.fillText(this.labels[i], mx + dx, my + dy);
 
         }
+    }
+
+    // Return edge's corners
+    getCorners() : Vector2D[] {
+        const distToVertex = 80;
+        const corners : Vector2D[] = [];
+        let edgeDirection = (this.node1 as Entity).getRectangleSegmentByPoint(this.vertex1)!.getDirection() + Math.PI / 2;
+        corners.push(Vector2D.sum(this.vertex1, Vector2D.fromPolar(distToVertex, edgeDirection)));
+        edgeDirection = (this.node2 as Entity).getRectangleSegmentByPoint(this.vertex2)!.getDirection() + Math.PI / 2;
+        corners.push(Vector2D.sum(this.vertex2, Vector2D.fromPolar(distToVertex, edgeDirection)));
+        return corners;
     }
  
 
