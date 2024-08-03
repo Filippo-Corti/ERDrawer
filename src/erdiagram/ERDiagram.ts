@@ -3,8 +3,6 @@ import { Graph } from "../graph/Graph";
 import { BinaryRelationship } from "./BinaryRelationship";
 import { Edge } from "../graph/Edge";
 
-
-
 export class ERDiagram extends Graph {
 
     addBinaryRelationship(label1: string, label2: string, edgeLabel: string) {

@@ -9,7 +9,6 @@ export class Graph implements Drawable {
     nodes: Map<string, Node>;
     edges: Edge[];
 
-
     constructor(nodes: Node[] = []) {
         this.nodes = new Map<string, Node>;
         nodes.forEach(node => {
@@ -23,7 +22,6 @@ export class Graph implements Drawable {
     }
 
     addEdge(label1: string, label2: string): void {
-
         const n1 = this.nodes.get(label1);
         const n2 = this.nodes.get(label2);
 

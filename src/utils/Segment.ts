@@ -144,4 +144,9 @@ export class Segment {
         return Math.sqrt(dx * dx + dy * dy);
     }
 
+    // Orientation in Gradients
+    getDirection() : number {
+        return new Vector2D(this.a.x - this.b.x, this.a.y - this.b.y).phase();
+    }
+
 }
