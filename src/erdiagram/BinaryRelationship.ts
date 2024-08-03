@@ -23,18 +23,8 @@ export class BinaryRelationship extends Edge {
         const PADDING = 15;
 
         if (!this.vertex1 || !this.vertex2) {
-            console.log(this.vertex1, this.vertex2);
             throw new Error("Couldn't find a Connection Point!");
         }
-
-        //Drawing points for debug
-        ctx.fillStyle = 'red';
-        ctx.beginPath();
-        ctx.arc(this.vertex1.x, this.vertex1.y, 5, 0, 2 * Math.PI, true);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(this.vertex2.x, this.vertex2.y, 5, 0, 2 * Math.PI, true);
-        ctx.fill();
 
         const mx = (this.vertex2.x + this.vertex1.x) / 2;
         const my = (this.vertex2.y + this.vertex1.y) / 2;

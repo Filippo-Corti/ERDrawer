@@ -21,7 +21,7 @@ export class Edge implements Drawable {
 
         //Vertex are initialized based on the segment that connects central positions of node1 and node2
 
-        let v1: [Vector2D, number] | null = null, v2: [Vector2D, number] | null = null;
+        let v1: Vector2D | null = null, v2: Vector2D | null = null;
         if (!vertex1) {
             v1 = this.node1.occupyConnectionPointBySegment(Segment.fromVectors(node1.pos, node2.pos));
             if (!v1) {
@@ -36,8 +36,8 @@ export class Edge implements Drawable {
             }
         }
 
-        this.vertex1 = vertex1 ? vertex1 : v1![0];
-        this.vertex2 = vertex2 ? vertex2 : v2![0];
+        this.vertex1 = vertex1 ? vertex1 : v1!;
+        this.vertex2 = vertex2 ? vertex2 : v2!;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -63,8 +63,8 @@ export class Edge implements Drawable {
 
     //Vertex are calculated based on the segment that connects central positions of node1 and node2
     calculateNewVertices(): void {
-        const [v1, _] = this.node1.occupyConnectionPointBySegment(Segment.fromVectors(this.node1.pos, this.node2.pos))!;
-        const [v2, __] = this.node2.occupyConnectionPointBySegment(Segment.fromVectors(this.node1.pos, this.node2.pos))!;
+        const v1 = this.node1.occupyConnectionPointBySegment(Segment.fromVectors(this.node1.pos, this.node2.pos))!;
+        const v2 = this.node2.occupyConnectionPointBySegment(Segment.fromVectors(this.node1.pos, this.node2.pos))!;
 
         if (!v1 || !v2) {
             throw new Error("Error finding a connection point for the edge");

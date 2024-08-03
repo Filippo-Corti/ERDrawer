@@ -47,9 +47,10 @@ export class Entity extends Node {
         ctx.fillText(this.label, this.pos.x, this.pos.y);
 
         for (let attribute of this.attributes) {
-            const [point, dir] = this.findAttributePosition(attribute.startingPoint);
+            const point = this.findAttributePosition(attribute.startingPoint);
+            const dir = this.getRectangleSegmentByPoint(point)!.getDirection();
             attribute.startingPoint = point;
-            attribute.direction = dir+ Math.PI / 2; //Direction is perpendicular to the segment
+            attribute.direction = dir + Math.PI / 2; //Direction is perpendicular to the segment
             attribute.draw(ctx);
         }
     }
@@ -109,8 +110,8 @@ export class Entity extends Node {
     // Occupies closest connection point to point, that is not already occupied.
     // If onSegment is true, Point needs to be sitting on one of the segments of the Entity and
     // only Connection Points standing on that segment are considered
-    // It then returns the occupied connection point and the direction of the segment on which it's found.
-    occupyClosestConnectionPoint(point: Vector2D, onSegment: boolean = true): [Vector2D, number] {
+    // It then returns the occupied connection point.
+    occupyClosestConnectionPoint(point: Vector2D, onSegment: boolean = true): Vector2D {
         const connPoints = this.getAllConnectionPoints();
         const sittingOnSegment = this.getRectangleSegmentByPoint(point);
         if (onSegment && !sittingOnSegment) {
@@ -135,10 +136,8 @@ export class Entity extends Node {
             this.reduceDeltas();
             return this.occupyClosestConnectionPoint(point, onSegment);
         }
-
-        const segment : Segment = this.getRectangleSegmentByPoint(minPoint)!;
         this.connectionPoints.set(minPoint.toString(), true);
-        return [minPoint, segment.getDirection()];
+        return minPoint;
     }
 
     // Returns the point where the edge and the rectangle of the entity intersect
@@ -154,8 +153,8 @@ export class Entity extends Node {
     }
 
     // Occupies closest connection point to the Segment segment.
-    // It then returns the occupied connection point and the direction of the segment it's on.
-    occupyConnectionPointBySegment(segment: Segment): [Vector2D, number] | null {
+    // It then returns the occupied connection point.
+    occupyConnectionPointBySegment(segment: Segment): Vector2D | null {
         const p = this.getEdgeIntersectingPoint(segment);
         if (!p) {
             return null;
@@ -181,8 +180,8 @@ export class Entity extends Node {
         this.deltaConnectionPointsY /= 2;
     }
 
-    // Finds and Returns a new Attribute starting position and direction of the segment it's found on.
-    findAttributePosition(attrCurrPosition : Vector2D) : [Vector2D, number] {
+    // Finds and Returns a new Attribute starting position.
+    findAttributePosition(attrCurrPosition : Vector2D) : Vector2D {
         return this.occupyClosestConnectionPoint(attrCurrPosition, false);
     }
 
