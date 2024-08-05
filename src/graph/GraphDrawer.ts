@@ -48,7 +48,11 @@ export class GraphDrawer {
             // Reset Nodes connection points
             this.graph.nodes.forEach((n) => n.resetConnectionPoints());
             // Calculate Edges positions (based on new nodes positions!)
-            this.graph.edges.forEach((e) => e.calculateNewVertices());
+            try {
+                this.graph.edges.forEach((e) => e.calculateNewVertices());
+            } catch(error) {
+                continue; // If you can't calculate new vertices, it's not a good layout
+            }
 
             // Check if current layout is better than the best one so far (the new edge positions are used!)
             let crossings = this.countCrossings();
@@ -59,6 +63,7 @@ export class GraphDrawer {
         }
 
         this.graph = minGraph.clone();
+        console.log(this.graph);
 }
 
     //Base code comes from https://faculty.washington.edu/joelross/courses/archive/s13/cs261/lab/k/fruchterman91graph.pdf

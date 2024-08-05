@@ -25,15 +25,14 @@ export class BinaryRelationship extends Edge {
     draw(ctx: CanvasRenderingContext2D): void {
         const OFFSET_BETWEEN_MULTIEDGES = 150; //In the center
         const PADDING = 15;
-        const corners = this.getCorners();
 
         if (!this.vertex1 || !this.vertex2) {
             throw new Error("Couldn't find a Connection Point!");
         }
-
-        const mx = (this.vertex2.x + this.vertex1.x) / 2;
-        const my = (this.vertex2.y + this.vertex1.y) / 2;
         for (let i = 0; i < this.count; i++) {
+            const mx = (this.vertex2.x + this.vertex1.x) / 2;
+            const my = (this.vertex2.y + this.vertex1.y) / 2;
+            const corners = this.getCorners();
             // Calculate offset
             const theta = Math.atan2(this.vertex2.y - this.vertex1.y, this.vertex2.x - this.vertex1.x);
             const offsetFactor = (i - (this.count - 1) / 2);
@@ -50,10 +49,8 @@ export class BinaryRelationship extends Edge {
             const rhombusCorners: Vector2D[] = [];
             rhombusConnPoints.forEach(p => {
                 const dir = [- Math.PI / 2, 0, + Math.PI / 2, Math.PI][this.getRhombusVertices(rhombusCenterPoint).map(v => v.toString()).indexOf(p.toString())];
-                console.log(p, dir);
                 rhombusCorners.push(Vector2D.sum(p, Vector2D.fromPolar(20, dir)));
             })
-            console.log(this.labels, rhombusCorners);
             points.push(this.vertex1);
             points.push(corners[0]);
             if (rhombusCorners.length > 0) {
@@ -62,7 +59,7 @@ export class BinaryRelationship extends Edge {
                 points.push(rhombusCenterPoint);
                 points.push(rhombusConnPoints[1]);
                 points.push(rhombusCorners[1]);
-            } else {
+            } else { // Only happens when nodes are too close to each other
                 points.push(rhombusCenterPoint);
             }
             points.push(corners[1]);
@@ -98,6 +95,8 @@ export class BinaryRelationship extends Edge {
             ctx.textBaseline = "middle";
             ctx.fillText(this.labels[i], mx + dx, my + dy);
 
+            // if (i != this.count - 1)
+            //     this.calculateNewVertices();
         }
     }
 
@@ -120,7 +119,7 @@ export class BinaryRelationship extends Edge {
         ]
     }
 
-    // Return edge's corners
+    // Return edge's first corners
     getCorners(): Vector2D[] {
         const distToVertex = 70;
         const corners: Vector2D[] = [];
