@@ -39,12 +39,13 @@ export class Attribute implements Drawable {
         ctx.save();
         ctx.fillStyle = "black";
         ctx.textBaseline = "middle";
-        let fontSize = 20;
-        do {
-            ctx.font = fontSize + "px serif";
-            fontSize -= 3;
-            this.length = Math.max(SIZE + 3, this.length - 5);
-        } while (ctx.measureText(this.label).width + this.length + SIZE + 3 > 70); // Needs correspondance with distToVertex in BinaryRelationship.ts (currently 70)
+        let fontSize = 14;
+        ctx.font = fontSize + "px serif";
+        // do {
+        //     ctx.font = fontSize + "px serif";
+        //     fontSize -= 3;
+        //     this.length = Math.max(SIZE + 3, this.length - 5);
+        // } while (ctx.measureText(this.label).width + this.length + SIZE + 3 > 70); // Needs correspondance with distToVertex in BinaryRelationship.ts (currently 70)
         ctx.translate(endPoint.x, endPoint.y);
         if (this.direction > Math.PI / 2 && this.direction < 3 / 2 * Math.PI) {
             ctx.rotate(this.direction + Math.PI);

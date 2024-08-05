@@ -21,3 +21,12 @@ C. IMPROVE LAYOUT CHOICE:
 
 ...
 
+Alcuni problemi:
+- Gli attributi dovrebbero diventare piccoli solo se ce ne è necessità. Dovrei verificare se la linea dell'attributo interseca con quella degli archi uscenti dal nodo.
+- Ha senso concentrarsi momentanamente solo su archi singoli. Per gli archi multipli devo innanzitutto sistemare meglio il codice che li disegna e poi capire come sia meglio
+ trovarne le traiettorie.
+- Il meccanismo di scelta dei "connection Points" è poco pratico per trovare punti vicini ad altri, cosa utile sia per gli archi multipli che per gli identificatori composti/esterni.
+- Devo imporre un limite rispetto ai delta per i connection point e un limite di dimensione per gli attributi.
+- Dovrei fermarmi un attimo per implementare i punti C, perché sicuramente renderebbero meno deprimente il lavoro di disegno.
+- Attualmente con ARCHI SINGOLI il risultato non è così male :)
+
