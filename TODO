@@ -8,8 +8,10 @@ A. MODELING THE GRAPH LAYOUT:
 
 B. DRAW THE ER DIAGRAM
 
-☐ Figure out what's a node and what's an edge
-☐ Create an ER Diagram with only basic Entities and Relationships
+☑ Figure out what's a node and what's an edge
+☑ Create an ER Diagram with only basic Entities and Relationships
+☐ Implement Identifier (Internal and External)
+☐ Implement Generalizations
 
 C. IMPROVE LAYOUT CHOICE:
 
