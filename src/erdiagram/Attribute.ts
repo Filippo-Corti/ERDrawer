@@ -1,4 +1,3 @@
-import { CLIENT_RENEG_LIMIT } from "tls";
 import { Drawable } from "../utils/Drawable";
 import { Vector2D } from "../utils/Vector2D";
 
@@ -8,10 +7,12 @@ export class Attribute implements Drawable {
     startingPoint: Vector2D;
     length: number = 30;
     direction: number = - Math.PI / 2; //Angle in radiants
+    filledPoint: boolean;
 
-    constructor(label: string, startingPoint: Vector2D) {
+    constructor(label: string, startingPoint: Vector2D, filledPoint: boolean = false) {
         this.label = label;
         this.startingPoint = startingPoint;
+        this.filledPoint = filledPoint;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -28,7 +29,7 @@ export class Attribute implements Drawable {
 
 
         // Draw Point
-        ctx.fillStyle = "white";
+        ctx.fillStyle = (this.filledPoint) ? "black" : "white";
         ctx.beginPath();
         ctx.arc(endPoint.x, endPoint.y, SIZE, 0, 2 * Math.PI, true);
         ctx.fill();
@@ -38,21 +39,27 @@ export class Attribute implements Drawable {
         ctx.save();
         ctx.fillStyle = "black";
         ctx.textBaseline = "middle";
+        let fontSize = 20;
+        do {
+            ctx.font = fontSize + "px serif";
+            fontSize -= 3;
+            this.length = Math.max(SIZE + 3, this.length - 5);
+        } while (ctx.measureText(this.label).width + this.length + SIZE + 3 > 100); // Needs correspondance with distToVertex in BinaryRelationship.ts (currently 100)
         ctx.translate(endPoint.x, endPoint.y);
         if (this.direction > Math.PI / 2 && this.direction < 3 / 2 * Math.PI) {
             ctx.rotate(this.direction + Math.PI);
             ctx.textAlign = "end";
-            ctx.fillText(this.label, - (SIZE + 5), 0);
+            ctx.fillText(this.label, - (SIZE + 3), 0);
         } else {
             ctx.rotate(this.direction);
             ctx.textAlign = "start";
-            ctx.fillText(this.label, SIZE + 5, 0);
+            ctx.fillText(this.label, SIZE + 3, 0);
         }
         ctx.restore();
     }
 
     clone(): Attribute {
-        const newAttr = new Attribute(this.label, this.startingPoint);
+        const newAttr = new Attribute(this.label, this.startingPoint, this.filledPoint);
         newAttr.length = this.length;
         newAttr.direction = this.direction;
         return newAttr;

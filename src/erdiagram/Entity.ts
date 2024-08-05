@@ -11,13 +11,13 @@ export class Entity extends Node {
     deltaConnectionPointsX: number = this.halfSizeX;
     deltaConnectionPointsY: number = this.halfSizeY;
 
-    attributes: Attribute[];
+    attributes: Map<string, Attribute>;
 
     constructor(label: string, x: number, y: number, size: number = 30, attributes: string[] = []) {
         super(label, x, y, size);
         this.connectionPoints = new Map<string, boolean>;
-        this.attributes = [];
-        attributes.forEach(a => this.attributes.push(new Attribute(a, this.pos))); //Default position is center of the entity
+        this.attributes = new Map<string, Attribute>;
+        attributes.forEach(a => this.attributes.set(a, new Attribute(a, this.pos))); //Default position is center of the entity
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -46,7 +46,7 @@ export class Entity extends Node {
         ctx.textBaseline = "middle";
         ctx.fillText(this.label, this.pos.x, this.pos.y);
 
-        for (let attribute of this.attributes) {
+        for (let [_, attribute] of this.attributes) {
             const point = this.findAttributePosition(attribute.startingPoint);
             const dir = this.getRectangleSegmentByPoint(point)!.getDirection();
             attribute.startingPoint = point;
@@ -94,14 +94,16 @@ export class Entity extends Node {
         const corners = this.getRectangleBoundaries();
         const connPoints = [];
 
-        for (let x = corners[0].x + this.deltaConnectionPointsX; x < corners[1].x; x += this.deltaConnectionPointsX) {
-            connPoints.push(new Vector2D(x, corners[0].y));
-            connPoints.push(new Vector2D(x, corners[2].y));
-        }
-
+        // Vert Points 
         for (let y = corners[0].y + this.deltaConnectionPointsY; y < corners[2].y; y += this.deltaConnectionPointsY) {
             connPoints.push(new Vector2D(corners[0].x, y));
             connPoints.push(new Vector2D(corners[1].x, y));
+        }
+
+        // Horiz Points
+        for (let x = corners[0].x + this.deltaConnectionPointsX; x < corners[1].x; x += this.deltaConnectionPointsX) {
+            connPoints.push(new Vector2D(x, corners[0].y));
+            connPoints.push(new Vector2D(x, corners[2].y));
         }
 
         return connPoints;
@@ -180,12 +182,23 @@ export class Entity extends Node {
         this.deltaConnectionPointsY /= 2;
     }
 
+    addAttribute(label : string, filledPoint : boolean = false) {
+        this.attributes.set(label, new Attribute(label, this.pos, filledPoint));
+    }
+
     // Finds and Returns a new Attribute starting position.
     findAttributePosition(attrCurrPosition : Vector2D) : Vector2D {
         return this.occupyClosestConnectionPoint(attrCurrPosition, false);
     }
 
-
+    // Labels list contains attributes and other entities' names
+    setPrimaryKey(labelsList : string[]) : void {
+        for(const label of labelsList) {
+            if (this.attributes.has(label)) {
+                this.attributes.get(label)!.filledPoint = true;
+            }
+        }
+    } 
 
     clone(): Node {
         const newNode = new Entity(this.label, this.pos.x, this.pos.y, this.size);
@@ -195,8 +208,8 @@ export class Entity extends Node {
         const newConnPoints = new Map<string, boolean>;
         this.connectionPoints.forEach((v, k) => newConnPoints.set(k, v));
         newNode.connectionPoints = newConnPoints;
-        const newAttributes: Attribute[] = [];
-        this.attributes.forEach((a) => newAttributes.push(a.clone()));
+        const newAttributes = new Map<string, Attribute>;
+        this.attributes.forEach((a) => newAttributes.set(a.label, a.clone()));
         newNode.attributes = newAttributes;
         return newNode;
     }

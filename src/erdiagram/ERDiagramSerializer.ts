@@ -34,7 +34,10 @@ export class ERDiagramSerializer {
                     node = new Node(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
                     break;
                 case "Entity":
-                    node = new Entity(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size, nodeData.attributes);
+                    node = new Entity(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size, []);
+                    for(const attr of nodeData.attributes) {
+                        (node as Entity).addAttribute(attr.label, attr.id);
+                    }
                     break;
             }
             node!.disp = new Vector2D(nodeData.disp.x, nodeData.disp.y);

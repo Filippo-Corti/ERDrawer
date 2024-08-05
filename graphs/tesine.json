@@ -1,109 +1,175 @@
 {
-    "nodes": [
-      {
-        "type": "Entity",
-        "label": "Persona",
-        "pos": {
-          "x": 318,
-          "y": 439
-        },
-        "disp": {
-          "x": 0,
-          "y": 0
-        },
-        "size": 42.857142857142854,
-        "attributes": ["Ciao", "Come", "Stai"] 
+  "nodes": [
+    {
+      "type": "Entity",
+      "label": "Persona",
+      "pos": {
+        "x": 318,
+        "y": 439
       },
-      {
-        "type": "Entity",
-        "label": "Lezione",
-        "pos": {
-          "x": 644,
-          "y": 524
-        },
-        "disp": {
-          "x": 0,
-          "y": 0
-        },
-        "size": 42.857142857142854,
-        "attributes": ["Ola", "Comoes"] 
+      "disp": {
+        "x": 0,
+        "y": 0
       },
-      {
-        "type": "Entity",
-        "label": "Argomento",
-        "pos": {
-          "x": 944,
-          "y": 402
+      "size": 42.857142857142854,
+      "attributes": [
+        {
+          "label": "CF",
+          "id": true
         },
-        "disp": {
-          "x": 0,
-          "y": 0
+        {
+          "label": "Nome",
+          "id": false
         },
-        "size": 42.857142857142854
+        {
+          "label": "Cognome",
+          "id": false
+        }
+      ]
+    },
+    {
+      "type": "Entity",
+      "label": "Lezione",
+      "pos": {
+        "x": 644,
+        "y": 524
       },
-      {
-        "type": "Entity",
-        "label": "Gruppo",
-        "pos": {
-          "x": 387,
-          "y": 473
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854,
+      "attributes": [
+        {
+          "label": "Codice",
+          "id": true
         },
-        "disp": {
-          "x": 0,
-          "y": 0
+        {
+          "label": "DataOraInizio",
+          "id": false
         },
-        "size": 42.857142857142854,
-        "attributes": ["Basta", "Oaic", "A", "B", "C"] 
+        {
+          "label": "DataOraFine",
+          "id": false
+        }
+      ]
+    },
+    {
+      "type": "Entity",
+      "label": "Argomento",
+      "pos": {
+        "x": 944,
+        "y": 402
       },
-      {
-        "type": "Entity",
-        "label": "Tesina",
-        "pos": {
-          "x": 390,
-          "y": 277
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854,
+      "attributes": [
+        {
+          "label": "Codice",
+          "id": true
         },
-        "disp": {
-          "x": 0,
-          "y": 0
+        {
+          "label": "Descrizione",
+          "id": false
+        }
+      ]
+    },
+    {
+      "type": "Entity",
+      "label": "Gruppo",
+      "pos": {
+        "x": 387,
+        "y": 473
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854,
+      "attributes": [
+        {
+          "label": "Nome",
+          "id": true
+        }
+      ]
+    },
+    {
+      "type": "Entity",
+      "label": "Tesina",
+      "pos": {
+        "x": 390,
+        "y": 277
+      },
+      "disp": {
+        "x": 0,
+        "y": 0
+      },
+      "size": 42.857142857142854,
+      "attributes": [
+        {
+          "label": "Codice",
+          "id": true
         },
-        "size": 42.857142857142854
-      }
-    ],
-    "edges": [
-      {
-        "type": "BinaryRelationship",
-        "node1": "Persona",
-        "node2": "Lezione",
-        "count": 2,
-        "labels": ["Tiene", "Segue"]
-      },
-      {
-        "type": "BinaryRelationship",
-        "node1": "Persona",
-        "node2": "Gruppo",
-        "count": 1,
-        "labels": ["Appartiene"]
-      },
-      {
-        "type": "BinaryRelationship",
-        "node1": "Gruppo",
-        "node2": "Tesina",
-        "count": 1,
-        "labels": ["Svolge"]
-      },
-      {
-        "type": "BinaryRelationship",
-        "node1": "Tesina",
-        "node2": "Argomento",
-        "count": 1,
-        "labels": ["Riguarda"]
-      },
-      {
-        "type": "BinaryRelationship",
-        "node1": "Lezione",
-        "node2": "Argomento",
-        "count": 1,
-        "labels": ["Riguarda"]
-      }
-    ]
-  }
+        {
+          "label": "Titolo",
+          "id": false
+        },
+        {
+          "label": "NumPagine",
+          "id": false
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "type": "BinaryRelationship",
+      "node1": "Persona",
+      "node2": "Lezione",
+      "count": 2,
+      "labels": [
+        "Tiene",
+        "Segue"
+      ]
+    },
+    {
+      "type": "BinaryRelationship",
+      "node1": "Persona",
+      "node2": "Gruppo",
+      "count": 1,
+      "labels": [
+        "Appartiene"
+      ]
+    },
+    {
+      "type": "BinaryRelationship",
+      "node1": "Gruppo",
+      "node2": "Tesina",
+      "count": 1,
+      "labels": [
+        "Svolge"
+      ]
+    },
+    {
+      "type": "BinaryRelationship",
+      "node1": "Tesina",
+      "node2": "Argomento",
+      "count": 1,
+      "labels": [
+        "Riguarda"
+      ]
+    },
+    {
+      "type": "BinaryRelationship",
+      "node1": "Lezione",
+      "node2": "Argomento",
+      "count": 1,
+      "labels": [
+        "Riguarda"
+      ]
+    }
+  ]
+}

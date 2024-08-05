@@ -74,7 +74,7 @@ export class BinaryRelationship extends Edge {
 
     // Return edge's corners
     getCorners() : Vector2D[] {
-        const distToVertex = 80;
+        const distToVertex = 100;
         const corners : Vector2D[] = [];
         let edgeDirection = (this.node1 as Entity).getRectangleSegmentByPoint(this.vertex1)!.getDirection() + Math.PI / 2;
         corners.push(Vector2D.sum(this.vertex1, Vector2D.fromPolar(distToVertex, edgeDirection)));
