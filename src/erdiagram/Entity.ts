@@ -159,6 +159,7 @@ export class Entity extends Node {
     occupyConnectionPointBySegment(segment: Segment): Vector2D | null {
         const p = this.getEdgeIntersectingPoint(segment);
         if (!p) {
+            console.log(this, segment, p);
             return null;
         }
         return this.occupyClosestConnectionPoint(p);
