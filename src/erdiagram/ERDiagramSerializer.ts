@@ -53,8 +53,8 @@ export class ERDiagramSerializer {
             if (node1 && node2) {
                 switch (edgeData.type) {
                     case "BinaryRelationship":
-                    //erDiagram.addBinaryRelationship(node1.label, node2.label, edgeData.labels[i]);
-                    //break;
+                        erDiagram.addBinaryRelationship(node1.label, node2.label, edgeData.label);
+                        break;
                     case "Edge":
                         erDiagram.addEdge(node1.label, node2.label);
                         break;

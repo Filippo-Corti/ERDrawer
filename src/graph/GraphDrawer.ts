@@ -49,7 +49,7 @@ export class GraphDrawer {
             this.graph.nodes.forEach((n) => n.resetConnectionPoints());
             // Calculate Edges positions (based on new nodes positions!)
             try {
-                this.graph.edges.forEach((e) => e.calculateNewVertices());
+                this.graph.layoutEdges();
             } catch(error) {
                 continue; // If you can't calculate new vertices, it's not a good layout
             }
@@ -63,6 +63,7 @@ export class GraphDrawer {
         }
 
         this.graph = minGraph.clone();
+        console.log("Found best solution with", minCrossings, "crossings");
         console.log(this.graph);
 }
 
@@ -130,7 +131,6 @@ export class GraphDrawer {
                 v.pos = this.getCoordsWithBoundaries(v.pos, borderSize);
             }
         }
-
     }
 
     //Positions Nodes in a discretized grid.
@@ -182,7 +182,7 @@ export class GraphDrawer {
                 const f = this.graph.edges[j];
                 const s2 = f.getDrawingSegment();
 
-                if (s1.intersects(s2)) {
+                if (e.intersects(f)) {
                     if (s1.parallel(s2)) {
                         count += 999; // This is a crossing we really want to avoid
                     } else {

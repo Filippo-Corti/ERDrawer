@@ -2,6 +2,8 @@ import { Node } from "../graph/Node";
 import { Graph } from "../graph/Graph";
 import { BinaryRelationship } from "./BinaryRelationship";
 import { Edge } from "../graph/Edge";
+import { Vector2D } from "../utils/Vector2D";
+import { CLIENT_RENEG_LIMIT } from "tls";
 
 export class ERDiagram extends Graph {
 
@@ -13,13 +15,12 @@ export class ERDiagram extends Graph {
             return;
         }
 
-        const existingEdge = this.edges.find((e) => e.node1.label == label1 && e.node2.label == label2);
+        this.edges.push(new BinaryRelationship(n1, n2, edgeLabel));
 
-        if (existingEdge) {
-            (existingEdge as BinaryRelationship).labels.push(edgeLabel);
-        } else {
-            this.edges.push(new BinaryRelationship(n1, n2, edgeLabel));
-        }
+        const existingEdges = this.edges.filter((e) => e.node1.label == label1 && e.node2.label == label2);
+
+        //Update edge's middlePoints
+        this.setEdgesMiddlePoints(label1, label2);
     }
 
     //Deep copies the ER Diagram

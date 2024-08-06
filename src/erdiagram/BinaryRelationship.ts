@@ -10,27 +10,52 @@ export class BinaryRelationship extends Edge {
     halfDiagX: number = 70;
     halfDiagY: number = 50;
 
+    static OFFSET_BETWEEN_MULTIEDGES: number = 100;
+
+
     constructor(node1: Node, node2: Node, label: string, vertex1?: Vector2D, vertex2?: Vector2D, middlePoint?: Vector2D) {
         super(node1, node2, vertex1, vertex2, middlePoint);
         this.label = label;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
-        const OFFSET_BETWEEN_MULTIEDGES = 150; //In the center
         const PADDING = 15;
 
         if (!this.vertex1 || !this.vertex2) {
             throw new Error("Couldn't find a Connection Point!");
         }
-        for (let i = 0; i < this.count; i++) {
+        //Calculate Quadratic Curve control point
+        const controlPoint: Vector2D = new Vector2D(
+            2 * this.middlePoint.x - 0.5 * this.vertex1.x - 0.5 * this.vertex2.x,
+            2 * this.middlePoint.y - 0.5 * this.vertex1.y - 0.5 * this.vertex2.y
+        );
+
+        // Draw Edge
+        ctx.beginPath();
+        ctx.moveTo(this.vertex1.x, this.vertex1.y);
+        ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, this.vertex2.x, this.vertex2.y);
+        ctx.stroke();
+
+        // Draw Rhombus half way
+        const rhombusVertices = this.getRhombusVertices(this.middlePoint);
+        ctx.fillStyle = "white";
+        ctx.beginPath();
+        ctx.moveTo(rhombusVertices[rhombusVertices.length - 1].x, rhombusVertices[rhombusVertices.length - 1].y);
+        for (const v of rhombusVertices) {
+            ctx.lineTo(v.x, v.y);
+        }
+        ctx.fill();
+        ctx.stroke();
+        
+        /*for (let i = 0; i < this.count; i++) {
             const mx = (this.vertex2.x + this.vertex1.x) / 2;
             const my = (this.vertex2.y + this.vertex1.y) / 2;
             const corners = this.getCorners();
             // Calculate offset
             const theta = Math.atan2(this.vertex2.y - this.vertex1.y, this.vertex2.x - this.vertex1.x);
             const offsetFactor = (i - (this.count - 1) / 2);
-            const dx = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
-            const dy = OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
+            const dx = BinaryRelationship.OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
+            const dy = BinaryRelationship.OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
 
             // Calculate Passing Points
             let points: Vector2D[] = [];
@@ -90,7 +115,7 @@ export class BinaryRelationship extends Edge {
 
             // if (i != this.count - 1)
             //     this.calculateNewVertices();
-        }
+        }*/
     }
 
     getRhombusVertices(centerPoint: Vector2D): Vector2D[] {
@@ -148,9 +173,13 @@ export class BinaryRelationship extends Edge {
         return connPoints;
     }
 
+    getMultiEdgesOffset() : number {
+        return BinaryRelationship.OFFSET_BETWEEN_MULTIEDGES;
+    }
+
 
     clone(): BinaryRelationship {
-        return new BinaryRelationship(this.node1, this.node2, this.count, this.labels, this.vertex1, this.vertex2);
+        return new BinaryRelationship(this.node1, this.node2, this.label, this.vertex1, this.vertex2, this.middlePoint);
     }
 
 

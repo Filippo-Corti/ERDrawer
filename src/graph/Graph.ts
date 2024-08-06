@@ -9,8 +9,6 @@ export class Graph implements Drawable {
     nodes: Map<string, Node>;
     edges: Edge[];
 
-    static OFFSET_BETWEEN_MULTIEDGES: number = 100; //In the center
-
     constructor(nodes: Node[] = []) {
         this.nodes = new Map<string, Node>;
         nodes.forEach(node => {
@@ -32,24 +30,31 @@ export class Graph implements Drawable {
         }
         this.edges.push(new Edge(n1, n2));
 
+        //Update edge's middlePoints
+        this.setEdgesMiddlePoints(label1, label2);
+    }
+
+    // Sets new value for middle points of all the edges with the specified labels
+    setEdgesMiddlePoints(label1: string, label2: string): void {
         const existingEdges = this.edges.filter((e) => e.node1.label == label1 && e.node2.label == label2);
 
-        //Update edge's middlePoints
         const middle = new Vector2D(
             (existingEdges[0].vertex1.x + existingEdges[0].vertex2.x) / 2,
             (existingEdges[0].vertex1.y + existingEdges[0].vertex2.y) / 2
         );
         const theta = new Vector2D(
-            existingEdges[0].vertex2.y - existingEdges[0].vertex1.y, 
-            existingEdges[0].vertex2.x - existingEdges[0].vertex1.x).phase();
+            existingEdges[0].vertex2.x - existingEdges[0].vertex1.x,
+            existingEdges[0].vertex2.y - existingEdges[0].vertex1.y).phase();
+
+        let sign = 1;
         for (let i = 0; i < existingEdges.length; i++) {
-            const offsetFactor = (i - (existingEdges.length - 1) / 2);
-            console.log(offsetFactor);
-            const dx = Graph.OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
-            const dy = Graph.OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
+            const offsetFactor = (existingEdges.length == 1) ? 0 : sign * Math.floor((i+2) / 2);
+            sign = (sign == 1) ? -1 : 1;
+            const offsetBase = existingEdges[i].getMultiEdgesOffset();
+            const dx = offsetBase * offsetFactor * Math.sin(theta);
+            const dy = offsetBase * offsetFactor * -Math.cos(theta);
             existingEdges[i].middlePoint = Vector2D.sum(middle, new Vector2D(dx, dy));
         }
-
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -110,6 +115,20 @@ export class Graph implements Drawable {
             }
         });
         return connectingEdges;
+    }
+
+    layoutEdges(): void {
+        // Update Start and End Point of each Edge
+        this.edges.forEach((e) => e.calculateNewVertices());
+
+        // Update Middle Point of each Edge
+        const edgesOnce: Map<string, boolean> = new Map<string, boolean>;
+        this.edges.forEach((e) => edgesOnce.set(e.node1.label + ";" + e.node2.label, true));
+
+        edgesOnce.forEach((_, key) => {
+            const labels = key.split(";");
+            this.setEdgesMiddlePoints(labels[0], labels[1]);
+        });
     }
 
     //Deep copies the Graph
