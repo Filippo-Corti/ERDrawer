@@ -129,47 +129,37 @@
       "type": "BinaryRelationship",
       "node1": "Persona",
       "node2": "Lezione",
-      "count": 2,
-      "labels": [
-        "Tiene",
-        "Segue"
-      ]
+      "label": "Tiene"
+    },
+    {
+      "type": "BinaryRelationship",
+      "node1": "Persona",
+      "node2": "Lezione",
+      "label": "Segue"
     },
     {
       "type": "BinaryRelationship",
       "node1": "Persona",
       "node2": "Gruppo",
-      "count": 1,
-      "labels": [
-        "Appartiene"
-      ]
+      "label": "Appartiene"
     },
     {
       "type": "BinaryRelationship",
       "node1": "Gruppo",
       "node2": "Tesina",
-      "count": 1,
-      "labels": [
-        "Svolge"
-      ]
+      "label": "Svolge"
     },
     {
       "type": "BinaryRelationship",
       "node1": "Tesina",
       "node2": "Argomento",
-      "count": 1,
-      "labels": [
-        "Riguarda"
-      ]
+      "label": "Riguarda"
     },
     {
       "type": "BinaryRelationship",
       "node1": "Lezione",
       "node2": "Argomento",
-      "count": 1,
-      "labels": [
-        "Riguarda"
-      ]
+      "label": "Riguarda"
     }
   ]
 }

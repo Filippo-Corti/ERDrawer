@@ -9,6 +9,8 @@ export class Graph implements Drawable {
     nodes: Map<string, Node>;
     edges: Edge[];
 
+    static OFFSET_BETWEEN_MULTIEDGES: number = 100; //In the center
+
     constructor(nodes: Node[] = []) {
         this.nodes = new Map<string, Node>;
         nodes.forEach(node => {
@@ -28,13 +30,24 @@ export class Graph implements Drawable {
         if (!n1 || !n2) {
             return;
         }
+        this.edges.push(new Edge(n1, n2));
 
-        const existingEdge = this.edges.find((e) => e.node1.label == label1 && e.node2.label == label2);
+        const existingEdges = this.edges.filter((e) => e.node1.label == label1 && e.node2.label == label2);
 
-        if (existingEdge) {
-            existingEdge.count++;
-        } else {
-            this.edges.push(new Edge(n1, n2));
+        //Update edge's middlePoints
+        const middle = new Vector2D(
+            (existingEdges[0].vertex1.x + existingEdges[0].vertex2.x) / 2,
+            (existingEdges[0].vertex1.y + existingEdges[0].vertex2.y) / 2
+        );
+        const theta = new Vector2D(
+            existingEdges[0].vertex2.y - existingEdges[0].vertex1.y, 
+            existingEdges[0].vertex2.x - existingEdges[0].vertex1.x).phase();
+        for (let i = 0; i < existingEdges.length; i++) {
+            const offsetFactor = (i - (existingEdges.length - 1) / 2);
+            console.log(offsetFactor);
+            const dx = Graph.OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
+            const dy = Graph.OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
+            existingEdges[i].middlePoint = Vector2D.sum(middle, new Vector2D(dx, dy));
         }
 
     }
@@ -89,8 +102,8 @@ export class Graph implements Drawable {
         });
     }
 
-    getEdgesByNode(label : string) : Edge[] {
-        const connectingEdges : Edge[] = [];
+    getEdgesByNode(label: string): Edge[] {
+        const connectingEdges: Edge[] = [];
         this.edges.forEach((e) => {
             if (e.node1.label == label || e.node2.label == label) {
                 connectingEdges.push(e);
@@ -111,8 +124,7 @@ export class Graph implements Drawable {
 
         const newGraph = new Graph(newNodes);
         this.edges.forEach(edge => {
-            for (let i = 0; i < edge.count; i++)
-                newGraph.addEdge(edge.node1.label, edge.node2.label);
+            newGraph.addEdge(edge.node1.label, edge.node2.label);
         });
 
         return newGraph;

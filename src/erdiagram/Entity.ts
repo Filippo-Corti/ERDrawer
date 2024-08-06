@@ -133,6 +133,7 @@ export class Entity extends Node {
             }
         }
 
+
         // If no point is found, reduce deltas and try again
         if (!minPoint) {
             this.reduceDeltas();
@@ -159,6 +160,7 @@ export class Entity extends Node {
     occupyConnectionPointBySegment(segment: Segment): Vector2D | null {
         const p = this.getEdgeIntersectingPoint(segment);
         if (!p) {
+            console.log("No intersection point found");
             return null;
         }
         return this.occupyClosestConnectionPoint(p);

@@ -16,10 +16,9 @@ export class ERDiagram extends Graph {
         const existingEdge = this.edges.find((e) => e.node1.label == label1 && e.node2.label == label2);
 
         if (existingEdge) {
-            existingEdge.count++;
             (existingEdge as BinaryRelationship).labels.push(edgeLabel);
         } else {
-            this.edges.push(new BinaryRelationship(n1, n2, 1, [edgeLabel]));
+            this.edges.push(new BinaryRelationship(n1, n2, edgeLabel));
         }
     }
 

@@ -1,6 +1,7 @@
 import { Node } from "../graph/Node";
 import { Vector2D } from "../utils/Vector2D";
 import { Entity } from "./Entity";
+import { Edge } from "../graph/Edge";
 import { ERDiagram } from "./ERDiagram";
 
 export class ERDiagramSerializer {
@@ -28,14 +29,14 @@ export class ERDiagramSerializer {
 
         const nodes: Node[] = [];
         parsedData.nodes.forEach((nodeData: any) => {
-            let node : Node;
+            let node: Node;
             switch (nodeData.type) {
                 case "Node":
                     node = new Node(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
                     break;
                 case "Entity":
                     node = new Entity(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size, []);
-                    for(const attr of nodeData.attributes) {
+                    for (const attr of nodeData.attributes) {
                         (node as Entity).addAttribute(attr.label, attr.id);
                     }
                     break;
@@ -50,15 +51,13 @@ export class ERDiagramSerializer {
             const node1 = erDiagram.nodes.get(edgeData.node1);
             const node2 = erDiagram.nodes.get(edgeData.node2);
             if (node1 && node2) {
-                for (let i = 0; i < edgeData.count; i++) {
-                    switch (edgeData.type) {
-                        case "BinaryRelationship":
-                            erDiagram.addBinaryRelationship(node1.label, node2.label, edgeData.labels[i]);
-                            break;
-                        case "Edge":
-                            erDiagram.addEdge(node1.label, node2.label);
-                            break;
-                    }
+                switch (edgeData.type) {
+                    case "BinaryRelationship":
+                    //erDiagram.addBinaryRelationship(node1.label, node2.label, edgeData.labels[i]);
+                    //break;
+                    case "Edge":
+                        erDiagram.addEdge(node1.label, node2.label);
+                        break;
                 }
             }
         });

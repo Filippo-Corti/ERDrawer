@@ -14,8 +14,7 @@ export class GraphSerializer {
             })),
             edges: graph.edges.map(edge => ({
                 node1: edge.node1.label,
-                node2: edge.node2.label,
-                count: edge.count
+                node2: edge.node2.label
             }))
         };
 

@@ -6,20 +6,13 @@ import { Entity } from "./Entity";
 
 export class BinaryRelationship extends Edge {
 
-    labels: string[];
+    label: string;
     halfDiagX: number = 70;
     halfDiagY: number = 50;
 
-    constructor(node1: Node, node2: Node, count: number = 1, labels: string[], vertex1?: Vector2D, vertex2?: Vector2D) {
-        super(node1, node2, count, vertex1, vertex2);
-        this.labels = [];
-        if (labels.length < count) {
-            console.log(node1.label, node2.label, count, labels);
-            throw new Error("Not enough labels");
-        }
-        for (let i = 0; i < count; i++) {
-            this.labels.push(labels[i]);
-        }
+    constructor(node1: Node, node2: Node, label: string, vertex1?: Vector2D, vertex2?: Vector2D, middlePoint?: Vector2D) {
+        super(node1, node2, vertex1, vertex2, middlePoint);
+        this.label = label;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
