@@ -106,6 +106,7 @@ export class Edge implements Drawable {
         return points;
     }
 
+
     intersects(e: Edge) {
         const numSamples = 100;  // Increase for more accuracy
         const points1 = this.samplePoints(numSamples);

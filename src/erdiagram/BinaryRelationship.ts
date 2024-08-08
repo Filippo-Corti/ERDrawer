@@ -18,26 +18,27 @@ export class BinaryRelationship extends Edge {
         this.label = label;
     }
 
+    // Node1 -- W ------- X -- <Rhombus> -- Y ------- Z -- Node2 
     draw(ctx: CanvasRenderingContext2D): void {
-        const PADDING = 15;
+        const LABEL_PADDING = 15;
 
         if (!this.vertex1 || !this.vertex2) {
             throw new Error("Couldn't find a Connection Point!");
         }
-        //Calculate Quadratic Curve control point
-        const controlPoint: Vector2D = new Vector2D(
-            2 * this.middlePoint.x - 0.5 * this.vertex1.x - 0.5 * this.vertex2.x,
-            2 * this.middlePoint.y - 0.5 * this.vertex1.y - 0.5 * this.vertex2.y
-        );
 
-        // Draw Edge
+        // Get the Drawing Path
+        let points: Vector2D[] = this.samplePoints(0);
+
+        // Draw the Path
         ctx.beginPath();
-        ctx.moveTo(this.vertex1.x, this.vertex1.y);
-        ctx.quadraticCurveTo(controlPoint.x, controlPoint.y, this.vertex2.x, this.vertex2.y);
+        ctx.moveTo(points[0].x, points[0].y);
+        for (const v of points) {
+            ctx.lineTo(v.x, v.y);
+        }
         ctx.stroke();
 
-        // Draw Rhombus half way
-        const rhombusVertices = this.getRhombusVertices(this.middlePoint);
+        // Draw Rhombus in the MiddlePoint
+        const rhombusVertices = this.getRhombusVertices();
         ctx.fillStyle = "white";
         ctx.beginPath();
         ctx.moveTo(rhombusVertices[rhombusVertices.length - 1].x, rhombusVertices[rhombusVertices.length - 1].y);
@@ -46,89 +47,31 @@ export class BinaryRelationship extends Edge {
         }
         ctx.fill();
         ctx.stroke();
-        
-        /*for (let i = 0; i < this.count; i++) {
-            const mx = (this.vertex2.x + this.vertex1.x) / 2;
-            const my = (this.vertex2.y + this.vertex1.y) / 2;
-            const corners = this.getCorners();
-            // Calculate offset
-            const theta = Math.atan2(this.vertex2.y - this.vertex1.y, this.vertex2.x - this.vertex1.x);
-            const offsetFactor = (i - (this.count - 1) / 2);
-            const dx = BinaryRelationship.OFFSET_BETWEEN_MULTIEDGES * offsetFactor * Math.sin(theta);
-            const dy = BinaryRelationship.OFFSET_BETWEEN_MULTIEDGES * offsetFactor * -Math.cos(theta);
 
-            // Calculate Passing Points
-            let points: Vector2D[] = [];
-            const rhombusCenterPoint = new Vector2D(mx + dx, my + dy);
-            const rhombusConnPoints =
-                this.findRhombusConnectionPoints(rhombusCenterPoint, Segment.fromVectors(corners[0], rhombusCenterPoint))
-                    .concat(this.findRhombusConnectionPoints(rhombusCenterPoint, Segment.fromVectors(corners[1], rhombusCenterPoint)));
-            rhombusConnPoints.sort((v1, v2) => v1.distanceTo(this.vertex1) - v2.distanceTo(this.vertex1)); // Order them correctly
-            const rhombusCorners: Vector2D[] = [];
-            rhombusConnPoints.forEach(p => {
-                const dir = [- Math.PI / 2, 0, + Math.PI / 2, Math.PI][this.getRhombusVertices(rhombusCenterPoint).map(v => v.toString()).indexOf(p.toString())];
-                rhombusCorners.push(Vector2D.sum(p, Vector2D.fromPolar(20, dir)));
-            })
-            points.push(this.vertex1);
-            points.push(corners[0]);
-            if (rhombusCorners.length > 0) {
-                points.push(rhombusCorners[0]);
-                points.push(rhombusConnPoints[0]);
-                points.push(rhombusCenterPoint);
-                points.push(rhombusConnPoints[1]);
-                points.push(rhombusCorners[1]);
-            } else { // Only happens when nodes are too close to each other
-                points.push(rhombusCenterPoint);
-            }
-            points.push(corners[1]);
-            points.push(this.vertex2);
+        //Draw Label
+        ctx.fillStyle = "black";
+        let fontSize = this.halfDiagX * 1.25;
+        do {
+            ctx.font = fontSize + "px serif";
+            fontSize -= 3;
+        } while (ctx.measureText(this.label).width > (this.halfDiagX * 1.25 - LABEL_PADDING));
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(this.label, this.middlePoint.x, this.middlePoint.y);
 
-            // Draw Edge
-            ctx.beginPath();
-            ctx.moveTo(points[0].x, points[0].y);
-            for (const v of points) {
-                ctx.lineTo(v.x, v.y);
-            }
-            ctx.stroke();
-
-            // Draw Rhombus half way
-            const rhombusVertices = this.getRhombusVertices(new Vector2D(mx + dx, my + dy));
-            ctx.fillStyle = "white";
-            ctx.beginPath();
-            ctx.moveTo(rhombusVertices[rhombusVertices.length - 1].x, rhombusVertices[rhombusVertices.length - 1].y);
-            for (const v of rhombusVertices) {
-                ctx.lineTo(v.x, v.y);
-            }
-            ctx.fill();
-            ctx.stroke();
-
-            //Draw Label
-            ctx.fillStyle = "black";
-            let fontSize = this.halfDiagX * 1.25;
-            do {
-                ctx.font = fontSize + "px serif";
-                fontSize -= 3;
-            } while (ctx.measureText(this.labels[i]).width > (this.halfDiagX * 1.25 - PADDING));
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(this.labels[i], mx + dx, my + dy);
-
-            // if (i != this.count - 1)
-            //     this.calculateNewVertices();
-        }*/
     }
 
-    getRhombusVertices(centerPoint: Vector2D): Vector2D[] {
+    getRhombusVertices(): Vector2D[] {
         return [
-            new Vector2D(centerPoint.x, centerPoint.y - this.halfDiagY),
-            new Vector2D(centerPoint.x + this.halfDiagX, centerPoint.y),
-            new Vector2D(centerPoint.x, centerPoint.y + this.halfDiagY),
-            new Vector2D(centerPoint.x - this.halfDiagX, centerPoint.y),
+            new Vector2D(this.middlePoint.x, this.middlePoint.y - this.halfDiagY),
+            new Vector2D(this.middlePoint.x + this.halfDiagX, this.middlePoint.y),
+            new Vector2D(this.middlePoint.x, this.middlePoint.y + this.halfDiagY),
+            new Vector2D(this.middlePoint.x - this.halfDiagX, this.middlePoint.y),
         ];
     }
 
-    getRhombusSegments(centerPoint: Vector2D): Segment[] {
-        const vertices = this.getRhombusVertices(centerPoint);
+    getRhombusSegments(): Segment[] {
+        const vertices = this.getRhombusVertices();
         return [
             Segment.fromVectors(vertices[0], vertices[1]),
             Segment.fromVectors(vertices[1], vertices[2]),
@@ -137,44 +80,69 @@ export class BinaryRelationship extends Edge {
         ]
     }
 
-    // Return edge's first corners
-    getCorners(): Vector2D[] {
-        const distToVertex = 70;
-        const corners: Vector2D[] = [];
-        let edgeDirection = (this.node1 as Entity).getRectangleSegmentByPoint(this.vertex1)!.getDirection() + Math.PI / 2;
-        corners.push(Vector2D.sum(this.vertex1, Vector2D.fromPolar(distToVertex, edgeDirection)));
-        edgeDirection = (this.node2 as Entity).getRectangleSegmentByPoint(this.vertex2)!.getDirection() + Math.PI / 2;
-        corners.push(Vector2D.sum(this.vertex2, Vector2D.fromPolar(distToVertex, edgeDirection)));
-        return corners;
-    }
-
-    // Returns the two rhombus vertices connected to the edge
-    findRhombusConnectionPoints(rhombusCenterPoint: Vector2D, crossingEdge: Segment): Vector2D[] {
-        const rhombusVertices = this.getRhombusVertices(rhombusCenterPoint);
-        const rhombusSegments = this.getRhombusSegments(rhombusCenterPoint);
+    // Returns the rhombus vertices connected to the edge, given the points W and Z
+    getRhombusConnectionPoints(w: Vector2D, z: Vector2D): Vector2D[] {
+        const rhombusSegments = this.getRhombusSegments();
         const connPoints: Vector2D[] = [];
-        for (const s of rhombusSegments) {
-            // Check if the edge and the rhombus segment intersect
-            const intersection = crossingEdge.getIntersection(s);
-            if (!intersection) continue;
-            let minDist = Number.MAX_VALUE;
-            let minPoint: Vector2D | null = null;
+        const crossingEdge1: Segment = Segment.fromVectors(w, this.middlePoint);
+        const crossingEdge2: Segment = Segment.fromVectors(this.middlePoint, z);
 
-            // Find closest vertice if they do
-            for (const v of rhombusVertices) {
-                let dist = intersection.distanceTo(v);
-                if (dist <= minDist) {
-                    minDist = dist;
-                    minPoint = v;
-                }
+        for (const s of rhombusSegments) {
+            // Check if the edges and the rhombus segment intersect
+            const intersection1 = crossingEdge1.getIntersection(s);
+            if (intersection1) {
+                const dist1 = s.a.distanceTo(intersection1);
+                const dist2 = s.b.distanceTo(intersection1);
+                connPoints.push((dist1 < dist2) ? s.a : s.b);
             }
-            connPoints.push(minPoint!);
+            const intersection2 = crossingEdge2.getIntersection(s);
+            if (intersection2) {
+                const dist1 = s.a.distanceTo(intersection2);
+                const dist2 = s.b.distanceTo(intersection2);
+                connPoints.push((dist1 < dist2) ? s.a : s.b);
+            }
         }
+
+        connPoints.sort((v1, v2) => v1.distanceTo(this.vertex1) - v2.distanceTo(this.vertex1)); // Order them correctly
         return connPoints;
     }
 
-    getMultiEdgesOffset() : number {
+    getMultiEdgesOffset(): number {
         return BinaryRelationship.OFFSET_BETWEEN_MULTIEDGES;
+    }
+
+    samplePoints(_numSamples: number): Vector2D[] {
+        const distToVertex = 70; // Length of "--"
+
+        // Build the Drawing Path
+        const dirFromNode1 = (this.node1 as Entity).getRectangleSegmentByPoint(this.vertex1)!.getDirection() + Math.PI / 2;
+        const dirFromNode2 = (this.node2 as Entity).getRectangleSegmentByPoint(this.vertex2)!.getDirection() + Math.PI / 2;
+
+        const w = Vector2D.sum(this.vertex1, Vector2D.fromPolar(distToVertex, dirFromNode1));
+        const z = Vector2D.sum(this.vertex2, Vector2D.fromPolar(distToVertex, dirFromNode2));
+
+        let rhombusConnPoints = this.getRhombusConnectionPoints(w, z);
+        if (rhombusConnPoints.length < 2) { // Fallback if the nodes are too close to each other. Shouldn't happen
+            rhombusConnPoints = [this.middlePoint, this.middlePoint];
+        }
+        const dirFromConnPoint1 = [- Math.PI / 2, 0, + Math.PI / 2, Math.PI][this.getRhombusVertices().map(v => v.toString()).indexOf(rhombusConnPoints[0].toString())];
+        const dirFromConnPoint2 = [- Math.PI / 2, 0, + Math.PI / 2, Math.PI][this.getRhombusVertices().map(v => v.toString()).indexOf(rhombusConnPoints[1].toString())];
+
+        const x = Vector2D.sum(rhombusConnPoints[0], Vector2D.fromPolar(distToVertex, dirFromConnPoint1));
+        const y = Vector2D.sum(rhombusConnPoints[1], Vector2D.fromPolar(distToVertex, dirFromConnPoint2));
+
+        let points: Vector2D[] = [
+            this.vertex1, // Node1
+            w, // W
+            x, // X
+            rhombusConnPoints[0], // <
+            this.middlePoint, // Rhombus
+            rhombusConnPoints[1], // >
+            y, // Y
+            z, // Z
+            this.vertex2 // Node2
+        ];
+        return points;
     }
 
 
