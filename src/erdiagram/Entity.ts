@@ -109,16 +109,29 @@ export class Entity extends Node {
         return connPoints;
     }
 
-    // Occupies closest connection point to point, that is not already occupied.
-    // If onSegment is true, Point needs to be sitting on one of the segments of the Entity and
-    // only Connection Points standing on that segment are considered
+    // Occupies the connection point that is not already occupied and the closest
+    // to the point or the segment given.
     // It then returns the occupied connection point.
-    occupyClosestConnectionPoint(point: Vector2D, onSegment: boolean = true): Vector2D {
+    // sameSegmentRequired = true requires the connection point to be on the same segment of the given point
+    // or the intersection between the segment and the rectangle.
+    occupyClosestConnectionPoint(point: Vector2D, sameSegmentRequired?: boolean): Vector2D | null;
+    occupyClosestConnectionPoint(segment: Segment, sameSegmentRequired?: boolean): Vector2D | null;
+    occupyClosestConnectionPoint(param: any, sameSegmentRequired: boolean = true): Vector2D | null {
+        let point: Vector2D;
+        if (param instanceof Vector2D) {
+            point = param;
+        } else {
+            const p = this.getRectangleIntersectingPoint(param);
+            if (!p) {
+                throw new Error("No intersection found between segment and point");
+            }
+            point = p;
+        }
+
         const connPoints = this.getAllConnectionPoints();
-        const sittingOnSegment = this.getRectangleSegmentByPoint(point);
-        if (onSegment && !sittingOnSegment) {
-            console.log(this, point);
-            throw new Error("The point is not on any segment of the entity");
+        const segmentOfPoint = this.getRectangleSegmentByPoint(point);
+        if (!segmentOfPoint && sameSegmentRequired) {
+            throw new Error("Point is not on any segment. sameSegmentRequired can't be true");
         }
         let minPoint = null;
         let minDist = Number.MAX_VALUE;
@@ -126,25 +139,27 @@ export class Entity extends Node {
         for (let i = 0; i < connPoints.length; i++) {
             let dist = connPoints[i].distanceTo(point);
             if (dist < minDist && !this.connectionPoints.has(connPoints[i].toString())) {
-                if (!onSegment || (onSegment && sittingOnSegment!.contains(connPoints[i]))) {
-                    minDist = dist;
-                    minPoint = connPoints[i];
+                if (!sameSegmentRequired) {
+                    if (!segmentOfPoint || segmentOfPoint.contains(connPoints[i])) {
+                        minDist = dist;
+                        minPoint = connPoints[i];
+                    }
+                } else {
+                    if (!segmentOfPoint || segmentOfPoint.contains(connPoints[i])) {
+                    }
                 }
             }
         }
 
-
-        // If no point is found, reduce deltas and try again
         if (!minPoint) {
-            this.reduceDeltas();
-            return this.occupyClosestConnectionPoint(point, onSegment);
+            return null;
         }
         this.connectionPoints.set(minPoint.toString(), true);
         return minPoint;
     }
 
     // Returns the point where the edge and the rectangle of the entity intersect
-    getEdgeIntersectingPoint(edgeSegment: Segment): Vector2D | null {
+    getRectangleIntersectingPoint(edgeSegment: Segment): Vector2D | null {
         const segments = this.getRectangleSegments();
 
         for (let s of segments) {
@@ -153,17 +168,6 @@ export class Entity extends Node {
             }
         }
         return null;
-    }
-
-    // Occupies closest connection point to the Segment segment.
-    // It then returns the occupied connection point.
-    occupyConnectionPointBySegment(segment: Segment): Vector2D | null {
-        const p = this.getEdgeIntersectingPoint(segment);
-        if (!p) {
-            console.log("No intersection point found");
-            return null;
-        }
-        return this.occupyClosestConnectionPoint(p);
     }
 
     // Empty Connection Points map and reset deltas
@@ -179,28 +183,69 @@ export class Entity extends Node {
     }
 
     // Sets the length between two connection points to half the previous value
-    reduceDeltas(): void {
+    // Returns true if the deltas are not too small to get halved.
+    reduceDeltas(): boolean {
+        if (this.deltaConnectionPointsX <= 10 || this.deltaConnectionPointsY <= 10) {
+            return false;
+        }
         this.deltaConnectionPointsX /= 2;
         this.deltaConnectionPointsY /= 2;
+        return true;
     }
 
-    addAttribute(label : string, filledPoint : boolean = false) {
+    addAttribute(label: string, filledPoint: boolean = false) {
         this.attributes.set(label, new Attribute(label, this.pos, filledPoint));
     }
 
+    findEdgeConnectionPosition(edgeSegment : Segment) : Vector2D {
+        const deltaX = this.deltaConnectionPointsX;
+        const deltaY = this.deltaConnectionPointsY;
+        let sameSegmentRequired = true;
+        do {
+            const cp = this.occupyClosestConnectionPoint(edgeSegment, sameSegmentRequired);
+            if (cp) return cp;
+            const ok = this.reduceDeltas();
+            if (!ok) {
+                if (sameSegmentRequired) {
+                    sameSegmentRequired = false;
+                    this.deltaConnectionPointsX = deltaX;
+                    this.deltaConnectionPointsY = deltaY;
+                }
+                else 
+                    throw new Error("Couldn't place the attribute in any possible way");
+            }
+        } while (true);
+    }
+
     // Finds and Returns a new Attribute starting position.
-    findAttributePosition(attrCurrPosition : Vector2D) : Vector2D {
-        return this.occupyClosestConnectionPoint(attrCurrPosition, false);
+    findAttributePosition(attrCurrPosition: Vector2D): Vector2D {
+        const deltaX = this.deltaConnectionPointsX;
+        const deltaY = this.deltaConnectionPointsY;
+        let sameSegmentRequired = false;
+        do {
+            const cp = this.occupyClosestConnectionPoint(attrCurrPosition, sameSegmentRequired);
+            if (cp) return cp;
+            const ok = this.reduceDeltas();
+            if (!ok) {
+                if (sameSegmentRequired) {
+                    sameSegmentRequired = false;
+                    this.deltaConnectionPointsX = deltaX;
+                    this.deltaConnectionPointsY = deltaY;
+                }
+                else 
+                    throw new Error("Couldn't place the attribute in any possible way");
+            }
+        } while (true);
     }
 
     // Labels list contains attributes and other entities' names
-    setPrimaryKey(labelsList : string[]) : void {
-        for(const label of labelsList) {
+    setPrimaryKey(labelsList: string[]): void {
+        for (const label of labelsList) {
             if (this.attributes.has(label)) {
                 this.attributes.get(label)!.filledPoint = true;
             }
         }
-    } 
+    }
 
     clone(): Node {
         const newNode = new Entity(this.label, this.pos.x, this.pos.y, this.size);

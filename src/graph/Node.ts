@@ -38,8 +38,14 @@ export class Node implements Drawable {
     }
 
     // For normal Nodes, the connection point is only the central one 
-    occupyClosestConnectionPoint(_point : Vector2D) : Vector2D {
+    occupyClosestConnectionPoint(point: Vector2D, sameSegmentRequired? : boolean): Vector2D | null;
+    occupyClosestConnectionPoint(segment: Segment, sameSegmentRequired? : boolean): Vector2D | null;
+    occupyClosestConnectionPoint(_param: any, _sameSegmentRequired? : boolean): Vector2D | null {
         return this.pos;
+    }
+
+    findEdgeConnectionPosition(edgeSegment : Segment) : Vector2D{
+        return this.occupyClosestConnectionPoint(edgeSegment)!;
     }
 
     // For normal Nodes, the connection point is only the central one 
