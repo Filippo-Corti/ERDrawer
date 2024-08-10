@@ -124,6 +124,17 @@ export class Edge implements Drawable {
         return false;
     }
 
+    intersectsSegment(s : Segment) {
+        const numSamples = 100;  // Increase for more accuracy
+        const points = this.samplePoints(numSamples);
+        for(let i = 0; i < points.length - 1; i++) {
+            if (s.intersects(Segment.fromVectors(points[i], points[i+1]))) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     getMultiEdgesOffset() : number {
         return Edge.OFFSET_BETWEEN_MULTIEDGES;
     }

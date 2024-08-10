@@ -9,7 +9,8 @@ export class Attribute implements Drawable {
     direction: number = - Math.PI / 2; //Angle in radiants
     filledPoint: boolean;
 
-    static fontSize : number = 15;
+    static FONT_SIZE : number = 15;
+    static CIRCLE_SIZE = 5;
 
     constructor(label: string, startingPoint: Vector2D, filledPoint: boolean = false) {
         this.label = label;
@@ -19,12 +20,11 @@ export class Attribute implements Drawable {
 
     totalLength() : number {
         const ctx = document.createElement("canvas").getContext("2d")!; // Fictionary context to measure label length
-        ctx.font = Attribute.fontSize + "px serif";
-        return this.length + ctx.measureText(this.label).width;
+        ctx.font = Attribute.FONT_SIZE + "px serif";
+        return this.length + Attribute.CIRCLE_SIZE + 3 + ctx.measureText(this.label).width;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
-        const SIZE = 5;
         const deltaVector = Vector2D.fromPolar(this.length, this.direction);
         const endPoint = Vector2D.sum(this.startingPoint, deltaVector);
 
@@ -39,7 +39,7 @@ export class Attribute implements Drawable {
         // Draw Point
         ctx.fillStyle = (this.filledPoint) ? "black" : "white";
         ctx.beginPath();
-        ctx.arc(endPoint.x, endPoint.y, SIZE, 0, 2 * Math.PI, true);
+        ctx.arc(endPoint.x, endPoint.y, Attribute.CIRCLE_SIZE, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.stroke();
 
@@ -47,16 +47,16 @@ export class Attribute implements Drawable {
         ctx.save();
         ctx.fillStyle = "black";
         ctx.textBaseline = "middle";
-        ctx.font = Attribute.fontSize + "px serif";
+        ctx.font = Attribute.FONT_SIZE + "px serif";
         ctx.translate(endPoint.x, endPoint.y);
         if (this.direction > Math.PI / 2 && this.direction < 3 / 2 * Math.PI) {
             ctx.rotate(this.direction + Math.PI);
             ctx.textAlign = "end";
-            ctx.fillText(this.label, - (SIZE + 3), 0);
+            ctx.fillText(this.label, - (Attribute.CIRCLE_SIZE + 3), 0);
         } else {
             ctx.rotate(this.direction);
             ctx.textAlign = "start";
-            ctx.fillText(this.label, SIZE + 3, 0);
+            ctx.fillText(this.label, Attribute.CIRCLE_SIZE + 3, 0);
         }
         ctx.restore();
     }

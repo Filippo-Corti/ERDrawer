@@ -4,8 +4,8 @@
       "type": "Entity",
       "label": "Persona",
       "pos": {
-        "x": 318,
-        "y": 439
+        "x": 801,
+        "y": 555
       },
       "disp": {
         "x": 0,
@@ -31,8 +31,8 @@
       "type": "Entity",
       "label": "Lezione",
       "pos": {
-        "x": 644,
-        "y": 524
+        "x": 1433,
+        "y": 544
       },
       "disp": {
         "x": 0,
@@ -58,8 +58,8 @@
       "type": "Entity",
       "label": "Argomento",
       "pos": {
-        "x": 944,
-        "y": 402
+        "x": 1025,
+        "y": 253
       },
       "disp": {
         "x": 0,
@@ -81,8 +81,8 @@
       "type": "Entity",
       "label": "Gruppo",
       "pos": {
-        "x": 387,
-        "y": 473
+        "x": 215,
+        "y": 789
       },
       "disp": {
         "x": 0,
@@ -100,7 +100,7 @@
       "type": "Entity",
       "label": "Tesina",
       "pos": {
-        "x": 390,
+        "x": 238,
         "y": 277
       },
       "disp": {

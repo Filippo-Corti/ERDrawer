@@ -56,6 +56,9 @@ export class Entity extends Node {
 
         for (let [_, attribute] of this.attributes) {
             const point = this.findAttributePosition(attribute.totalLength());
+            if (!point) {
+                throw new Error("Couldn't position attribute");
+            }
             const dir = this.getRectangleSegmentByPoint(point)!.getDirection();
             attribute.startingPoint = point;
             attribute.direction = dir + Math.PI / 2; //Direction is perpendicular to the segment
@@ -132,21 +135,17 @@ export class Entity extends Node {
     isConnectionPointOccupied(p: Vector2D): boolean {
         const found = this.connectionPoints.find((cp) => cp.p.x == p.x && cp.p.y == p.y);
         if (!found) {
-            console.log(this);
-            console.log(p, found);
             throw new Error("P is not a connection point");
         }
         return !found.empty;
     }
 
-    occupyConnectionPoint(p: Vector2D): void {
+    setConnectionPoint(p: Vector2D, empty: boolean): void {
         const found = this.connectionPoints.find((cp) => cp.p.x == p.x && cp.p.y == p.y);
         if (!found) {
-            console.log(this);
-            console.log(p, found);
             throw new Error("P is not a connection point");
         }
-        found.empty = false;
+        found.empty = empty;
     }
 
     // Occupies the connection point that is not already occupied and the closest
@@ -197,7 +196,7 @@ export class Entity extends Node {
         if (!minPoint) {
             return null;
         }
-        this.occupyConnectionPoint(minPoint);
+        this.setConnectionPoint(minPoint, false);
         return minPoint;
     }
 
@@ -273,22 +272,36 @@ export class Entity extends Node {
     }
 
     // Finds and Returns a new Attribute starting position.
-    findAttributePosition(attrSegmentLength: number): Vector2D {
+    findAttributePosition(attrSegmentLength: number): Vector2D | null {
+        const connectingEdges = this.graph.getEdgesByNode(this.label);
         do {
-            const cp = this.occupyClosestConnectionPoint(this.pos, false);
-            if (cp) {
-                // Check for Intersections
-                const diffVect = Vector2D.fromPolar(attrSegmentLength, this.getRectangleSegmentByPoint(cp)!.getDirection() + Math.PI / 2);
+            const connectionPoints = this.connectionPoints;
+            Random.shuffle(connectionPoints);
+            // Search Connection Point
+            for (const cp of connectionPoints) {
+                if (!cp.empty) continue;
+                // Build Attribute Segment
+                const diffVect = Vector2D.fromPolar(attrSegmentLength, this.getRectangleSegmentByPoint(cp.p)!.getDirection() + Math.PI / 2);
                 const attrSegment = Segment.fromVectors(
-                    cp,
-                    Vector2D.sum(cp, diffVect)
+                    cp.p,
+                    Vector2D.sum(cp.p, diffVect)
                 );
-
-                return cp;
+                //Check for Intersections
+                let intersects = false;
+                for (const edge of connectingEdges) {
+                    if (edge.intersectsSegment(attrSegment)) {
+                        intersects = true;
+                        break;
+                    }
+                }
+                if (!intersects) {
+                    this.setConnectionPoint(cp.p, false);
+                    return cp.p;
+                }
             }
             const ok = this.reduceDeltas();
             if (!ok) {
-                throw new Error("Couldn't place the attribute in any possible way");
+                return this.occupyClosestConnectionPoint(this.pos, false); //If you can't reduce any more, just pick a random one.
             }
         } while (true);
     }
