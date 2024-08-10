@@ -124,6 +124,8 @@ export class BinaryRelationship extends Edge {
         let rhombusConnPoints = this.getRhombusConnectionPoints(w, z);
         if (rhombusConnPoints.length < 2) { // Fallback if the nodes are too close to each other. Shouldn't happen
             rhombusConnPoints = [this.middlePoint, this.middlePoint];
+        } else if (rhombusConnPoints.length == 4) { // Happens when 2 segments intersect the same edge, due to it being on the corner
+            rhombusConnPoints = [rhombusConnPoints[0], rhombusConnPoints[2]];
         }
         const dirFromConnPoint1 = [- Math.PI / 2, 0, + Math.PI / 2, Math.PI][this.getRhombusVertices().map(v => v.toString()).indexOf(rhombusConnPoints[0].toString())];
         const dirFromConnPoint2 = [- Math.PI / 2, 0, + Math.PI / 2, Math.PI][this.getRhombusVertices().map(v => v.toString()).indexOf(rhombusConnPoints[1].toString())];
