@@ -1,7 +1,9 @@
 import { Edge } from "../graph/Edge";
 import { Node } from "../graph/Node";
 import { Segment } from "../utils/Segment";
+import { ConnectionPoint } from "../utils/Utils";
 import { Vector2D } from "../utils/Vector2D";
+import { Attribute } from "./Attribute";
 import { Entity } from "./Entity";
 
 export class BinaryRelationship extends Edge {
@@ -9,13 +11,22 @@ export class BinaryRelationship extends Edge {
     label: string;
     halfDiagX: number = 70;
     halfDiagY: number = 50;
+    connectionPoints: ConnectionPoint[]; // Vector2D Hashcode to boolean
+    deltaConnectionPointsX: number = this.halfDiagX / 2;
+    deltaConnectionPointsY: number = this.halfDiagY / 2;
+    attributes: Map<string, Attribute>;
+    
+    cardNode1: [string, string];
+    cardNode2: [string, string];
 
     static OFFSET_BETWEEN_MULTIEDGES: number = 100;
 
-
-    constructor(node1: Node, node2: Node, label: string, vertex1?: Vector2D, vertex2?: Vector2D, middlePoint?: Vector2D) {
+    constructor(node1: Node, node2: Node, label: string, cardNode1: [string, string], cardNode2: [string, string],
+        vertex1?: Vector2D, vertex2?: Vector2D, middlePoint?: Vector2D) {
         super(node1, node2, vertex1, vertex2, middlePoint);
         this.label = label;
+        this.cardNode1 = cardNode1;
+        this.cardNode2 = cardNode2;
     }
 
     // Node1 -- W ------- X - <Rhombus> - Y ------- Z -- Node2 
@@ -48,8 +59,29 @@ export class BinaryRelationship extends Edge {
         ctx.fill();
         ctx.stroke();
 
-        //Draw Label
+        // Draw Cardinalities next to the Rhombus
         ctx.fillStyle = "black";
+        ctx.textBaseline = "middle";
+        ctx.font = "12px serif";
+        const segmentsForCards = [
+            Segment.fromVectors(points[2], points[3]),
+            Segment.fromVectors(points[6], points[5])
+        ];
+        const cards = [this.cardNode1, this.cardNode2];
+        for (let i = 0; i < 2; i++) {
+            const pointCard = new Vector2D(
+                segmentsForCards[i].a.x * 0.4 + segmentsForCards[i].b.x * 0.6,
+                segmentsForCards[i].a.y * 0.4 + segmentsForCards[i].b.y * 0.6,
+            );
+            const horizSegment = segmentsForCards[i].getDirection() % Math.PI == 0;
+            ctx.textAlign = (horizSegment) ? "center" : "left";
+            const diffVectDir = (horizSegment) ? - Math.PI / 2 : 0;
+            pointCard.sum(Vector2D.fromPolar(9, diffVectDir));  
+            console.log(this.label, i, segmentsForCards[i].getDirection())
+            ctx.fillText("[" + cards[i].toString() + "]", pointCard.x, pointCard.y);
+        }
+
+        // Draw Label
         let fontSize = this.halfDiagX * 1.25;
         do {
             ctx.font = fontSize + "px serif";
@@ -149,7 +181,8 @@ export class BinaryRelationship extends Edge {
 
 
     clone(): BinaryRelationship {
-        return new BinaryRelationship(this.node1, this.node2, this.label, this.vertex1, this.vertex2, this.middlePoint);
+        return new BinaryRelationship(this.node1, this.node2, this.label, this.cardNode1, this.cardNode2,
+            this.vertex1, this.vertex2, this.middlePoint);
     }
 
 

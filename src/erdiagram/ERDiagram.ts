@@ -5,7 +5,7 @@ import { Edge } from "../graph/Edge";
 
 export class ERDiagram extends Graph {
 
-    addBinaryRelationship(label1: string, label2: string, edgeLabel: string) {
+    addBinaryRelationship(label1: string, label2: string, edgeLabel: string, cardNode1 : [string, string], cardNode2 : [string, string]) {
         const n1 = this.nodes.get(label1);
         const n2 = this.nodes.get(label2);
 
@@ -13,7 +13,7 @@ export class ERDiagram extends Graph {
             return;
         }
 
-        this.edges.push(new BinaryRelationship(n1, n2, edgeLabel));
+        this.edges.push(new BinaryRelationship(n1, n2, edgeLabel, cardNode1, cardNode2));
 
 
         //Update edge's middlePoints

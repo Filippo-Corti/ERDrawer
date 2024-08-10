@@ -1,31 +1,19 @@
 import { Graph } from "../graph/Graph";
 import { Node } from "../graph/Node";
 import { Segment } from "../utils/Segment";
-import { Random } from "../utils/Utils";
+import { ConnectionPoint, Random } from "../utils/Utils";
 import { Vector2D } from "../utils/Vector2D";
 import { Attribute } from "./Attribute";
+import { NodeWithAttributes } from "./NodeWithAttributes";
 
-type ConnectionPoint = {
-    p: Vector2D,
-    empty: boolean
-}
-
-export class Entity extends Node {
-
+export class Entity extends NodeWithAttributes {
     halfSizeX: number = 50;
     halfSizeY: number = 30;
-    connectionPoints: ConnectionPoint[]; // Vector2D Hashcode to boolean
     deltaConnectionPointsX: number = this.halfSizeX;
     deltaConnectionPointsY: number = this.halfSizeY;
-    attributes: Map<string, Attribute>;
 
     constructor(graph: Graph, label: string, x: number, y: number, size: number = 30, attributes: string[] = []) {
-        super(graph, label, x, y, size);
-        this.connectionPoints = [];
-        const connPoints = this.getAllConnectionPoints();
-        connPoints.forEach((p) => this.connectionPoints.push({ p: p, empty: true }));
-        this.attributes = new Map<string, Attribute>;
-        attributes.forEach(a => this.attributes.set(a, new Attribute(a, this.pos))); //Default position is center of the entity
+        super(graph, label, x, y, size, attributes);
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -128,26 +116,6 @@ export class Entity extends Node {
         return connPoints;
     }
 
-    isAConnectionPoint(p: Vector2D): boolean {
-        return this.connectionPoints.find((cp) => cp.p.x == p.x && cp.p.y == p.y) !== undefined;
-    }
-
-    isConnectionPointOccupied(p: Vector2D): boolean {
-        const found = this.connectionPoints.find((cp) => cp.p.x == p.x && cp.p.y == p.y);
-        if (!found) {
-            throw new Error("P is not a connection point");
-        }
-        return !found.empty;
-    }
-
-    setConnectionPoint(p: Vector2D, empty: boolean): void {
-        const found = this.connectionPoints.find((cp) => cp.p.x == p.x && cp.p.y == p.y);
-        if (!found) {
-            throw new Error("P is not a connection point");
-        }
-        found.empty = empty;
-    }
-
     // Occupies the connection point that is not already occupied and the closest
     // to the point or the segment given.
     // It then returns the occupied connection point.
@@ -200,6 +168,11 @@ export class Entity extends Node {
         return minPoint;
     }
 
+    resetDeltas(): void {
+        this.deltaConnectionPointsX = this.halfSizeX;
+        this.deltaConnectionPointsY = this.halfSizeY;
+    }
+
     // Returns the point where the edge and the rectangle of the entity intersect
     getRectangleIntersectingPoint(edgeSegment: Segment): Vector2D | null {
         const segments = this.getRectangleSegments();
@@ -210,20 +183,6 @@ export class Entity extends Node {
             }
         }
         return null;
-    }
-
-    // Empty Connection Points map and reset deltas
-    // It also resets attributes positions
-    resetConnectionPoints(): void {
-        this.connectionPoints = [];
-        const connPoints = this.getAllConnectionPoints();
-        connPoints.forEach((p) => this.connectionPoints.push({ p: p, empty: true }));
-        this.deltaConnectionPointsX = this.halfSizeX;
-        this.deltaConnectionPointsY = this.halfSizeY;
-        this.attributes.forEach(a => {
-            a.startingPoint = this.pos;
-            a.direction = 0;
-        });
     }
 
     // Sets the length between two connection points to half the previous value
@@ -245,10 +204,6 @@ export class Entity extends Node {
         });
         this.connectionPoints = newConnectionPoints;
         return true;
-    }
-
-    addAttribute(label: string, filledPoint: boolean = false) {
-        this.attributes.set(label, new Attribute(label, this.pos, filledPoint));
     }
 
     findEdgeConnectionPosition(edgeSegment: Segment): Vector2D {

@@ -129,37 +129,49 @@
       "type": "BinaryRelationship",
       "node1": "Persona",
       "node2": "Lezione",
-      "label": "Tiene"
+      "label": "Tiene",
+      "card1": ["0", "N"],
+      "card2": ["0", "1"]
     },
     {
       "type": "BinaryRelationship",
       "node1": "Persona",
       "node2": "Lezione",
-      "label": "Segue"
+      "label": "Segue",
+      "card1": ["0", "N"],
+      "card2": ["0", "1"]
     },
     {
       "type": "BinaryRelationship",
       "node1": "Persona",
       "node2": "Gruppo",
-      "label": "Appartiene"
+      "label": "Appartiene",
+      "card1": ["0", "N"],
+      "card2": ["0", "1"]
     },
     {
       "type": "BinaryRelationship",
       "node1": "Gruppo",
       "node2": "Tesina",
-      "label": "Svolge"
+      "label": "Svolge",
+      "card1": ["0", "N"],
+      "card2": ["0", "1"]
     },
     {
       "type": "BinaryRelationship",
       "node1": "Tesina",
       "node2": "Argomento",
-      "label": "Riguarda"
+      "label": "Riguarda",
+      "card1": ["0", "N"],
+      "card2": ["0", "1"]
     },
     {
       "type": "BinaryRelationship",
       "node1": "Lezione",
       "node2": "Argomento",
-      "label": "Riguarda"
+      "label": "Riguarda",
+      "card1": ["0", "N"],
+      "card2": ["0", "1"]
     }
   ]
 }

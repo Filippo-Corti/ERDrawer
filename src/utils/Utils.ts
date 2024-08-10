@@ -1,3 +1,10 @@
+import { Vector2D } from "./Vector2D";
+
+export type ConnectionPoint = {
+    p: Vector2D,
+    empty: boolean
+}
+
 
 export module Random {
 
