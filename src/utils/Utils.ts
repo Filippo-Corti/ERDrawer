@@ -1,9 +1,9 @@
 
 export module Random {
 
-    var seed = 10;
+    var seed = 0;
     function random(): number {
-        return Math.random()
+        //return Math.random()
         var x = Math.sin(seed++) * 10000;
         return x - Math.floor(x);
     }

@@ -18,7 +18,7 @@ export class BinaryRelationship extends Edge {
         this.label = label;
     }
 
-    // Node1 -- W ------- X -- <Rhombus> -- Y ------- Z -- Node2 
+    // Node1 -- W ------- X - <Rhombus> - Y ------- Z -- Node2 
     draw(ctx: CanvasRenderingContext2D): void {
         const LABEL_PADDING = 15;
 
@@ -130,8 +130,8 @@ export class BinaryRelationship extends Edge {
         const dirFromConnPoint1 = [- Math.PI / 2, 0, + Math.PI / 2, Math.PI][this.getRhombusVertices().map(v => v.toString()).indexOf(rhombusConnPoints[0].toString())];
         const dirFromConnPoint2 = [- Math.PI / 2, 0, + Math.PI / 2, Math.PI][this.getRhombusVertices().map(v => v.toString()).indexOf(rhombusConnPoints[1].toString())];
 
-        const x = Vector2D.sum(rhombusConnPoints[0], Vector2D.fromPolar(distToVertex, dirFromConnPoint1));
-        const y = Vector2D.sum(rhombusConnPoints[1], Vector2D.fromPolar(distToVertex, dirFromConnPoint2));
+        const x = Vector2D.sum(rhombusConnPoints[0], Vector2D.fromPolar(distToVertex / 2, dirFromConnPoint1));
+        const y = Vector2D.sum(rhombusConnPoints[1], Vector2D.fromPolar(distToVertex / 2, dirFromConnPoint2));
 
         let points: Vector2D[] = [
             this.vertex1, // Node1

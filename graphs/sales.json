@@ -1,6 +1,7 @@
 {
   "nodes": [
     {
+      "type": "Entity",
       "label": "Company",
       "pos": {
         "x": 288,
@@ -10,9 +11,28 @@
         "x": 0,
         "y": 0
       },
-      "size": 37.5
+      "size": 37.5,
+      "attributes": [
+        {
+          "label": "Denominazione",
+          "id": true
+        },
+        {
+          "label": "Via",
+          "id": false
+        },
+        {
+          "label": "CAP",
+          "id": false
+        },
+        {
+          "label": "nCiv",
+          "id": false
+        }
+      ]
     },
     {
+      "type": "Entity",
       "label": "Item",
       "pos": {
         "x": 416,
@@ -22,9 +42,24 @@
         "x": 0,
         "y": 0
       },
-      "size": 37.5
+      "size": 37.5,
+      "attributes": [
+        {
+          "label": "Codice",
+          "id": true
+        },
+        {
+          "label": "Descrizione",
+          "id": false
+        },
+        {
+          "label": "Prezzo",
+          "id": false
+        }
+      ]
     },
     {
+      "type": "Entity",
       "label": "Shopping Cart",
       "pos": {
         "x": 607,
@@ -34,9 +69,20 @@
         "x": 0,
         "y": 0
       },
-      "size": 37.5
+      "size": 37.5,
+      "attributes": [
+        {
+          "label": "Codice",
+          "id": true
+        },
+        {
+          "label": "numItem",
+          "id": false
+        }
+      ]
     },
     {
+      "type": "Entity",
       "label": "Customer",
       "pos": {
         "x": 545,
@@ -46,9 +92,24 @@
         "x": 0,
         "y": 0
       },
-      "size": 37.5
+      "size": 37.5,
+      "attributes": [
+        {
+          "label": "CF",
+          "id": true
+        },
+        {
+          "label": "Nome",
+          "id": false
+        },
+        {
+          "label": "Cognome",
+          "id": false
+        }
+      ]
     },
     {
+      "type": "Entity",
       "label": "Shipping",
       "pos": {
         "x": 201,
@@ -58,9 +119,12 @@
         "x": 0,
         "y": 0
       },
-      "size": 37.5
+      "size": 37.5,
+      "attributes": [
+      ]
     },
     {
+      "type": "Entity",
       "label": "Credit Card",
       "pos": {
         "x": 134,
@@ -70,9 +134,16 @@
         "x": 0,
         "y": 0
       },
-      "size": 37.5
+      "size": 37.5,
+      "attributes": [
+        {
+          "label": "Codice",
+          "id": true
+        }
+      ]
     },
     {
+      "type": "Entity",
       "label": "Order",
       "pos": {
         "x": 598,
@@ -82,9 +153,16 @@
         "x": 0,
         "y": 0
       },
-      "size": 37.5
+      "size": 37.5,
+      "attributes": [
+        {
+          "label": "Codice",
+          "id": true
+        }
+      ]
     },
     {
+      "type": "Entity",
       "label": "E-Commerce",
       "pos": {
         "x": 333,
@@ -94,54 +172,65 @@
         "x": 0,
         "y": 0
       },
-      "size": 37.5
+      "size": 37.5,
+      "attributes": [
+      ]
     }
   ],
   "edges": [
     {
+      "type": "BinaryRelationship",
       "node1": "Company",
       "node2": "Item",
-      "count": 1
+      "label": "Sells"
     },
     {
+      "type": "BinaryRelationship",
       "node1": "Shopping Cart",
       "node2": "Item",
-      "count": 1
+      "label": "Contains"
     },
     {
+      "type": "BinaryRelationship",
       "node1": "Item",
       "node2": "Order",
-      "count": 1
+      "label": "About"
     },
     {
+      "type": "BinaryRelationship",
       "node1": "Order",
       "node2": "Shopping Cart",
-      "count": 1
+      "label": "About"
     },
     {
+      "type": "BinaryRelationship",
       "node1": "Order",
       "node2": "E-Commerce",
-      "count": 1
+      "label": ""
     },
     {
+      "type": "BinaryRelationship",
       "node1": "Shipping",
       "node2": "E-Commerce",
-      "count": 1
+      "label": ""
     },
     {
+      "type": "BinaryRelationship",
       "node1": "Shipping",
       "node2": "Customer",
-      "count": 1
+      "label": "Where"
     },
     {
+      "type": "BinaryRelationship",
       "node1": "Customer",
       "node2": "Credit Card",
-      "count": 1
+      "label": "Has"
     },
     {
+      "type": "BinaryRelationship",
       "node1": "Item",
       "node2": "Customer",
-      "count": 1
+      "label": "Buys"
     }
   ]
 }

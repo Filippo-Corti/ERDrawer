@@ -20,8 +20,12 @@ export class GraphDrawer {
         this.graph.nodes.forEach(v => {
             v.size = this.calcNodeSize();
         });
-        this.drawer.clear();
-        this.graph.draw(this.drawer.ctx);
+        try {
+            this.drawer.clear();
+            this.graph.draw(this.drawer.ctx);
+        } catch(error) {
+            alert("Couldn't draw it. Try 'Discretize Graph'");
+        }
         //this.drawer.drawGrid(GraphDrawer.DELTA);
     }
 
