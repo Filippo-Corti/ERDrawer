@@ -22,14 +22,17 @@ export class ERDiagram extends Graph {
 
     //Deep copies the ER Diagram
     clone(): ERDiagram {
+        const erDiagram = new ERDiagram();
         const newNodes: Map<string, Node> = new Map<string, Node>;
         const newEdges: Edge[] = [];
 
         this.nodes.forEach((node, _) => {
-            newNodes.set(node.label, node.clone());
+            const newNode = node.clone();
+            newNode.graph = erDiagram;
+            newNodes.set(node.label, newNode);
+            erDiagram.addNode(newNode);
         });
 
-        const erDiagram = new ERDiagram(Array.from(newNodes.values()));
         this.edges.forEach(edge => {
             let node1 = newNodes.get(edge.node1.label);
             let node2 = newNodes.get(edge.node2.label);

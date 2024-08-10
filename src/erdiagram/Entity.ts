@@ -1,3 +1,4 @@
+import { Graph } from "../graph/Graph";
 import { Node } from "../graph/Node";
 import { Segment } from "../utils/Segment";
 import { Random } from "../utils/Utils";
@@ -16,11 +17,10 @@ export class Entity extends Node {
     connectionPoints: ConnectionPoint[]; // Vector2D Hashcode to boolean
     deltaConnectionPointsX: number = this.halfSizeX;
     deltaConnectionPointsY: number = this.halfSizeY;
-
     attributes: Map<string, Attribute>;
 
-    constructor(label: string, x: number, y: number, size: number = 30, attributes: string[] = []) {
-        super(label, x, y, size);
+    constructor(graph: Graph, label: string, x: number, y: number, size: number = 30, attributes: string[] = []) {
+        super(graph, label, x, y, size);
         this.connectionPoints = [];
         const connPoints = this.getAllConnectionPoints();
         connPoints.forEach((p) => this.connectionPoints.push({ p: p, empty: true }));
@@ -55,7 +55,7 @@ export class Entity extends Node {
         ctx.fillText(this.label, this.pos.x, this.pos.y);
 
         for (let [_, attribute] of this.attributes) {
-            const point = this.findAttributePosition(attribute.startingPoint);
+            const point = this.findAttributePosition(attribute.totalLength());
             const dir = this.getRectangleSegmentByPoint(point)!.getDirection();
             attribute.startingPoint = point;
             attribute.direction = dir + Math.PI / 2; //Direction is perpendicular to the segment
@@ -186,7 +186,9 @@ export class Entity extends Node {
                         minPoint = connPoints[i].p;
                     }
                 } else {
-                    if (!segmentOfPoint || segmentOfPoint.contains(connPoints[i].p)) {
+                    if (segmentOfPoint!.contains(connPoints[i].p)) {
+                        minDist = dist;
+                        minPoint = connPoints[i].p;
                     }
                 }
             }
@@ -271,22 +273,22 @@ export class Entity extends Node {
     }
 
     // Finds and Returns a new Attribute starting position.
-    findAttributePosition(attrCurrPosition: Vector2D): Vector2D {
-        const deltaX = this.deltaConnectionPointsX;
-        const deltaY = this.deltaConnectionPointsY;
-        let sameSegmentRequired = false;
+    findAttributePosition(attrSegmentLength: number): Vector2D {
         do {
-            const cp = this.occupyClosestConnectionPoint(attrCurrPosition, sameSegmentRequired);
-            if (cp) return cp;
+            const cp = this.occupyClosestConnectionPoint(this.pos, false);
+            if (cp) {
+                // Check for Intersections
+                const diffVect = Vector2D.fromPolar(attrSegmentLength, this.getRectangleSegmentByPoint(cp)!.getDirection() + Math.PI / 2);
+                const attrSegment = Segment.fromVectors(
+                    cp,
+                    Vector2D.sum(cp, diffVect)
+                );
+
+                return cp;
+            }
             const ok = this.reduceDeltas();
             if (!ok) {
-                if (sameSegmentRequired) {
-                    sameSegmentRequired = false;
-                    this.deltaConnectionPointsX = deltaX;
-                    this.deltaConnectionPointsY = deltaY;
-                }
-                else
-                    throw new Error("Couldn't place the attribute in any possible way");
+                throw new Error("Couldn't place the attribute in any possible way");
             }
         } while (true);
     }
@@ -301,7 +303,7 @@ export class Entity extends Node {
     }
 
     clone(): Node {
-        const newNode = new Entity(this.label, this.pos.x, this.pos.y, this.size);
+        const newNode = new Entity(this.graph, this.label, this.pos.x, this.pos.y, this.size);
         newNode.disp = new Vector2D(this.disp.x, this.disp.y);
         newNode.deltaConnectionPointsX = this.deltaConnectionPointsX;
         newNode.deltaConnectionPointsY = this.deltaConnectionPointsY;

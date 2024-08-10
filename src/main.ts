@@ -65,7 +65,7 @@ document.getElementById("canvas-btn")!.addEventListener("click", () => {
 // Add Node Button
 
 document.getElementById("newnode-btn")!.addEventListener("click", () => {
-    graphDrawer.graph.addNode(new Node("Prova" + Random.getRandom(0, 10), Random.getRandom(50, graphDrawer.drawer.canvas.width - 50), Random.getRandom(50, graphDrawer.drawer.canvas.height - 50)));
+    graphDrawer.graph.addNode(new Node(graph,"Prova" + Random.getRandom(0, 10), Random.getRandom(50, graphDrawer.drawer.canvas.width - 50), Random.getRandom(50, graphDrawer.drawer.canvas.height - 50)));
     graphDrawer.graph.addEdge("Prova" + Random.getRandom(0, 10), "Prova" + Random.getRandom(0, 10));
     graphDrawer.drawGraph();
 })
@@ -111,3 +111,6 @@ function waitingKeypress() {
         }
     });
 }
+
+console.log(graph);
+console.log(graph.clone())

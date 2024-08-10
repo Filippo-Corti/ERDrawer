@@ -133,15 +133,14 @@ export class Graph implements Drawable {
 
     //Deep copies the Graph
     clone(): Graph {
-        const newNodes: Node[] = [];
+        const newGraph = new Graph();
 
         this.nodes.forEach((node, _) => {
             let newNode: Node;
-            newNode = new Node(node.label, node.pos.x, node.pos.y);
-            newNodes.push(newNode);
+            newNode = new Node(newGraph, node.label, node.pos.x, node.pos.y);
+            newGraph.addNode(newNode);
         });
 
-        const newGraph = new Graph(newNodes);
         this.edges.forEach(edge => {
             newGraph.addEdge(edge.node1.label, edge.node2.label);
         });

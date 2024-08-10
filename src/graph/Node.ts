@@ -1,15 +1,18 @@
 import { Drawable } from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
 import { Vector2D } from "../utils/Vector2D";
+import { Graph } from "./Graph";
 
 export class Node implements Drawable {
 
+    graph : Graph;
     label : string;
     pos : Vector2D;
     disp : Vector2D;
     size : number;
 
-    constructor(label: string, x: number, y: number, size : number = 30) {
+    constructor(graph : Graph, label: string, x: number, y: number, size : number = 30) {
+        this.graph = graph;
         this.label = label;
         this.pos = new Vector2D(x, y);
         this.disp = new Vector2D(0, 0);
@@ -58,7 +61,7 @@ export class Node implements Drawable {
     }
 
     clone() : Node {
-        const newNode = new Node(this.label, this.pos.x, this.pos.y, this.size);
+        const newNode = new Node(this.graph, this.label, this.pos.x, this.pos.y, this.size);
         newNode.disp = new Vector2D(this.disp.x, this.disp.y);
         return newNode;
     }

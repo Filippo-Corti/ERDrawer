@@ -23,15 +23,14 @@ export class GraphSerializer {
 
     static importGraph(json : string) : Graph {
         const parsedData = JSON.parse(json);
+        const graph = new Graph();
 
-        const nodes : Node[] = [];
         parsedData.nodes.forEach((nodeData: any) => {
-            const node = new Node(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
+            const node = new Node(graph, nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
             node.disp = new Vector2D(nodeData.disp.x, nodeData.disp.y);
-            nodes.push(node);
+            graph.addNode(node);
         });
 
-        const graph = new Graph(nodes);
 
         parsedData.edges.forEach((edgeData: any) => {
             const node1 = graph.nodes.get(edgeData.node1);

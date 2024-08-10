@@ -9,10 +9,18 @@ export class Attribute implements Drawable {
     direction: number = - Math.PI / 2; //Angle in radiants
     filledPoint: boolean;
 
+    static fontSize : number = 15;
+
     constructor(label: string, startingPoint: Vector2D, filledPoint: boolean = false) {
         this.label = label;
         this.startingPoint = startingPoint;
         this.filledPoint = filledPoint;
+    }
+
+    totalLength() : number {
+        const ctx = document.createElement("canvas").getContext("2d")!; // Fictionary context to measure label length
+        ctx.font = Attribute.fontSize + "px serif";
+        return this.length + ctx.measureText(this.label).width;
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -39,13 +47,7 @@ export class Attribute implements Drawable {
         ctx.save();
         ctx.fillStyle = "black";
         ctx.textBaseline = "middle";
-        let fontSize = 14;
-        ctx.font = fontSize + "px serif";
-        // do {
-        //     ctx.font = fontSize + "px serif";
-        //     fontSize -= 3;
-        //     this.length = Math.max(SIZE + 3, this.length - 5);
-        // } while (ctx.measureText(this.label).width + this.length + SIZE + 3 > 70); // Needs correspondance with distToVertex in BinaryRelationship.ts (currently 70)
+        ctx.font = Attribute.fontSize + "px serif";
         ctx.translate(endPoint.x, endPoint.y);
         if (this.direction > Math.PI / 2 && this.direction < 3 / 2 * Math.PI) {
             ctx.rotate(this.direction + Math.PI);

@@ -27,25 +27,24 @@ export class ERDiagramSerializer {
     static importDiagram(json: string): ERDiagram {
         const parsedData = JSON.parse(json);
 
-        const nodes: Node[] = [];
+        const erDiagram = new ERDiagram();
         parsedData.nodes.forEach((nodeData: any) => {
             let node: Node;
             switch (nodeData.type) {
                 case "Node":
-                    node = new Node(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
+                    node = new Node(erDiagram, nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size);
                     break;
                 case "Entity":
-                    node = new Entity(nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size, []);
+                    node = new Entity(erDiagram, nodeData.label, nodeData.pos.x, nodeData.pos.y, nodeData.size, []);
                     for (const attr of nodeData.attributes) {
                         (node as Entity).addAttribute(attr.label, attr.id);
                     }
                     break;
             }
             node!.disp = new Vector2D(nodeData.disp.x, nodeData.disp.y);
-            nodes.push(node!);
+            erDiagram.addNode(node!);
         });
 
-        const erDiagram = new ERDiagram(nodes);
 
         parsedData.edges.forEach((edgeData: any) => {
             const node1 = erDiagram.nodes.get(edgeData.node1);
