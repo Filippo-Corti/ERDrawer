@@ -4,7 +4,6 @@ import { Segment } from "../utils/Segment";
 import { ConnectionPoint, Random } from "../utils/Utils";
 import { Vector2D } from "../utils/Vector2D";
 import { Attribute } from "./Attribute";
-import { NodeWithAttributes } from "./NodeWithAttributes";
 
 export class Entity extends Node {
 

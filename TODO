@@ -30,3 +30,7 @@ Alcuni problemi:
 - Dovrei fermarmi un attimo per implementare i punti C, perché sicuramente renderebbero meno deprimente il lavoro di disegno.
 - Attualmente con ARCHI SINGOLI il risultato non è così male :)
 
+
+Deve essere gestita in maniera più intelligente la questione dei connectionPoint. 
+Sia Archi che Nodi possono avere connectionPoint. 
+I ConnectionPoint collegano Nodi e Archi tra loro, ma sono anche condivisi dagli attributi.
