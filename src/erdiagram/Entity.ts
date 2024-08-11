@@ -6,14 +6,23 @@ import { Vector2D } from "../utils/Vector2D";
 import { Attribute } from "./Attribute";
 import { NodeWithAttributes } from "./NodeWithAttributes";
 
-export class Entity extends NodeWithAttributes {
+export class Entity extends Node {
+
     halfSizeX: number = 50;
     halfSizeY: number = 30;
     deltaConnectionPointsX: number = this.halfSizeX;
     deltaConnectionPointsY: number = this.halfSizeY;
+    connectionPoints: ConnectionPoint[]; // Vector2D Hashcode to boolean
+    attributes: Map<string, Attribute>;
 
     constructor(graph: Graph, label: string, x: number, y: number, size: number = 30, attributes: string[] = []) {
-        super(graph, label, x, y, size, attributes);
+        super(graph, label, x, y, size);
+        this.connectionPoints = [];
+        const connPoints = this.getAllConnectionPoints();
+        connPoints.forEach((p) => this.connectionPoints.push({ p: p, empty: true }));
+        this.attributes = new Map<string, Attribute>;
+        attributes.forEach(a => this.attributes.set(a, new Attribute(a, this.pos))); //Default position is center of the entity
+
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -115,6 +124,44 @@ export class Entity extends NodeWithAttributes {
 
         return connPoints;
     }
+
+    isAConnectionPoint(p: Vector2D): boolean {
+        return this.connectionPoints.find((cp) => cp.p.x == p.x && cp.p.y == p.y) !== undefined;
+    }
+
+    isConnectionPointOccupied(p: Vector2D): boolean {
+        const found = this.connectionPoints.find((cp) => cp.p.x == p.x && cp.p.y == p.y);
+        if (!found) {
+            throw new Error("P is not a connection point");
+        }
+        return !found.empty;
+    }
+
+    setConnectionPoint(p: Vector2D, empty: boolean): void {
+        const found = this.connectionPoints.find((cp) => cp.p.x == p.x && cp.p.y == p.y);
+        if (!found) {
+            throw new Error("P is not a connection point");
+        }
+        found.empty = empty;
+    }
+
+    // Empty Connection Points map and reset deltas
+    // It also resets attributes positions
+    resetConnectionPoints(): void {
+        this.connectionPoints = [];
+        const connPoints = this.getAllConnectionPoints();
+        connPoints.forEach((p) => this.connectionPoints.push({ p: p, empty: true }));
+        this.attributes.forEach(a => {
+            a.startingPoint = this.pos;
+            a.direction = 0;
+        });
+        this.resetDeltas();
+    }
+
+    addAttribute(label: string, filledPoint: boolean = false) {
+        this.attributes.set(label, new Attribute(label, this.pos, filledPoint));
+    }
+
 
     // Occupies the connection point that is not already occupied and the closest
     // to the point or the segment given.
