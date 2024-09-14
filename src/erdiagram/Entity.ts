@@ -21,7 +21,6 @@ export class Entity extends Node {
         connPoints.forEach((p) => this.connectionPoints.push({ p: p, empty: true }));
         this.attributes = new Map<string, Attribute>;
         attributes.forEach(a => this.attributes.set(a, new Attribute(a, this.pos))); //Default position is center of the entity
-
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
