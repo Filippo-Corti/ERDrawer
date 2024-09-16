@@ -8,10 +8,10 @@ export default abstract class Shape implements Connectable, Drawable {
 
     centerPoint: Vector2D;
     connectionPoints: ConnectionPoint[];
-    label : string;
-    labelFontSize : number;
+    label: string;
+    labelFontSize: number;
 
-    constructor(centerPoint: Vector2D, label : string) {
+    constructor(centerPoint: Vector2D, label: string) {
         this.centerPoint = centerPoint;
         this.label = label;
         this.connectionPoints = [];
@@ -21,11 +21,11 @@ export default abstract class Shape implements Connectable, Drawable {
 
     abstract draw(ctx: CanvasRenderingContext2D): void;
 
-    abstract generateConnectionPoints() : void;
+    abstract generateConnectionPoints(): void;
 
-    abstract calculateLabelSize() : number;
+    abstract calculateLabelSize(): number;
 
-    abstract getCorners() : Vector2D[];
+    abstract getCorners(): Vector2D[];
 
     getAllConnectionPoints(): Iterator<ConnectionPoint> {
         return this.connectionPoints[Symbol.iterator]();
@@ -59,12 +59,20 @@ export default abstract class Shape implements Connectable, Drawable {
         found.value = null;
     }
 
-    getSegments() : Segment[] {
-        const corners : Vector2D[] = this.getCorners();
-        let segments : Segment[] = [];
+    getConnectionPointFor(c: Connectable): Vector2D {
+        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.value == c);
+        if (!found) {
+            throw new Error("P is not a valid Connection Point for this shape");
+        }
+        return found.pos;
+    }
 
-        for(let i = 0; i < corners.length - 1; i++) {
-            segments.push(Segment.fromVectors(corners[i], corners[i+1]));
+    getSegments(): Segment[] {
+        const corners: Vector2D[] = this.getCorners();
+        let segments: Segment[] = [];
+
+        for (let i = 0; i < corners.length - 1; i++) {
+            segments.push(Segment.fromVectors(corners[i], corners[i + 1]));
         }
         segments.push(Segment.fromVectors(corners[corners.length - 1], corners[0]));
 

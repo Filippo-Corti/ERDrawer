@@ -1,7 +1,6 @@
 import Vector2D from "../utils/Vector2D";
 import Entity from "./Entity";
 import Shape from "./Shape";
-
 export default class Relationship extends Shape {
 
     static HALF_DIAG_X: number = 70;
@@ -17,7 +16,7 @@ export default class Relationship extends Shape {
     }
 
     linkToEntity(e: Entity): void {
-
+        
     }
 
     getCorners(): Vector2D[] {

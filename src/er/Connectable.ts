@@ -15,4 +15,6 @@ export default interface Connectable {
 
     freeConnectionPoint(p : Vector2D) : void;
 
+    getConnectionPointFor(c : Connectable) : Vector2D;
+
 }
