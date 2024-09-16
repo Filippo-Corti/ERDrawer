@@ -6,8 +6,4 @@ export type ConnectionPoint = {
     pos: Vector2D,
     value: Connectable | null;
 
-    isEmpty(): boolean {
-    return value == null;
-}
-
 }
