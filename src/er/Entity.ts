@@ -1,4 +1,5 @@
 import Vector2D from "../utils/Vector2D";
+import Relationship from "./Relationship";
 import Shape from "./Shape";
 
 export default class Entity extends Shape {
@@ -8,6 +9,17 @@ export default class Entity extends Shape {
 
     deltaX: number = Entity.HALF_DIM_X;
     deltaY: number = Entity.HALF_DIM_Y;
+    relationships: Relationship[];
+
+    constructor(centerPoint: Vector2D, label: string) {
+        super(centerPoint, label);
+        this.relationships = [];
+    }
+
+    linkRelationship(r: Relationship, connPoint: Vector2D): void {
+        this.relationships.push(r);
+        this.occupyConnectionPoint(connPoint, r);
+    }
 
     getCorners(): Vector2D[] {
         return [
@@ -20,14 +32,14 @@ export default class Entity extends Shape {
 
     draw(ctx: CanvasRenderingContext2D): void {
         //Draw Rectangle
+        const rectangleVertices = this.getCorners();
         ctx.fillStyle = "white";
         ctx.strokeStyle = "black";
         ctx.beginPath();
-        ctx.moveTo(this.centerPoint.x - Entity.HALF_DIM_X, this.centerPoint.y - Entity.HALF_DIM_Y);
-        ctx.lineTo(this.centerPoint.x + Entity.HALF_DIM_X, this.centerPoint.y - Entity.HALF_DIM_Y);
-        ctx.lineTo(this.centerPoint.x + Entity.HALF_DIM_X, this.centerPoint.y + Entity.HALF_DIM_Y);
-        ctx.lineTo(this.centerPoint.x - Entity.HALF_DIM_X, this.centerPoint.y + Entity.HALF_DIM_Y);
-        ctx.lineTo(this.centerPoint.x - Entity.HALF_DIM_X, this.centerPoint.y - Entity.HALF_DIM_Y);
+        ctx.moveTo(rectangleVertices[rectangleVertices.length - 1].x, rectangleVertices[rectangleVertices.length - 1].y);
+        for (const v of rectangleVertices) {
+            ctx.lineTo(v.x, v.y);
+        }
         ctx.fill();
         ctx.stroke();
 
@@ -42,7 +54,7 @@ export default class Entity extends Shape {
 
     generateConnectionPoints(): void {
         const corners = this.getCorners();
-        const connPoints : Vector2D[] = [];
+        const connPoints: Vector2D[] = [];
 
         // Top Points (Left to Right)
         for (let x = corners[0].x + this.deltaX; x < corners[1].x; x += this.deltaX) {
@@ -64,8 +76,8 @@ export default class Entity extends Shape {
             connPoints.push(new Vector2D(corners[3].x, y));
         }
 
-        for(const p of connPoints) {
-            const cp = {pos : p, value : null};
+        for (const p of connPoints) {
+            const cp = { pos: p, value: null };
             this.connectionPoints.push(cp);
         }
     }
