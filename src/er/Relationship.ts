@@ -17,7 +17,7 @@ export default class Relationship extends Shape {
     }
 
     linkToEntity(e: Entity): void {
-        
+
     }
 
     getCorners(): Vector2D[] {

@@ -1,4 +1,4 @@
-export class Drawer {
+export default class Drawer {
 
     canvas : HTMLCanvasElement;
     ctx: CanvasRenderingContext2D;
