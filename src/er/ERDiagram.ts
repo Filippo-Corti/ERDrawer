@@ -41,9 +41,11 @@ export default class ERDiagram implements Drawable {
         const middlePoint = e1.centerPoint.halfWayTo(e2.centerPoint);
 
         const newRelationship = new Relationship(middlePoint, label);
-        newRelationship.linkToEntity(e1);
-        newRelationship.linkToEntity(e2);
         this.relationships.set(relationshipKeyInMap, newRelationship);
+        newRelationship.linkToEntity(e1);
+        e1.linkRelationship(newRelationship);
+        newRelationship.linkToEntity(e2);
+        e2.linkRelationship(newRelationship);
 
         //Update edge's middlePoints
         //this.setEdgesMiddlePoints(label1, label2);

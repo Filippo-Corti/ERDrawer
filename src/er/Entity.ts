@@ -14,9 +14,14 @@ export default class Entity extends Shape {
         this.relationships = [];
     }
 
-    linkRelationship(r: Relationship, connPoint: Vector2D): void {
+    linkRelationship(r: Relationship): void {
+        this.occupyConnectionPoint(this.findConnectionPointFor(r), r);
         this.relationships.push(r);
-        this.occupyConnectionPoint(connPoint, r);
+    }
+
+    isTheNearestConnectionPoint(p: Vector2D, connPoint: Vector2D): boolean {
+        const currDist = connPoint.distanceTo(p);
+        return (currDist <= Math.hypot(this.deltaX, this.deltaY) / 2);
     }
 
     getCorners(): Vector2D[] {

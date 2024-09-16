@@ -1,7 +1,7 @@
-import { Segment } from "../utils/Segment";
 import Vector2D from "../utils/Vector2D";
 import Entity from "./Entity";
 import Shape from "./Shape";
+
 export default class Relationship extends Shape {
 
     static HALF_DIAG_X: number = 70;
@@ -15,48 +15,13 @@ export default class Relationship extends Shape {
     }
 
     linkToEntity(e: Entity): void {
-        e.occupyConnectionPoint(this.findEntityConnectionPointToEntity(e), this);
-        this.occupyConnectionPoint(this.findMyConnectionPointToEntity(e), e);
+        this.occupyConnectionPoint(this.findConnectionPointFor(e), e);
         this.entities.push(e);
-        e.relationships.push(this);
     }
 
-    findEntityConnectionPointToEntity(e: Entity): Vector2D {
-        const segmentToEntity = Segment.fromVectors(this.centerPoint, e.centerPoint);
-        const intersectionPoint: Vector2D = e.getPointByIntersectingSegment(segmentToEntity);
-
-        do {
-            const allConnPoints = e.getAllConnectionPoints();
-            for (const cp of allConnPoints) {
-                if (cp.value !== null) continue;
-                const currDist = cp.pos.distanceTo(intersectionPoint);
-                if (Math.abs(cp.pos.y - intersectionPoint.y) <= 10 && currDist <= e.deltaX / 2 || Math.abs(cp.pos.x - intersectionPoint.x) <= 10 && currDist <= e.deltaY / 2) {
-                    // ConnectionPoint found
-                    return cp.pos;
-                }
-            }
-        } while (e.reduceDeltasAndRegenerate());
-        throw new Error("Couldn't find a connection point");
-    }
-
-    findMyConnectionPointToEntity(e: Entity): Vector2D {
-        const segmentFromEntity = Segment.fromVectors(e.centerPoint, this.centerPoint);
-        const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromEntity);
-
-        do {
-            const allConnPoints = this.getAllConnectionPoints();
-            for (const cp of allConnPoints) {
-                if (cp.value !== null) continue;
-                const currDist = cp.pos.distanceTo(intersectionPoint);
-                if (currDist <= Math.hypot(this.deltaX, this.deltaY) / 2 ) {
-                    // ConnectionPoint found
-                    return cp.pos;
-                }
-            }
-        } while (this.reduceDeltasAndRegenerate());
-        console.log(this, intersectionPoint)
-        throw new Error("Couldn't find a connection point");
-
+    isTheNearestConnectionPoint(p: Vector2D, connPoint: Vector2D): boolean {
+        const currDist = connPoint.distanceTo(p);
+        return (currDist <= Math.hypot(this.deltaX, this.deltaY) / 2);
     }
 
     getCorners(): Vector2D[] {
@@ -144,8 +109,8 @@ export default class Relationship extends Shape {
     }
 
     getPathTo(e: Entity): Vector2D[] {
-        const myConnPoint = this.getConnectionPointFor(e);
-        const theirConnPoint = e.getConnectionPointFor(this);
+        const myConnPoint = this.getCurrentConnectionPointFor(e);
+        const theirConnPoint = e.getCurrentConnectionPointFor(this);
         return [
             myConnPoint,
             theirConnPoint

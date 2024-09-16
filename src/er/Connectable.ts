@@ -3,6 +3,7 @@ import { ConnectionPoint } from "./ConnectionPoint";
 
 export default interface Connectable {
 
+    centerPoint : Vector2D;
     connectionPoints: ConnectionPoint[];
 
     getAllConnectionPoints() : IterableIterator<ConnectionPoint>;
@@ -15,6 +16,10 @@ export default interface Connectable {
 
     freeConnectionPoint(p : Vector2D) : void;
 
-    getConnectionPointFor(c : Connectable) : Vector2D;
+    getCurrentConnectionPointFor(c : Connectable) : Vector2D;
+
+    findConnectionPointFor(c : Connectable) : Vector2D;
+
+    isTheNearestConnectionPoint(p : Vector2D, connPoint : Vector2D) : boolean;
 
 }

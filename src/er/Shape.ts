@@ -32,6 +32,8 @@ export default abstract class Shape implements Connectable, Drawable {
 
     abstract getCorners(): Vector2D[];
 
+    abstract isTheNearestConnectionPoint(p: Vector2D, connPoint: Vector2D): boolean;
+
     getAllConnectionPoints(): IterableIterator<ConnectionPoint> {
         return this.connectionPoints[Symbol.iterator]();
     }
@@ -64,12 +66,28 @@ export default abstract class Shape implements Connectable, Drawable {
         found.value = null;
     }
 
-    getConnectionPointFor(c: Connectable): Vector2D {
+    getCurrentConnectionPointFor(c: Connectable): Vector2D {
         const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.value == c);
         if (!found) {
             throw new Error("P is not a valid Connection Point for this shape");
         }
         return found.pos;
+    }
+
+    findConnectionPointFor(c: Connectable): Vector2D {
+        const segmentFromConnectable = Segment.fromVectors(c.centerPoint, this.centerPoint);
+        const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromConnectable);
+
+        do {
+            const allConnPoints = this.getAllConnectionPoints();
+            for (const cp of allConnPoints) {
+                if (cp.value !== null) continue;
+                if (this.isTheNearestConnectionPoint(intersectionPoint, cp.pos)) {
+                    return cp.pos;
+                }
+            }
+        } while (this.reduceDeltasAndRegenerate());
+        throw new Error("Couldn't find a connection point");
     }
 
 

@@ -17,8 +17,6 @@ er.addRelationship("Prova", "Canguro", "Ammesso");
 const erDrawer = new ERDrawer(er, drawer);
 erDrawer.drawER();
 
-console.log(er);
-
 //Draw Point
 
 document.getElementById("addpoint-form")!.addEventListener("submit", (event) => addPoint(event));
