@@ -11,9 +11,14 @@ export default abstract class Shape implements Connectable, Drawable {
     label: string;
     labelFontSize: number;
 
-    constructor(centerPoint: Vector2D, label: string) {
+    deltaX: number;
+    deltaY: number;
+
+    constructor(centerPoint: Vector2D, label: string, deltaX: number, deltaY: number) {
         this.centerPoint = centerPoint;
         this.label = label;
+        this.deltaX = deltaX;
+        this.deltaY = deltaY;
         this.connectionPoints = [];
         this.labelFontSize = this.calculateLabelSize();
         this.generateConnectionPoints();
@@ -27,7 +32,7 @@ export default abstract class Shape implements Connectable, Drawable {
 
     abstract getCorners(): Vector2D[];
 
-    getAllConnectionPoints(): Iterator<ConnectionPoint> {
+    getAllConnectionPoints(): IterableIterator<ConnectionPoint> {
         return this.connectionPoints[Symbol.iterator]();
     }
 
@@ -67,6 +72,7 @@ export default abstract class Shape implements Connectable, Drawable {
         return found.pos;
     }
 
+
     getSegments(): Segment[] {
         const corners: Vector2D[] = this.getCorners();
         let segments: Segment[] = [];
@@ -91,6 +97,35 @@ export default abstract class Shape implements Connectable, Drawable {
         throw new Error("No Segment contains this point");
     }
 
+    getPointByIntersectingSegment(segment: Segment): Vector2D {
+        const segments = this.getSegments();
+
+        for (let s of segments) {
+            if (s.intersects(segment)) {
+                const intersection = s.getIntersection(segment);
+                if (!intersection) break;
+                return intersection;
+            }
+        }
+
+        throw new Error("No intersection between the shape and the given segment");
+    }
+
+    reduceDeltasAndRegenerate(): boolean {
+        if (this.deltaX < 15 || this.deltaY < 10) return false;
+        this.deltaX /= 2;
+        this.deltaY /= 2;
+
+        const oldConnPoints = this.connectionPoints;
+        this.generateConnectionPoints();
+        for (const oldP of oldConnPoints) {
+            if (oldP.value !== null) {
+                this.occupyConnectionPoint(oldP.pos, oldP.value);
+            }
+        }
+
+        return true;
+    }
 
 
 }

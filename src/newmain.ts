@@ -16,3 +16,23 @@ er.addRelationship("Prova", "Canguro", "Ammesso");
 
 const erDrawer = new ERDrawer(er, drawer);
 erDrawer.drawER();
+
+console.log(er);
+
+//Draw Point
+
+document.getElementById("addpoint-form")!.addEventListener("submit", (event) => addPoint(event));
+
+function addPoint(event : Event) : boolean {
+    event.preventDefault();
+    const form = event.target as HTMLFormElement;
+    const formData = new FormData(form);
+
+    const x = parseInt(formData.get("x") as string);
+    const y = parseInt(formData.get("y") as string);
+
+    console.log(x, y);
+
+    erDrawer.drawer.drawPoint(x, y, undefined, "green");
+    return false;
+}

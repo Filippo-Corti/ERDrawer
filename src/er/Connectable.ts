@@ -5,7 +5,7 @@ export default interface Connectable {
 
     connectionPoints: ConnectionPoint[];
 
-    getAllConnectionPoints() : Iterator<ConnectionPoint>;
+    getAllConnectionPoints() : IterableIterator<ConnectionPoint>;
 
     isAConnectionPoint(p : Vector2D) : boolean;
 

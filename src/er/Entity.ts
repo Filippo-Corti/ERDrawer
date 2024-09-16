@@ -7,12 +7,10 @@ export default class Entity extends Shape {
     static HALF_DIM_X: number = 50;
     static HALF_DIM_Y: number = 30;
 
-    deltaX: number = Entity.HALF_DIM_X;
-    deltaY: number = Entity.HALF_DIM_Y;
     relationships: Relationship[];
 
     constructor(centerPoint: Vector2D, label: string) {
-        super(centerPoint, label);
+        super(centerPoint, label, Entity.HALF_DIM_X, Entity.HALF_DIM_Y);
         this.relationships = [];
     }
 
