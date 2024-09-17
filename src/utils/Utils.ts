@@ -32,3 +32,23 @@ export module Random {
     }
 
 }
+
+export function containsAny<T>(haystack: T[], needles: T[]): boolean {
+    for (const n of needles) {
+        if (contains(haystack, n)) return true;
+    }
+    return false;
+}
+
+export function contains<T>(haystack: T[], needle: T): boolean {
+    for (const o of haystack) {
+        if (typeof (o as any).equals === 'function') {
+            if ((o as any).equals(needle)) {
+                return true;
+            }
+        } else {
+            if (o == needle) return true;
+        }
+    }
+    return false;
+}

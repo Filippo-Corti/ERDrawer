@@ -1,5 +1,6 @@
 import Drawable from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
+import { containsAny } from "../utils/Utils";
 import Vector2D from "../utils/Vector2D";
 import Connectable from "./Connectable";
 import { ConnectionPoint } from "./ConnectionPoint";
@@ -77,7 +78,7 @@ export default abstract class Shape implements Connectable, Drawable {
     findConnectionPointFor(c: Connectable): Vector2D {
         const segmentFromConnectable = Segment.fromVectors(c.centerPoint, this.centerPoint);
         const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromConnectable);
-        const intersectionSegment: Segment = this.getSegmentByPoint(intersectionPoint);
+        const intersectionSegments: Segment[] = this.getSegmentsByPoint(intersectionPoint);
 
         do {
             const allConnPoints = this.getAllConnectionPoints();
@@ -86,7 +87,7 @@ export default abstract class Shape implements Connectable, Drawable {
             for (const cp of allConnPoints) {
                 if (cp.value !== null) continue;
                 const currDist = cp.pos.distanceTo(intersectionPoint);
-                if (currDist < minDist && this.getSegmentByPoint(cp.pos).equals(intersectionSegment)) {
+                if (currDist < minDist && containsAny(intersectionSegments, this.getSegmentsByPoint(cp.pos))) {
                     minDist = currDist;
                     minPoint = cp.pos;
                 }
@@ -109,16 +110,16 @@ export default abstract class Shape implements Connectable, Drawable {
         return segments;
     }
 
-    getSegmentByPoint(point: Vector2D): Segment {
+    getSegmentsByPoint(point: Vector2D): Segment[] {
         const segments = this.getSegments();
+        const containingSegments : Segment[] = [];
 
         for (const s of segments) {
             if (s.contains(point)) {
-                return s;
+                containingSegments.push(s);
             }
         }
-
-        throw new Error("No Segment contains this point");
+        return containingSegments;
     }
 
     getPointByIntersectingSegment(segment: Segment): Vector2D {
