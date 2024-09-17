@@ -4,7 +4,7 @@ import { ConnectionPoint } from "./ConnectionPoint";
 export default interface Connectable {
 
     centerPoint : Vector2D;
-    connectionPoints: ConnectionPoint[];
+    connectionPoints: Map<string, ConnectionPoint>;
 
     getAllConnectionPoints() : IterableIterator<ConnectionPoint>;
 

@@ -8,7 +8,7 @@ import { ConnectionPoint } from "./ConnectionPoint";
 export default abstract class Shape implements Connectable, Drawable {
 
     centerPoint: Vector2D;
-    connectionPoints: ConnectionPoint[];
+    connectionPoints: Map<string, ConnectionPoint>;
     label: string;
     labelFontSize: number;
 
@@ -20,7 +20,7 @@ export default abstract class Shape implements Connectable, Drawable {
         this.label = label;
         this.deltaX = deltaX;
         this.deltaY = deltaY;
-        this.connectionPoints = [];
+        this.connectionPoints = new Map<string, ConnectionPoint>();
         this.labelFontSize = this.calculateLabelSize();
         this.generateConnectionPoints();
     }
@@ -36,15 +36,15 @@ export default abstract class Shape implements Connectable, Drawable {
     abstract isTheNearestConnectionPoint(p: Vector2D, connPoint: Vector2D): boolean;
 
     getAllConnectionPoints(): IterableIterator<ConnectionPoint> {
-        return this.connectionPoints[Symbol.iterator]();
+        return this.connectionPoints.values();
     }
 
     isAConnectionPoint(p: Vector2D): boolean {
-        return this.connectionPoints.some((cp) => cp.pos.equals(p));
+        return this.connectionPoints.has(p.toString())
     }
 
     isConnectionPointOccupied(p: Vector2D): boolean {
-        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.pos.equals(p));
+        const found: ConnectionPoint | undefined = this.connectionPoints.get(p.toString());
         if (!found) {
             throw new Error("P is not a valid Connection Point for this shape");
         }
@@ -52,7 +52,7 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     occupyConnectionPoint(p: Vector2D, value: Connectable): void {
-        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.pos.equals(p));
+        const found: ConnectionPoint | undefined = this.connectionPoints.get(p.toString());
         if (!found) {
             throw new Error("P is not a valid Connection Point for this shape");
         }
@@ -60,7 +60,7 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     freeConnectionPoint(p: Vector2D): void {
-        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.pos.equals(p));
+        const found: ConnectionPoint | undefined = this.connectionPoints.get(p.toString());
         if (!found) {
             throw new Error("P is not a valid Connection Point for this shape");
         }
@@ -68,7 +68,7 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     getCurrentConnectionPointFor(c: Connectable): Vector2D {
-        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.value == c);
+        const found: ConnectionPoint | undefined = Array.from(this.connectionPoints.values()).find((cp) => cp.value == c);
         if (!found) {
             throw new Error("P is not a valid Connection Point for this shape");
         }
@@ -143,7 +143,7 @@ export default abstract class Shape implements Connectable, Drawable {
 
         const oldConnPoints = this.connectionPoints;
         this.generateConnectionPoints();
-        for (const oldP of oldConnPoints) {
+        for (const [_, oldP] of oldConnPoints) {
             if (oldP.value !== null) {
                 this.occupyConnectionPoint(oldP.pos, oldP.value);
             }

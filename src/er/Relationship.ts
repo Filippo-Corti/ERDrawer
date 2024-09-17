@@ -1,4 +1,5 @@
 import Vector2D from "../utils/Vector2D";
+import { ConnectionPoint } from "./ConnectionPoint";
 import Entity from "./Entity";
 import Shape from "./Shape";
 
@@ -66,7 +67,7 @@ export default class Relationship extends Shape {
     }
 
     generateConnectionPoints(): void {
-        this.connectionPoints = [];
+        this.connectionPoints = new Map<string, ConnectionPoint>();
         const corners = this.getCorners();
         const connPoints: Vector2D[] = [];
 
@@ -92,7 +93,7 @@ export default class Relationship extends Shape {
 
         for (const p of connPoints) {
             const cp = { pos: p, value: null };
-            this.connectionPoints.push(cp);
+            this.connectionPoints.set(p.toString(), cp);
         }
     }
 
