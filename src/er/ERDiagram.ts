@@ -1,7 +1,9 @@
 import Drawable from "../utils/Drawable";
 import Vector2D from "../utils/Vector2D";
+import Attribute from "./Attribute";
 import Entity from "./Entity";
 import Relationship from "./Relationship";
+import ShapeWithAttributes from "./ShapeWithAttributes";
 
 export default class ERDiagram implements Drawable {
 
@@ -36,7 +38,7 @@ export default class ERDiagram implements Drawable {
         const entityObjects = entities.map(entityName => {
             const entity = this.entities.get(entityName);
             if (!entity) {
-                throw new Error(`Entity "${entityName}" does not exist in the ER`);
+                throw new Error("Entity " + entityName + " does not exist in the ER");
             }
             return entity;
         });
@@ -63,6 +65,32 @@ export default class ERDiagram implements Drawable {
 
         //Update edge's middlePoints
         //this.setEdgesMiddlePoints(label1, label2);
+    }
+
+    addAttributes(s : ShapeWithAttributes, attributes : string[]) {
+        for(const attLabel of attributes) {
+            const attribute = new Attribute(attLabel);
+            s.addAttribute(attribute);
+        }
+    }
+
+    getEntity(entityLabel : string) : Entity {
+        const found = this.entities.get(entityLabel);
+        if (!found)
+            throw new Error("Entity " + entityLabel + " does not exist in the ER");
+
+        return found;
+    }
+
+    getRelationship(relationshipLabel : string, linkedEntitiesLabels : string[]) : Relationship {
+        linkedEntitiesLabels.sort(); 
+        const relationshipKeyInMap = linkedEntitiesLabels.join('$') + "$" + relationshipLabel;
+        
+        const found = this.relationships.get(relationshipKeyInMap);
+        if (!found)
+            throw new Error("Relationship " + relationshipLabel + " does not exist in the ER");
+
+        return found;
     }
 
 }

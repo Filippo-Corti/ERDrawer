@@ -2,6 +2,7 @@ import Drawable from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
 import { containsAny } from "../utils/Utils";
 import Vector2D from "../utils/Vector2D";
+import Attribute from "./Attribute";
 import Connectable from "./Connectable";
 import { ConnectionPoint } from "./ConnectionPoint";
 

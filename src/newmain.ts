@@ -7,6 +7,7 @@ import Vector2D from "./utils/Vector2D";
 const drawer = new Drawer("drawing-board");
 const er = new ERDiagram();
 
+
 er.addEntity(new Entity(new Vector2D(100, 200), "Prova"));
 er.addEntity(new Entity(new Vector2D(600, 200), "Xyz"));
 er.addEntity(new Entity(new Vector2D(300, 600), "Canguro"));
@@ -16,8 +17,12 @@ er.addRelationship(["Prova", "Canguro"], "Ammesso");
 er.addRelationship(["Prova", "Canguro", "Xyz"], "Ammesso");
 
 const erDrawer = new ERDrawer(er, drawer);
-erDrawer.drawER();
 
+er.addAttributes(er.getEntity("Prova"), ["ciao"]);
+er.addAttributes(er.getEntity("Xyz"), ["ciao"]);
+er.addAttributes(er.getEntity("Canguro"), ["ciao"]);
+
+erDrawer.drawER();
 console.log(er);
 
 //Draw Point

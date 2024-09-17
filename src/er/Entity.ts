@@ -1,9 +1,9 @@
 import Vector2D from "../utils/Vector2D";
 import { ConnectionPoint } from "./ConnectionPoint";
 import Relationship from "./Relationship";
-import Shape from "./Shape";
+import ShapeWithAttributes from "./ShapeWithAttributes";
 
-export default class Entity extends Shape {
+export default class Entity extends ShapeWithAttributes {
 
     static HALF_DIM_X: number = 50;
     static HALF_DIM_Y: number = 30;
@@ -54,12 +54,16 @@ export default class Entity extends Shape {
         ctx.textBaseline = "middle";
         ctx.fillText(this.label, this.centerPoint.x, this.centerPoint.y);
 
+        //Draw Attributes
+        for (const attr of this.attributes) {
+            attr.draw(ctx);
+        }
     }
 
     generateConnectionPoints(): void {
         this.connectionPoints = new Map<string, ConnectionPoint>();
         const corners = this.getCorners();
-        
+
         // Top Points (Left to Right)
         for (let x = corners[0].x + this.deltaX; x < corners[1].x; x += this.deltaX) {
             const cp = { pos: new Vector2D(x, corners[0].y), value: null, outDirection: - Math.PI / 2 };
