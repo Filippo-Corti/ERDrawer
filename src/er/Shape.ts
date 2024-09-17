@@ -67,15 +67,15 @@ export default abstract class Shape implements Connectable, Drawable {
         found.value = null;
     }
 
-    getCurrentConnectionPointFor(c: Connectable): Vector2D {
+    getCurrentConnectionPointFor(c: Connectable): ConnectionPoint {
         const found: ConnectionPoint | undefined = Array.from(this.connectionPoints.values()).find((cp) => cp.value == c);
         if (!found) {
             throw new Error("P is not a valid Connection Point for this shape");
         }
-        return found.pos;
+        return found;
     }
 
-    findConnectionPointFor(c: Connectable): Vector2D {
+    findConnectionPointFor(c: Connectable): ConnectionPoint {
         const segmentFromConnectable = Segment.fromVectors(c.centerPoint, this.centerPoint);
         const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromConnectable);
         const intersectionSegments: Segment[] = this.getSegmentsByPoint(intersectionPoint);
@@ -89,7 +89,7 @@ export default abstract class Shape implements Connectable, Drawable {
                 const currDist = cp.pos.distanceTo(intersectionPoint);
                 if (currDist < minDist && containsAny(intersectionSegments, this.getSegmentsByPoint(cp.pos))) {
                     minDist = currDist;
-                    minPoint = cp.pos;
+                    minPoint = cp;
                 }
             }
             if (minPoint) return minPoint;

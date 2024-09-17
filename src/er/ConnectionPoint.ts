@@ -4,6 +4,7 @@ import Connectable from "./Connectable";
 export type ConnectionPoint = {
 
     pos: Vector2D,
-    value: Connectable | null;
+    value: Connectable | null,
+    outDirection : number,
 
 }

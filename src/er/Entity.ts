@@ -16,7 +16,7 @@ export default class Entity extends Shape {
     }
 
     linkRelationship(r: Relationship): void {
-        this.occupyConnectionPoint(this.findConnectionPointFor(r), r);
+        this.occupyConnectionPoint(this.findConnectionPointFor(r).pos, r);
         this.relationships.push(r);
     }
 
@@ -59,31 +59,29 @@ export default class Entity extends Shape {
     generateConnectionPoints(): void {
         this.connectionPoints = new Map<string, ConnectionPoint>();
         const corners = this.getCorners();
-        const connPoints: Vector2D[] = [];
-
+        
         // Top Points (Left to Right)
         for (let x = corners[0].x + this.deltaX; x < corners[1].x; x += this.deltaX) {
-            connPoints.push(new Vector2D(x, corners[0].y));
+            const cp = { pos: new Vector2D(x, corners[0].y), value: null, outDirection: - Math.PI / 2 };
+            this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
         // Right Points (Top to Bottom)
         for (let y = corners[1].y + this.deltaY; y < corners[2].y; y += this.deltaY) {
-            connPoints.push(new Vector2D(corners[1].x, y));
+            const cp = { pos: new Vector2D(corners[1].x, y), value: null, outDirection: 0 };
+            this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
         // Bottom Points (Right to Left) 
         for (let x = corners[2].x - this.deltaX; x > corners[3].x; x -= this.deltaX) {
-            connPoints.push(new Vector2D(x, corners[2].y));
+            const cp = { pos: new Vector2D(x, corners[2].y), value: null, outDirection: Math.PI / 2 };
+            this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
         // Left Points (Bottom to Top)
         for (let y = corners[3].y - this.deltaY; y > corners[0].y; y -= this.deltaY) {
-            connPoints.push(new Vector2D(corners[3].x, y));
-        }
-
-        for (const p of connPoints) {
-            const cp = { pos: p, value: null };
-            this.connectionPoints.set(p.toString(), cp);
+            const cp = { pos: new Vector2D(corners[3].x, y), value: null, outDirection: Math.PI };
+            this.connectionPoints.set(cp.pos.toString(), cp);
         }
     }
 

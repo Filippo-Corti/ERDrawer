@@ -16,9 +16,9 @@ export default interface Connectable {
 
     freeConnectionPoint(p : Vector2D) : void;
 
-    getCurrentConnectionPointFor(c : Connectable) : Vector2D;
+    getCurrentConnectionPointFor(c : Connectable) : ConnectionPoint;
 
-    findConnectionPointFor(c : Connectable) : Vector2D;
+    findConnectionPointFor(c : Connectable) : ConnectionPoint;
 
     isTheNearestConnectionPoint(p : Vector2D, connPoint : Vector2D) : boolean;
 

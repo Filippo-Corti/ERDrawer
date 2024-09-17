@@ -16,7 +16,7 @@ export default class Relationship extends Shape {
     }
 
     linkToEntity(e: Entity): void {
-        this.occupyConnectionPoint(this.findConnectionPointFor(e), e);
+        this.occupyConnectionPoint(this.findConnectionPointFor(e).pos, e);
         this.entities.push(e);
     }
 
@@ -58,7 +58,6 @@ export default class Relationship extends Shape {
         for (const e of this.entities) {
             const path = this.getPathTo(e);
             ctx.beginPath();
-            ctx.moveTo(path[path.length - 1].x, path[path.length - 1].y);
             for (const v of path) {
                 ctx.lineTo(v.x, v.y);
             }
@@ -69,31 +68,37 @@ export default class Relationship extends Shape {
     generateConnectionPoints(): void {
         this.connectionPoints = new Map<string, ConnectionPoint>();
         const corners = this.getCorners();
-        const connPoints: Vector2D[] = [];
 
         // Top to Right Points
-        for (let x = corners[0].x, y = corners[0].y; x < corners[1].x && y < corners[1].y; x += this.deltaX, y += this.deltaY) {
-            connPoints.push(new Vector2D(x, y));
+        const corner1 = { pos: new Vector2D(corners[0].x, corners[0].y), value: null, outDirection: - Math.PI / 2 };
+        this.connectionPoints.set(corner1.pos.toString(), corner1);
+        for (let x = corners[0].x + this.deltaX, y = corners[0].y + this.deltaY; x < corners[1].x && y < corners[1].y; x += this.deltaX, y += this.deltaY) {
+            const cp = { pos: new Vector2D(x, y), value: null, outDirection: - 3 / 4 * Math.PI };
+            this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
         // Right To Bottom Points
-        for (let x = corners[1].x, y = corners[1].y; x > corners[2].x && y < corners[2].y; x -= this.deltaX, y += this.deltaY) {
-            connPoints.push(new Vector2D(x, y));
+        const corner2 = { pos: new Vector2D(corners[1].x, corners[1].y), value: null, outDirection: 0 };
+        this.connectionPoints.set(corner2.pos.toString(), corner2);
+        for (let x = corners[1].x - this.deltaX, y = corners[1].y + this.deltaY; x > corners[2].x && y < corners[2].y; x -= this.deltaX, y += this.deltaY) {
+            const cp = { pos: new Vector2D(x, y), value: null, outDirection: 3 / 4 * Math.PI };
+            this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
         // Bottom to Left Points
-        for (let x = corners[2].x, y = corners[2].y; x > corners[3].x && y > corners[3].y; x -= this.deltaX, y -= this.deltaY) {
-            connPoints.push(new Vector2D(x, y));
+        const corner3 = { pos: new Vector2D(corners[2].x, corners[2].y), value: null, outDirection: Math.PI / 2 };
+        this.connectionPoints.set(corner3.pos.toString(), corner3);
+        for (let x = corners[2].x - this.deltaX, y = corners[2].y - this.deltaY; x > corners[3].x && y > corners[3].y; x -= this.deltaX, y -= this.deltaY) {
+            const cp = { pos: new Vector2D(x, y), value: null, outDirection: 1 / 4 * Math.PI };
+            this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
         // Left to Top Points
-        for (let x = corners[3].x, y = corners[3].y; x < corners[0].x && y > corners[0].y; x += this.deltaX, y -= this.deltaY) {
-            connPoints.push(new Vector2D(x, y));
-        }
-
-        for (const p of connPoints) {
-            const cp = { pos: p, value: null };
-            this.connectionPoints.set(p.toString(), cp);
+        const corner4 = { pos: new Vector2D(corners[3].x, corners[3].y), value: null, outDirection: Math.PI };
+        this.connectionPoints.set(corner4.pos.toString(), corner4);
+        for (let x = corners[3].x + this.deltaX, y = corners[3].y - this.deltaY; x < corners[0].x && y > corners[0].y; x += this.deltaX, y -= this.deltaY) {
+            const cp = { pos: new Vector2D(x, y), value: null, outDirection: - 1 / 4 * Math.PI };
+            this.connectionPoints.set(cp.pos.toString(), cp);
         }
     }
 
@@ -112,10 +117,14 @@ export default class Relationship extends Shape {
 
     getPathTo(e: Entity): Vector2D[] {
         const myConnPoint = this.getCurrentConnectionPointFor(e);
+        const myCorner = Vector2D.sum(myConnPoint.pos, Vector2D.fromPolar(30, myConnPoint.outDirection));
         const theirConnPoint = e.getCurrentConnectionPointFor(this);
+        const theirCorner = Vector2D.sum(theirConnPoint.pos, Vector2D.fromPolar(30, theirConnPoint.outDirection));
         return [
-            myConnPoint,
-            theirConnPoint
+            myConnPoint.pos,
+            myCorner,
+            theirCorner,
+            theirConnPoint.pos
         ];
     }
 
