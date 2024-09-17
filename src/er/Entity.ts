@@ -56,6 +56,7 @@ export default class Entity extends Shape {
     }
 
     generateConnectionPoints(): void {
+        this.connectionPoints = [];
         const corners = this.getCorners();
         const connPoints: Vector2D[] = [];
 

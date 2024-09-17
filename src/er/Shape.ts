@@ -39,11 +39,11 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     isAConnectionPoint(p: Vector2D): boolean {
-        return this.connectionPoints.some((cp) => cp.pos == p);
+        return this.connectionPoints.some((cp) => cp.pos.equals(p));
     }
 
     isConnectionPointOccupied(p: Vector2D): boolean {
-        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.pos == p);
+        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.pos.equals(p));
         if (!found) {
             throw new Error("P is not a valid Connection Point for this shape");
         }
@@ -51,7 +51,7 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     occupyConnectionPoint(p: Vector2D, value: Connectable): void {
-        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.pos == p);
+        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.pos.equals(p));
         if (!found) {
             throw new Error("P is not a valid Connection Point for this shape");
         }
@@ -59,7 +59,7 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     freeConnectionPoint(p: Vector2D): void {
-        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.pos == p);
+        const found: ConnectionPoint | undefined = this.connectionPoints.find((cp) => cp.pos.equals(p));
         if (!found) {
             throw new Error("P is not a valid Connection Point for this shape");
         }
@@ -77,15 +77,21 @@ export default abstract class Shape implements Connectable, Drawable {
     findConnectionPointFor(c: Connectable): Vector2D {
         const segmentFromConnectable = Segment.fromVectors(c.centerPoint, this.centerPoint);
         const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromConnectable);
+        const intersectionSegment: Segment = this.getSegmentByPoint(intersectionPoint);
 
         do {
             const allConnPoints = this.getAllConnectionPoints();
+            let minDist = Number.MAX_VALUE;
+            let minPoint = null;
             for (const cp of allConnPoints) {
                 if (cp.value !== null) continue;
-                if (this.isTheNearestConnectionPoint(intersectionPoint, cp.pos)) {
-                    return cp.pos;
+                const currDist = cp.pos.distanceTo(intersectionPoint);
+                if (currDist < minDist && this.getSegmentByPoint(cp.pos).equals(intersectionSegment)) {
+                    minDist = currDist;
+                    minPoint = cp.pos;
                 }
             }
+            if (minPoint) return minPoint;
         } while (this.reduceDeltasAndRegenerate());
         throw new Error("Couldn't find a connection point");
     }

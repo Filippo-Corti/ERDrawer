@@ -47,5 +47,9 @@ export default class Vector2D {
         return this.x + ";" + this.y;
     }
 
+    equals(o : Vector2D) : boolean {
+        return (o.x == this.x && o.y == this.y);
+    }
+
 
 };

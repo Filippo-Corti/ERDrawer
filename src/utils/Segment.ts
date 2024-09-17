@@ -149,4 +149,8 @@ export class Segment {
         return new Vector2D(this.a.x - this.b.x, this.a.y - this.b.y).phase();
     }
 
+    equals(o : Segment) : boolean {
+        return (o.a.equals(this.a) && o.b.equals(this.b) || o.a.equals(this.b) && o.b.equals(this.a));
+    }
+
 }

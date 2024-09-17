@@ -1,4 +1,5 @@
 import Drawable from "../utils/Drawable";
+import Vector2D from "../utils/Vector2D";
 import Entity from "./Entity";
 import Relationship from "./Relationship";
 
@@ -25,27 +26,40 @@ export default class ERDiagram implements Drawable {
         this.entities.set(e.label, e);
     }
 
-    addRelationship(entity1: string, entity2: string, label : string): void {
-        const e1 = this.entities.get(entity1);
-        const e2 = this.entities.get(entity2);
-
-        if (!e1 || !e2) {
-            throw new Error("The specified labels don't match any entity in the ER");
+    addRelationship(entities: string[], label: string, centerPoint: Vector2D | null = null): void {
+        if (entities.length < 2) {
+            throw new Error("At least two entities are required to form a relationship.");
         }
-        
-        const relationshipKeyInMap = entity1 + "$" + label + "$" + entity2;
+
+        entities.sort();
+
+        const entityObjects = entities.map(entityName => {
+            const entity = this.entities.get(entityName);
+            if (!entity) {
+                throw new Error(`Entity "${entityName}" does not exist in the ER`);
+            }
+            return entity;
+        });
+
+        const relationshipKeyInMap = entities.join('$') + "$" + label;
         if (this.relationships.has(relationshipKeyInMap)) {
-            throw new Error("An Entity with the label " + relationshipKeyInMap + " already exists");
+            throw new Error(`A relationship with the label ${relationshipKeyInMap} already exists`);
         }
 
-        const middlePoint = e1.centerPoint.halfWayTo(e2.centerPoint);
+        if (!centerPoint) {
+            const avgX = entityObjects.map((e) => e.centerPoint.x).reduce((a, b) => a + b, 0) / entityObjects.length;
+            const avgY = entityObjects.map((e) => e.centerPoint.y).reduce((a, b) => a + b, 0) / entityObjects.length;
+            centerPoint = new Vector2D(avgX, avgY);
+        }
 
-        const newRelationship = new Relationship(middlePoint, label);
+
+        const newRelationship = new Relationship(centerPoint, label);
         this.relationships.set(relationshipKeyInMap, newRelationship);
-        newRelationship.linkToEntity(e1);
-        e1.linkRelationship(newRelationship);
-        newRelationship.linkToEntity(e2);
-        e2.linkRelationship(newRelationship);
+
+        for (const e of entityObjects) {
+            e.linkRelationship(newRelationship);
+            newRelationship.linkToEntity(e);
+        }
 
         //Update edge's middlePoints
         //this.setEdgesMiddlePoints(label1, label2);

@@ -11,17 +11,20 @@ er.addEntity(new Entity(new Vector2D(100, 200), "Prova"));
 er.addEntity(new Entity(new Vector2D(600, 200), "Xyz"));
 er.addEntity(new Entity(new Vector2D(300, 600), "Canguro"));
 
-er.addRelationship("Prova", "Xyz", "Connesso");
-er.addRelationship("Prova", "Canguro", "Ammesso");
+er.addRelationship(["Prova", "Xyz"], "Connesso");
+er.addRelationship(["Prova", "Canguro"], "Ammesso");
+er.addRelationship(["Prova", "Canguro", "Xyz"], "Ammesso");
 
 const erDrawer = new ERDrawer(er, drawer);
 erDrawer.drawER();
+
+console.log(er);
 
 //Draw Point
 
 document.getElementById("addpoint-form")!.addEventListener("submit", (event) => addPoint(event));
 
-function addPoint(event : Event) : boolean {
+function addPoint(event: Event): boolean {
     event.preventDefault();
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);

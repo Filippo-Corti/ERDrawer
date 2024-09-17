@@ -66,6 +66,7 @@ export default class Relationship extends Shape {
     }
 
     generateConnectionPoints(): void {
+        this.connectionPoints = [];
         const corners = this.getCorners();
         const connPoints: Vector2D[] = [];
 
