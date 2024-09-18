@@ -18,7 +18,7 @@ export default interface Connectable {
 
     getCurrentConnectionPointFor(c : Connectable) : ConnectionPoint;
 
-    findConnectionPointFor(c : Connectable) : ConnectionPoint;
+    findConnectionPointFor(c : Connectable, closestSegment : boolean) : ConnectionPoint;
 
     isTheNearestConnectionPoint(p : Vector2D, connPoint : Vector2D) : boolean;
 

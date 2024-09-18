@@ -75,7 +75,7 @@ export default abstract class Shape implements Connectable, Drawable {
         return found;
     }
 
-    findConnectionPointFor(c: Connectable): ConnectionPoint {
+    findConnectionPointFor(c: Connectable, closestSegment: boolean = true): ConnectionPoint {
         const segmentFromConnectable = Segment.fromVectors(c.centerPoint, this.centerPoint);
         const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromConnectable);
         const intersectionSegments: Segment[] = this.getSegmentsByPoint(intersectionPoint);
@@ -87,13 +87,15 @@ export default abstract class Shape implements Connectable, Drawable {
             for (const cp of allConnPoints) {
                 if (cp.value !== null) continue;
                 const currDist = cp.pos.distanceTo(intersectionPoint);
-                if (currDist < minDist && containsAny(intersectionSegments, this.getSegmentsByPoint(cp.pos))) {
+                if (currDist < minDist && (containsAny(intersectionSegments, this.getSegmentsByPoint(cp.pos)) || !closestSegment)) {
                     minDist = currDist;
                     minPoint = cp;
                 }
             }
             if (minPoint) return minPoint;
         } while (this.reduceDeltasAndRegenerate());
+        if (closestSegment)
+            return this.findConnectionPointFor(c, false);
         throw new Error("Couldn't find a connection point");
     }
 
@@ -137,10 +139,10 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     reduceDeltasAndRegenerate(): boolean {
-        const canDivideX : boolean = (this.deltaX >= 10);
-        const canDivideY : boolean = (this.deltaY >= 20);
+        const canDivideX: boolean = (this.deltaX >= 15);
+        const canDivideY: boolean = (this.deltaY >= 20);
         if (!(canDivideX || canDivideY)) return false;
-        
+
         if (canDivideX)
             this.deltaX /= 2;
         if (canDivideY)
@@ -155,6 +157,21 @@ export default abstract class Shape implements Connectable, Drawable {
         }
 
         return true;
+    }
+
+    updateCenterPoint(newCenterPoint: Vector2D): void {
+        if (this.centerPoint.equals(newCenterPoint)) return;
+
+        const centerPointsDiff = Vector2D.sum(newCenterPoint, this.centerPoint.negative());
+        const newConnectionPoints: Map<string, ConnectionPoint> = new Map<string, ConnectionPoint>();
+
+        for (const [_, oldCP] of this.connectionPoints) {
+            const newPoint = Vector2D.sum(oldCP.pos, centerPointsDiff);
+            oldCP.pos = newPoint;
+            newConnectionPoints.set(newPoint.toString(), oldCP)
+        }
+
+        this.centerPoint = newCenterPoint;
     }
 
 

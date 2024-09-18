@@ -7,6 +7,7 @@ export default class Relationship extends Shape {
 
     static HALF_DIAG_X: number = 70;
     static HALF_DIAG_Y: number = 50;
+    static MULTIPLE_RELATIONSHIPS_OFFSET : number = 110;
 
     entities: Entity[];
 

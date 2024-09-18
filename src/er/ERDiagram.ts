@@ -63,18 +63,46 @@ export default class ERDiagram implements Drawable {
             newRelationship.linkToEntity(e);
         }
 
-        //Update edge's middlePoints
-        //this.setEdgesMiddlePoints(label1, label2);
+        this.positionRelationships(entities);
     }
 
-    addAttributes(s : ShapeWithAttributes, attributes : string[]) {
-        for(const attLabel of attributes) {
+    addAttributes(s: ShapeWithAttributes, attributes: string[]) {
+        for (const attLabel of attributes) {
             const attribute = new Attribute(attLabel);
             s.addAttribute(attribute);
         }
     }
 
-    getEntity(entityLabel : string) : Entity {
+    positionRelationships(entities: string[]) {
+        const entitiesKeyPrefix = entities.join('$') + "$";
+        const involvedRelationships: Relationship[] = [];
+
+        const involvedEntities: Entity[] = entities.map((entityName) => this.entities.get(entityName)!);
+
+        for (const [k, v] of this.relationships) {
+            if (k.startsWith(entitiesKeyPrefix)) {
+                involvedRelationships.push(v);
+            }
+        }
+
+        if (involvedRelationships.length <= 1) return;
+
+        const middle = involvedEntities[0].centerPoint.halfWayTo(involvedEntities[1].centerPoint);
+        const theta = Vector2D.sum(involvedEntities[0].centerPoint, involvedEntities[1].centerPoint.negative()).phase();
+
+        let sign = 1;
+        for (let i = 0; i < involvedRelationships.length; i++) {
+            const offsetFactor = (involvedRelationships.length == 1) ? 0 : sign * Math.floor((i + 1) / 2);
+            sign *= -1;
+            const offsetBase = Relationship.MULTIPLE_RELATIONSHIPS_OFFSET;
+            const dx = offsetBase * offsetFactor * Math.sin(theta);
+            const dy = offsetBase * offsetFactor * -Math.cos(theta);
+            involvedRelationships[i].updateCenterPoint(Vector2D.sum(middle, new Vector2D(dx, dy)));
+        }
+
+    }
+
+    getEntity(entityLabel: string): Entity {
         const found = this.entities.get(entityLabel);
         if (!found)
             throw new Error("Entity " + entityLabel + " does not exist in the ER");
@@ -82,10 +110,10 @@ export default class ERDiagram implements Drawable {
         return found;
     }
 
-    getRelationship(relationshipLabel : string, linkedEntitiesLabels : string[]) : Relationship {
-        linkedEntitiesLabels.sort(); 
+    getRelationship(relationshipLabel: string, linkedEntitiesLabels: string[]): Relationship {
+        linkedEntitiesLabels.sort();
         const relationshipKeyInMap = linkedEntitiesLabels.join('$') + "$" + relationshipLabel;
-        
+
         const found = this.relationships.get(relationshipKeyInMap);
         if (!found)
             throw new Error("Relationship " + relationshipLabel + " does not exist in the ER");

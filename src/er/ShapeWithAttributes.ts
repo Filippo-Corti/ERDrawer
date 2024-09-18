@@ -21,9 +21,9 @@ export default abstract class ShapeWithAttributes extends Shape {
         a.linkToConnectable(this);
     }
 
-    findConnectionPointFor(c: Connectable): ConnectionPoint {
+    findConnectionPointFor(c: Connectable, closestSegment: boolean = true): ConnectionPoint {
         if (!(c instanceof Attribute)) {
-            return super.findConnectionPointFor(c);
+            return super.findConnectionPointFor(c, closestSegment);
         }
 
         const allConnPoints = this.getAllConnectionPoints();
@@ -36,7 +36,7 @@ export default abstract class ShapeWithAttributes extends Shape {
 
         if (availableConnPoints.length == 0) {
             if (this.reduceDeltasAndRegenerate()) {
-                return this.findConnectionPointFor(c);
+                return this.findConnectionPointFor(c, closestSegment);
             }
             else
                 throw new Error("Couldn't find room for this attribute");

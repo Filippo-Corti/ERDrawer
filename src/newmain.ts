@@ -8,11 +8,14 @@ const drawer = new Drawer("drawing-board");
 const er = new ERDiagram();
 
 
-er.addEntity(new Entity(new Vector2D(200, 200), "Prova"));
-er.addEntity(new Entity(new Vector2D(700, 200), "Xyz"));
-er.addEntity(new Entity(new Vector2D(400, 600), "Canguro"));
+er.addEntity(new Entity(new Vector2D(200, 300), "Prova"));
+er.addEntity(new Entity(new Vector2D(1000, 300), "Xyz"));
+er.addEntity(new Entity(new Vector2D(400, 800), "Canguro"));
 
 er.addRelationship(["Prova", "Xyz"], "Connesso");
+er.addRelationship(["Prova", "Xyz"], "Connesso2");
+er.addRelationship(["Prova", "Xyz"], "Connesso23");
+er.addRelationship(["Prova", "Xyz"], "Connesso323");
 er.addRelationship(["Prova", "Canguro"], "Ammesso");
 er.addRelationship(["Prova", "Canguro", "Xyz"], "Ammesso");
 
