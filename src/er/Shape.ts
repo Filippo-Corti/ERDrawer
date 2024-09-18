@@ -2,7 +2,6 @@ import Drawable from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
 import { containsAny } from "../utils/Utils";
 import Vector2D from "../utils/Vector2D";
-import Attribute from "./Attribute";
 import Connectable from "./Connectable";
 import { ConnectionPoint } from "./ConnectionPoint";
 
@@ -113,7 +112,7 @@ export default abstract class Shape implements Connectable, Drawable {
 
     getSegmentsByPoint(point: Vector2D): Segment[] {
         const segments = this.getSegments();
-        const containingSegments : Segment[] = [];
+        const containingSegments: Segment[] = [];
 
         for (const s of segments) {
             if (s.contains(point)) {
@@ -138,9 +137,14 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     reduceDeltasAndRegenerate(): boolean {
-        if (this.deltaX < 15 || this.deltaY < 10) return false;
-        this.deltaX /= 2;
-        this.deltaY /= 2;
+        const canDivideX : boolean = (this.deltaX >= 10);
+        const canDivideY : boolean = (this.deltaY >= 20);
+        if (!(canDivideX || canDivideY)) return false;
+        
+        if (canDivideX)
+            this.deltaX /= 2;
+        if (canDivideY)
+            this.deltaY /= 2;
 
         const oldConnPoints = this.connectionPoints;
         this.generateConnectionPoints();

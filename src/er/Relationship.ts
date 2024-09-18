@@ -116,10 +116,11 @@ export default class Relationship extends Shape {
     }
 
     getPathTo(e: Entity): Vector2D[] {
+        const STRAIGHT_SEGMENT_LENGTH : number = 30;
         const myConnPoint = this.getCurrentConnectionPointFor(e);
-        const myCorner = Vector2D.sum(myConnPoint.pos, Vector2D.fromPolar(30, myConnPoint.outDirection));
+        const myCorner = Vector2D.sum(myConnPoint.pos, Vector2D.fromPolar(STRAIGHT_SEGMENT_LENGTH, myConnPoint.outDirection));
         const theirConnPoint = e.getCurrentConnectionPointFor(this);
-        const theirCorner = Vector2D.sum(theirConnPoint.pos, Vector2D.fromPolar(30, theirConnPoint.outDirection));
+        const theirCorner = Vector2D.sum(theirConnPoint.pos, Vector2D.fromPolar(STRAIGHT_SEGMENT_LENGTH, theirConnPoint.outDirection));
         return [
             myConnPoint.pos,
             myCorner,

@@ -5,6 +5,8 @@ import { ConnectionPoint } from "./ConnectionPoint";
 
 export default class Attribute implements Connectable, Drawable {
 
+    static CIRCLE_SIZE = 5;
+
     centerPoint: Vector2D;
     connectionPoints: Map<string, ConnectionPoint>;
     label: string;
@@ -48,11 +50,26 @@ export default class Attribute implements Connectable, Drawable {
         // Draw Point
         ctx.fillStyle = (this.filledPoint) ? "black" : "white";
         ctx.beginPath();
-        ctx.arc(endPoint.x, endPoint.y, 5, 0, 2 * Math.PI, true);
+        ctx.arc(endPoint.x, endPoint.y, Attribute.CIRCLE_SIZE, 0, 2 * Math.PI, true);
         ctx.fill();
         ctx.stroke();
 
-        console.log("Attribute done");
+        // Draw Text
+        ctx.save();
+        ctx.fillStyle = "black";
+        ctx.textBaseline = "middle";
+        ctx.font = this.labelFontSize + "px serif";
+        ctx.translate(endPoint.x, endPoint.y);
+        if (this.segmentDirection > Math.PI / 2 && this.segmentDirection < 3 / 2 * Math.PI) {
+            ctx.rotate(this.segmentDirection + Math.PI);
+            ctx.textAlign = "end";
+            ctx.fillText(this.label, - (Attribute.CIRCLE_SIZE + 3), 0);
+        } else {
+            ctx.rotate(this.segmentDirection);
+            ctx.textAlign = "start";
+            ctx.fillText(this.label, Attribute.CIRCLE_SIZE + 3, 0);
+        }
+        ctx.restore();
     }
 
     getAllConnectionPoints(): IterableIterator<ConnectionPoint> {
@@ -91,13 +108,13 @@ export default class Attribute implements Connectable, Drawable {
         return this.connectionPoints.get(this.centerPoint.toString())!;
     }
 
-    findConnectionPointFor(c: Connectable): ConnectionPoint {
+    findConnectionPointFor(_c: Connectable): ConnectionPoint {
         if (this.connectionPoints.get(this.centerPoint.toString())!.value !== null)
             throw new Error("Couldn't find a connection point");
         return this.connectionPoints.get(this.centerPoint.toString())!;
     }
 
-    isTheNearestConnectionPoint(p: Vector2D, connPoint: Vector2D): boolean {
+    isTheNearestConnectionPoint(_p: Vector2D, _connPoint: Vector2D): boolean {
         return true;
     }
 

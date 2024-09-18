@@ -15,7 +15,7 @@ export default abstract class ShapeWithAttributes extends Shape {
     }
 
     addAttribute(a: Attribute): void {
-        const found = this.findConnectionPointFor(a)
+        const found = this.findConnectionPointFor(a);
         this.occupyConnectionPoint(found.pos, a);
         this.attributes.push(a);
         a.linkToConnectable(this);
@@ -34,8 +34,13 @@ export default abstract class ShapeWithAttributes extends Shape {
             availableConnPoints.push(cp);
         }
 
-        if (availableConnPoints.length == 0)
-            throw new Error("Couldn't find room for this attribute");
+        if (availableConnPoints.length == 0) {
+            if (this.reduceDeltasAndRegenerate()) {
+                return this.findConnectionPointFor(c);
+            }
+            else
+                throw new Error("Couldn't find room for this attribute");
+        }
 
         return availableConnPoints[Random.getRandom(0, availableConnPoints.length - 1)];
     }
