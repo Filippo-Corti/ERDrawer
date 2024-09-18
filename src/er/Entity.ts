@@ -55,9 +55,7 @@ export default class Entity extends ShapeWithAttributes {
         ctx.fillText(this.label, this.centerPoint.x, this.centerPoint.y);
 
         //Draw Attributes
-        for (const attr of this.attributes) {
-            attr.draw(ctx);
-        }
+        super.draw(ctx);
     }
 
     generateConnectionPoints(): void {

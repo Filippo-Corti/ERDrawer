@@ -1,9 +1,9 @@
 import Vector2D from "../utils/Vector2D";
 import { ConnectionPoint } from "./ConnectionPoint";
 import Entity from "./Entity";
-import Shape from "./Shape";
+import ShapeWithAttributes from "./ShapeWithAttributes";
 
-export default class Relationship extends Shape {
+export default class Relationship extends ShapeWithAttributes {
 
     static HALF_DIAG_X: number = 70;
     static HALF_DIAG_Y: number = 50;
@@ -64,6 +64,9 @@ export default class Relationship extends Shape {
             }
             ctx.stroke();
         }
+
+        //Draw Attributes
+        super.draw(ctx);
     }
 
     generateConnectionPoints(): void {
@@ -74,7 +77,7 @@ export default class Relationship extends Shape {
         const corner1 = { pos: new Vector2D(corners[0].x, corners[0].y), value: null, outDirection: - Math.PI / 2 };
         this.connectionPoints.set(corner1.pos.toString(), corner1);
         for (let x = corners[0].x + this.deltaX, y = corners[0].y + this.deltaY; x < corners[1].x && y < corners[1].y; x += this.deltaX, y += this.deltaY) {
-            const cp = { pos: new Vector2D(x, y), value: null, outDirection: - 3 / 4 * Math.PI };
+            const cp = { pos: new Vector2D(x, y), value: null, outDirection: -1 / 4 * Math.PI };
             this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
@@ -82,7 +85,7 @@ export default class Relationship extends Shape {
         const corner2 = { pos: new Vector2D(corners[1].x, corners[1].y), value: null, outDirection: 0 };
         this.connectionPoints.set(corner2.pos.toString(), corner2);
         for (let x = corners[1].x - this.deltaX, y = corners[1].y + this.deltaY; x > corners[2].x && y < corners[2].y; x -= this.deltaX, y += this.deltaY) {
-            const cp = { pos: new Vector2D(x, y), value: null, outDirection: 3 / 4 * Math.PI };
+            const cp = { pos: new Vector2D(x, y), value: null, outDirection: 1 / 4 * Math.PI };
             this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
@@ -90,7 +93,7 @@ export default class Relationship extends Shape {
         const corner3 = { pos: new Vector2D(corners[2].x, corners[2].y), value: null, outDirection: Math.PI / 2 };
         this.connectionPoints.set(corner3.pos.toString(), corner3);
         for (let x = corners[2].x - this.deltaX, y = corners[2].y - this.deltaY; x > corners[3].x && y > corners[3].y; x -= this.deltaX, y -= this.deltaY) {
-            const cp = { pos: new Vector2D(x, y), value: null, outDirection: 1 / 4 * Math.PI };
+            const cp = { pos: new Vector2D(x, y), value: null, outDirection: 3 / 4 * Math.PI };
             this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
@@ -98,7 +101,7 @@ export default class Relationship extends Shape {
         const corner4 = { pos: new Vector2D(corners[3].x, corners[3].y), value: null, outDirection: Math.PI };
         this.connectionPoints.set(corner4.pos.toString(), corner4);
         for (let x = corners[3].x + this.deltaX, y = corners[3].y - this.deltaY; x < corners[0].x && y > corners[0].y; x += this.deltaX, y -= this.deltaY) {
-            const cp = { pos: new Vector2D(x, y), value: null, outDirection: - 1 / 4 * Math.PI };
+            const cp = { pos: new Vector2D(x, y), value: null, outDirection: - 3 / 4 * Math.PI };
             this.connectionPoints.set(cp.pos.toString(), cp);
         }
     }

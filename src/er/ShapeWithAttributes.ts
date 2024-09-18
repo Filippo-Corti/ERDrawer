@@ -14,6 +14,12 @@ export default abstract class ShapeWithAttributes extends Shape {
         this.attributes = [];
     }
 
+    draw(ctx: CanvasRenderingContext2D): void {
+        for (const attr of this.attributes) {
+            attr.draw(ctx);
+        }
+    }
+
     addAttribute(a: Attribute): void {
         const found = this.findConnectionPointFor(a);
         this.occupyConnectionPoint(found.pos, a);

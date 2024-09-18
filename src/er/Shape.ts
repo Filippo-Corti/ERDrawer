@@ -172,6 +172,7 @@ export default abstract class Shape implements Connectable, Drawable {
         }
 
         this.centerPoint = newCenterPoint;
+        this.connectionPoints = newConnectionPoints;
     }
 
 
