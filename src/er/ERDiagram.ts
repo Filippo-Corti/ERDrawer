@@ -121,4 +121,8 @@ export default class ERDiagram implements Drawable {
         return found;
     }
 
+    getAttribute(item : ShapeWithAttributes, attributeLabel : string) {
+        return item.getAttribute(attributeLabel);
+    }
+
 }

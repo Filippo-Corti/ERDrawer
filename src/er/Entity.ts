@@ -1,4 +1,7 @@
+import { Segment } from "../utils/Segment";
 import Vector2D from "../utils/Vector2D";
+import Attribute from "./Attribute";
+import Connectable from "./Connectable";
 import { ConnectionPoint } from "./ConnectionPoint";
 import Relationship from "./Relationship";
 import ShapeWithAttributes from "./ShapeWithAttributes";
@@ -9,10 +12,12 @@ export default class Entity extends ShapeWithAttributes {
     static HALF_DIM_Y: number = 30;
 
     relationships: Relationship[];
+    identifierConnPoints: ConnectionPoint[];
 
     constructor(centerPoint: Vector2D, label: string) {
         super(centerPoint, label, Entity.HALF_DIM_X, Entity.HALF_DIM_Y);
         this.relationships = [];
+        this.identifierConnPoints = [];
     }
 
     linkRelationship(r: Relationship): void {
@@ -56,6 +61,24 @@ export default class Entity extends ShapeWithAttributes {
 
         //Draw Attributes
         super.draw(ctx);
+
+        //Draw Primary Key
+        if (this.identifierConnPoints.length > 1) {
+            const composedIdentifierPath = this.getComposedIdentifierPath();
+            const lastPoint = composedIdentifierPath[composedIdentifierPath.length - 1];
+
+            ctx.beginPath();
+            for (const v of composedIdentifierPath) {
+                ctx.lineTo(v.x, v.y);
+            }
+            ctx.stroke();
+
+            ctx.fillStyle = "black";
+            ctx.beginPath();
+            ctx.arc(lastPoint.x, lastPoint.y, Attribute.CIRCLE_SIZE, 0, 2 * Math.PI, true);
+            ctx.stroke();
+            ctx.fill();
+        }
     }
 
     generateConnectionPoints(): void {
@@ -98,6 +121,83 @@ export default class Entity extends ShapeWithAttributes {
         } while (ctx.measureText(this.label).width > (Entity.HALF_DIM_X - BORDER) * 2);
 
         return fontSize;
+    }
+
+    setPrimaryKey(involvedConnectables: Connectable[]): void {
+        const relationships: Relationship[] = involvedConnectables.filter((c) => c instanceof Relationship);
+        const attributes: Attribute[] = involvedConnectables.filter((c) => c instanceof Attribute);
+
+        switch (relationships.length) {
+            case 0:
+                this.setAttributesAsIdentifier(attributes);
+                break;
+            default:
+                throw new Error("External Identifiers are currently not implemented");
+        }
+    }
+
+    setAttributesAsIdentifier(attributes: Attribute[]): void {
+        const attributesConnPoints: ConnectionPoint[] = attributes.map((a) => this.getCurrentConnectionPointFor(a));
+        const allConnPoints = this.getAllConnectionPoints();
+
+        if (attributes.length == 1) {
+            attributes[0].filledPoint = true;
+            this.identifierConnPoints = attributesConnPoints;
+            return;
+        }
+
+
+        let countConsecutiveSpaces: number = 0;
+        let foundConnPoints: ConnectionPoint[] = [];
+        for (const connPoint of allConnPoints) {
+            if (connPoint.value instanceof Relationship) {
+                countConsecutiveSpaces = 0;
+                foundConnPoints = [];
+                continue;
+            }
+            countConsecutiveSpaces++;
+            foundConnPoints.push(connPoint);
+            if (countConsecutiveSpaces >= attributes.length)
+                break;
+        }
+
+        if (countConsecutiveSpaces < attributes.length)
+            throw new Error("We've got a problem");
+
+
+        for (let i = 0; i < attributesConnPoints.length; i++) {
+            const attribute = attributes[i];
+            const oldConnPoint = this.getCurrentConnectionPointFor(attribute);
+            const newConnPoint = foundConnPoints[i];
+            const otherConnectable = newConnPoint.value;
+
+            [oldConnPoint.value, newConnPoint.value] = [newConnPoint.value, oldConnPoint.value];
+            attribute.setConnectedPoint(newConnPoint);
+            if (otherConnectable instanceof Attribute)
+                otherConnectable.setConnectedPoint(oldConnPoint);
+        }
+
+        this.identifierConnPoints = foundConnPoints;
+    }
+
+    getComposedIdentifierPath(): Vector2D[] {
+        const passingPoints: Vector2D[] = this.identifierConnPoints.map((cp) => (cp.value as Attribute).getMiddleSegmentPoint());
+        const identifierPath: Vector2D[] = [passingPoints[0]];
+
+        let prevPoint = passingPoints[0];
+        for (let i = 1; i < passingPoints.length; i++) {
+            const currPoint = passingPoints[i];
+            if (!(prevPoint.x == currPoint.x || prevPoint.y == currPoint.y)) {
+                identifierPath.push(new Vector2D(prevPoint.x, currPoint.y));
+            }
+            identifierPath.push(currPoint);
+
+            prevPoint = currPoint;
+        }
+
+        const firstPoint = Vector2D.sum(identifierPath[0], Vector2D.fromPolar(8, Segment.fromVectors(identifierPath[0], identifierPath[1]).getDirection()));
+        const lastPoint = Vector2D.sum(identifierPath[identifierPath.length - 1], Vector2D.fromPolar(10, Segment.fromVectors(identifierPath[identifierPath.length - 1], identifierPath[identifierPath.length - 2]).getDirection()));
+        return [firstPoint, ...identifierPath, lastPoint];
     }
 
 

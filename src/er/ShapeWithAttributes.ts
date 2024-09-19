@@ -27,6 +27,14 @@ export default abstract class ShapeWithAttributes extends Shape {
         a.linkToConnectable(this);
     }
 
+    getAttribute(label : string) : Attribute {
+        const found = this.attributes.find((a) => a.label == label);
+        if (found)
+            return found;
+
+        throw new Error("Attribute " + label + " not in " + this.label);
+    }
+
     findConnectionPointFor(c: Connectable, closestSegment: boolean = true): ConnectionPoint {
         if (!(c instanceof Attribute)) {
             return super.findConnectionPointFor(c, closestSegment);

@@ -7,7 +7,7 @@ export default class Relationship extends ShapeWithAttributes {
 
     static HALF_DIAG_X: number = 70;
     static HALF_DIAG_Y: number = 50;
-    static MULTIPLE_RELATIONSHIPS_OFFSET : number = 110;
+    static MULTIPLE_RELATIONSHIPS_OFFSET : number = Math.max(Relationship.HALF_DIAG_X, Relationship.HALF_DIAG_Y) * 2 + 10;
 
     entities: Entity[];
 

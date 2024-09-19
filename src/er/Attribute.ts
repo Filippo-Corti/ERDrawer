@@ -29,10 +29,14 @@ export default class Attribute implements Connectable, Drawable {
         this.connected = c;
 
         const found = c.getCurrentConnectionPointFor(this);
-        this.centerPoint = found.pos;
-        this.segmentDirection = found.outDirection;
+        this.setConnectedPoint(found);
+    }
+
+    setConnectedPoint(cp : ConnectionPoint) : void {
+        this.centerPoint = cp.pos;
+        this.segmentDirection = cp.outDirection;
         this.connectionPoints = new Map<string, ConnectionPoint>();
-        this.connectionPoints.set(found.pos.toString(), { pos: found.pos, value: this, outDirection: found.outDirection });
+        this.connectionPoints.set(cp.pos.toString(), { pos: cp.pos, value: this, outDirection: cp.outDirection });
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
@@ -116,6 +120,21 @@ export default class Attribute implements Connectable, Drawable {
 
     isTheNearestConnectionPoint(_p: Vector2D, _connPoint: Vector2D): boolean {
         return true;
+    }
+
+    getPreviousConnectionPoint(_p: Vector2D): ConnectionPoint {
+        return this.connectionPoints.get(this.centerPoint.toString())!;
+    }
+
+    getNextConnectionPoint(_p: Vector2D): ConnectionPoint {
+        return this.connectionPoints.get(this.centerPoint.toString())!;
+    }
+
+    getMiddleSegmentPoint() : Vector2D {
+        const deltaVector = Vector2D.fromPolar(this.segmentLength, this.segmentDirection);
+        const endPoint = Vector2D.sum(this.centerPoint, deltaVector);
+        
+        return this.centerPoint.halfWayTo(endPoint);
     }
 
 }

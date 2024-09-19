@@ -9,8 +9,8 @@ const er = new ERDiagram();
 
 
 er.addEntity(new Entity(new Vector2D(200, 300), "Prova"));
-er.addEntity(new Entity(new Vector2D(1000, 300), "Xyz"));
-er.addEntity(new Entity(new Vector2D(400, 800), "Canguro"));
+er.addEntity(new Entity(new Vector2D(1200, 300), "Xyz"));
+er.addEntity(new Entity(new Vector2D(400, 950), "Canguro"));
 
 er.addRelationship(["Prova", "Xyz"], "Connesso");
 er.addRelationship(["Prova", "Xyz"], "Connesso2");
@@ -22,12 +22,15 @@ const erDrawer = new ERDrawer(er, drawer);
 
 er.addAttributes(er.getEntity("Prova"), ["ciao", "cosa", "fai", "ecco", "ottimo", "ciao", "ecco", "ottimo", "ciao", "ecco", "ottimo", "ciao"]);
 er.addAttributes(er.getEntity("Xyz"), ["ciao"]);
-er.addAttributes(er.getEntity("Canguro"), ["ciao"]);
-er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Fai", "Due", "Tre", "quatro"]);
+er.addAttributes(er.getEntity("Canguro"), ["ciao", "pesce", "prova", "cannone", "anatra"]);
+er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Uno", "Due", "Tre", "Quattro"]);
 er.addAttributes(er.getRelationship("Connesso2", ["Prova", "Xyz"]), ["ciao"]);
 
-erDrawer.drawER();
+const e = er.getEntity("Canguro");
+e.setPrimaryKey([e.getAttribute("ciao"), e.getAttribute("pesce"), e.getAttribute("prova"), e.getAttribute("anatra")]);
+
 console.log(er);
+erDrawer.drawER();
 
 //Draw Point
 

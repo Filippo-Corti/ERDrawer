@@ -22,4 +22,9 @@ export default interface Connectable {
 
     isTheNearestConnectionPoint(p : Vector2D, connPoint : Vector2D) : boolean;
 
+    getPreviousConnectionPoint(p : Vector2D) : ConnectionPoint;
+
+    getNextConnectionPoint(p: Vector2D) : ConnectionPoint;
+
+
 }

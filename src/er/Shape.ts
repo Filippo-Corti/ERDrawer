@@ -75,6 +75,32 @@ export default abstract class Shape implements Connectable, Drawable {
         return found;
     }
 
+    getPreviousConnectionPoint(p: Vector2D): ConnectionPoint {
+        let prev : ConnectionPoint | null = null;
+        for (let [key, value] of this.connectionPoints) {
+            if (key === p.toString()) 
+                return (prev) ? prev : Array.from(this.connectionPoints).pop()![1];
+
+            prev = value;
+        }
+        throw new Error("P is not a Connection Point");
+    }
+
+    getNextConnectionPoint(p: Vector2D): ConnectionPoint {
+        let found : boolean = false;
+        for (let [key, value] of this.connectionPoints) {
+            if (found) 
+                return value;
+
+            if (key === p.toString()) 
+                found = true;
+        }
+        if (found)
+            return Array.from(this.connectionPoints)[0][1];
+
+        throw new Error("P is not a Connection Point");
+    }
+
     findConnectionPointFor(c: Connectable, closestSegment: boolean = true): ConnectionPoint {
         const segmentFromConnectable = Segment.fromVectors(c.centerPoint, this.centerPoint);
         const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromConnectable);
