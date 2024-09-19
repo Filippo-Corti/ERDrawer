@@ -1,4 +1,5 @@
 import { Segment } from "../utils/Segment";
+import { Random } from "../utils/Utils";
 import Vector2D from "../utils/Vector2D";
 import Attribute from "./Attribute";
 import Connectable from "./Connectable";
@@ -138,7 +139,9 @@ export default class Entity extends ShapeWithAttributes {
 
     setAttributesAsIdentifier(attributes: Attribute[]): void {
         const attributesConnPoints: ConnectionPoint[] = attributes.map((a) => this.getCurrentConnectionPointFor(a));
-        const allConnPoints = this.getAllConnectionPoints();
+        let allConnPoints = Array.from(this.connectionPoints);
+        const randIndex = Random.getRandom(0, allConnPoints.length - 1);
+        allConnPoints = allConnPoints.slice(randIndex).concat(allConnPoints.slice(0, randIndex)); // Start from random point
 
         if (attributes.length == 1) {
             attributes[0].filledPoint = true;
@@ -146,24 +149,29 @@ export default class Entity extends ShapeWithAttributes {
             return;
         }
 
-
         let countConsecutiveSpaces: number = 0;
         let foundConnPoints: ConnectionPoint[] = [];
-        for (const connPoint of allConnPoints) {
+        let firstSequenceLength = 0;
+        let isFirstSequence = true;
+        for (const [_, connPoint] of allConnPoints) {
             if (connPoint.value instanceof Relationship) {
                 countConsecutiveSpaces = 0;
+                isFirstSequence = false;
                 foundConnPoints = [];
                 continue;
             }
             countConsecutiveSpaces++;
+            if (isFirstSequence) firstSequenceLength++;
             foundConnPoints.push(connPoint);
             if (countConsecutiveSpaces >= attributes.length)
                 break;
         }
 
-        if (countConsecutiveSpaces < attributes.length)
-            throw new Error("We've got a problem");
-
+        if (countConsecutiveSpaces < attributes.length) {
+            countConsecutiveSpaces += firstSequenceLength;
+            if (countConsecutiveSpaces < attributes.length)
+                throw new Error("We've got a problem");
+        }
 
         for (let i = 0; i < attributesConnPoints.length; i++) {
             const attribute = attributes[i];
@@ -188,7 +196,10 @@ export default class Entity extends ShapeWithAttributes {
         for (let i = 1; i < passingPoints.length; i++) {
             const currPoint = passingPoints[i];
             if (!(prevPoint.x == currPoint.x || prevPoint.y == currPoint.y)) {
-                identifierPath.push(new Vector2D(prevPoint.x, currPoint.y));
+                let cornerPoint = new Vector2D(prevPoint.x, currPoint.y);
+                if (cornerPoint.distanceTo(this.centerPoint) < Math.hypot(Entity.HALF_DIM_X, Entity.HALF_DIM_Y))
+                    cornerPoint = new Vector2D(currPoint.x, prevPoint.y);
+                identifierPath.push(cornerPoint);
             }
             identifierPath.push(currPoint);
 

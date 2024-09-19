@@ -8,7 +8,7 @@ export type ConnectionPoint = {
 
 export module Random {
 
-    var seed = 0;
+    var seed = 1;
     function random(): number {
         return Math.random()
         var x = Math.sin(seed++) * 10000;
