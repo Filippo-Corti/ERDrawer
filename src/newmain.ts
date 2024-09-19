@@ -22,12 +22,12 @@ const erDrawer = new ERDrawer(er, drawer);
 
 er.addAttributes(er.getEntity("Prova"), ["ciao", "cosa", "fai", "ecco", "ottimo", "ciao", "ecco", "ottimo", "ciao", "ecco", "ottimo", "ciao"]);
 er.addAttributes(er.getEntity("Xyz"), ["ciao"]);
-er.addAttributes(er.getEntity("Canguro"), ["ciao", "pesce", "prova", "cannone", "anatra"]);
+er.addAttributes(er.getEntity("Canguro"), ["ciao", "pesce", "prova", "cannone", "anatra", "a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m"]);
 er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Uno", "Due", "Tre", "Quattro"]);
 er.addAttributes(er.getRelationship("Connesso2", ["Prova", "Xyz"]), ["ciao"]);
 
 const e = er.getEntity("Canguro");
-e.setPrimaryKey([e.getAttribute("ciao"), e.getAttribute("pesce")]);
+e.setPrimaryKey([e.getAttribute("ciao"), e.getAttribute("pesce"), e.getAttribute("f"), e.getAttribute("j"), e.getAttribute("b"), e.getAttribute("a"), e.getAttribute("d")]);
 
 console.log(er);
 erDrawer.drawER();

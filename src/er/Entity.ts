@@ -153,6 +153,7 @@ export default class Entity extends ShapeWithAttributes {
         let foundConnPoints: ConnectionPoint[] = [];
         let firstSequenceLength = 0;
         let isFirstSequence = true;
+        let firstSequence: ConnectionPoint[] = [];
         for (const [_, connPoint] of allConnPoints) {
             if (connPoint.value instanceof Relationship) {
                 countConsecutiveSpaces = 0;
@@ -161,7 +162,10 @@ export default class Entity extends ShapeWithAttributes {
                 continue;
             }
             countConsecutiveSpaces++;
-            if (isFirstSequence) firstSequenceLength++;
+            if (isFirstSequence) {
+                firstSequenceLength++;
+                firstSequence.push(connPoint);
+            }
             foundConnPoints.push(connPoint);
             if (countConsecutiveSpaces >= attributes.length)
                 break;
@@ -169,6 +173,7 @@ export default class Entity extends ShapeWithAttributes {
 
         if (countConsecutiveSpaces < attributes.length) {
             countConsecutiveSpaces += firstSequenceLength;
+            foundConnPoints = [...firstSequence, ...foundConnPoints];
             if (countConsecutiveSpaces < attributes.length)
                 throw new Error("We've got a problem");
         }
