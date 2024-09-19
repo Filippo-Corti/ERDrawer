@@ -27,7 +27,7 @@ er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "
 er.addAttributes(er.getRelationship("Connesso2", ["Prova", "Xyz"]), ["ciao"]);
 
 const e = er.getEntity("Canguro");
-e.setPrimaryKey([e.getAttribute("ciao"), e.getAttribute("pesce"), e.getAttribute("prova"), e.getAttribute("anatra")]);
+e.setPrimaryKey([e.getAttribute("ciao"), e.getAttribute("pesce")]);
 
 console.log(er);
 erDrawer.drawER();

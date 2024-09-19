@@ -76,7 +76,7 @@ export default class Entity extends ShapeWithAttributes {
 
             ctx.fillStyle = "black";
             ctx.beginPath();
-            ctx.arc(lastPoint.x, lastPoint.y, Attribute.CIRCLE_SIZE, 0, 2 * Math.PI, true);
+            ctx.arc(lastPoint.x, lastPoint.y, Math.max(Attribute.CIRCLE_SIZE, Math.min(this.deltaX, this.deltaY) / 3), 0, 2 * Math.PI, true);
             ctx.stroke();
             ctx.fill();
         }
@@ -207,7 +207,7 @@ export default class Entity extends ShapeWithAttributes {
         }
 
         const firstPoint = Vector2D.sum(identifierPath[0], Vector2D.fromPolar(8, Segment.fromVectors(identifierPath[0], identifierPath[1]).getDirection()));
-        const lastPoint = Vector2D.sum(identifierPath[identifierPath.length - 1], Vector2D.fromPolar(10, Segment.fromVectors(identifierPath[identifierPath.length - 1], identifierPath[identifierPath.length - 2]).getDirection()));
+        const lastPoint = Vector2D.sum(identifierPath[identifierPath.length - 1], Vector2D.fromPolar(8, Segment.fromVectors(identifierPath[identifierPath.length - 1], identifierPath[identifierPath.length - 2]).getDirection()));
         return [firstPoint, ...identifierPath, lastPoint];
     }
 
