@@ -164,7 +164,7 @@ export default class Entity extends ShapeWithAttributes {
         let movingRelationshipsNeeded: boolean = false;
 
         while (leftConnPoint != rightConnPoint) {
-            let roomLeft : boolean = false, roomRight : boolean = false
+            let roomLeft: boolean = false, roomRight: boolean = false
             if (!(leftConnPoint.value instanceof Relationship) || movingRelationshipsNeeded) {
                 foundConnPointsLeft = [leftConnPoint, ...foundConnPointsLeft];
                 leftConnPoint = this.getPreviousConnectionPoint(leftConnPoint.pos);
@@ -179,8 +179,8 @@ export default class Entity extends ShapeWithAttributes {
             if (!(roomLeft || roomRight)) movingRelationshipsNeeded = true;
 
             if (foundConnPointsLeft.length + foundConnPointsRight.length >= attributes.length) {
-                this.updateConnectionPointsFor(attributes, [...foundConnPointsLeft, ...foundConnPointsRight]);
-                this.identifierConnPoints = [...foundConnPointsLeft, relationshipConnPoint, ...foundConnPointsRight];
+                this.updateConnectionPointsFor(attributes, [...foundConnPointsLeft, ...foundConnPointsRight].splice(0, attributes.length));
+                this.identifierConnPoints = [...foundConnPointsLeft, relationshipConnPoint, ...foundConnPointsRight].splice(0, attributes.length + 1);
                 return;
             }
         }
@@ -211,7 +211,9 @@ export default class Entity extends ShapeWithAttributes {
         }
 
         const firstPoint = Vector2D.sum(identifierPath[0], Vector2D.fromPolar(8, Segment.fromVectors(identifierPath[0], identifierPath[1]).getDirection()));
-        const lastPoint = Vector2D.sum(identifierPath[identifierPath.length - 1], Vector2D.fromPolar(8, Segment.fromVectors(identifierPath[identifierPath.length - 1], identifierPath[identifierPath.length - 2]).getDirection()));
+        const lastPoint = Vector2D.sum(identifierPath[identifierPath.length - 1],
+            Vector2D.fromPolar(6,
+                Segment.fromVectors(identifierPath[identifierPath.length - 1], identifierPath[identifierPath.length - 2]).getDirection()));
         return [firstPoint, ...identifierPath, lastPoint];
     }
 
@@ -244,6 +246,7 @@ export default class Entity extends ShapeWithAttributes {
     }
 
     private updateConnectionPointsFor(connectables: Connectable[], newConnectionPoints: ConnectionPoint[]) {
+        console.log(newConnectionPoints, newConnectionPoints.length);
         for (let i = 0; i < connectables.length; i++) {
             const connectable = connectables[i];
             const oldConnPoint = this.getCurrentConnectionPointFor(connectable);

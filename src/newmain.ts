@@ -20,14 +20,14 @@ er.addRelationship(["Prova", "Canguro", "Xyz"], "Ammesso");
 
 const erDrawer = new ERDrawer(er, drawer);
 
-er.addAttributes(er.getEntity("Prova"), ["ciao", "cosa", "fai", "ecco", "ottimo", "ciao", "ecco", "ottimo", "ciao", "ecco", "ottimo", "ciao"]);
+er.addAttributes(er.getEntity("Prova"), ["ciao", "cosa", "fai", "ecco", "ottimo", "ciao2", "ecco2", "ottimo3", "ciao5", "ecco6", "ottimo7", "ciao8"]);
 er.addAttributes(er.getEntity("Xyz"), ["ciao"]);
 er.addAttributes(er.getEntity("Canguro"), ["ciao", "pesce", "prova", "cannone", "anatra"]);
 er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Uno", "Due", "Tre", "Quattro"]);
 er.addAttributes(er.getRelationship("Connesso2", ["Prova", "Xyz"]), ["ciao"]);
 
-const e = er.getEntity("Canguro");
-e.setPrimaryKey([e.getAttribute("ciao"), er.getRelationship("Ammesso", ["Prova", "Canguro", "Xyz"]), e.getAttribute("pesce")]);
+const e = er.getEntity("Prova");
+e.setPrimaryKey([e.getAttribute("ciao"), er.getRelationship("Connesso2", ["Prova", "Xyz"]), e.getAttribute("fai"), e.getAttribute("ottimo")]);
 
 console.log(er);
 erDrawer.drawER();
