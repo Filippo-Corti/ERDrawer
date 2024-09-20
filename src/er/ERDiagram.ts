@@ -84,20 +84,22 @@ export default class ERDiagram implements Drawable {
                 involvedRelationships.push(v);
             }
         }
+        const countRel: number = involvedRelationships.length;
 
-        if (involvedRelationships.length <= 1) return;
+        if (countRel <= 1) return;
 
         const middle = involvedEntities[0].centerPoint.halfWayTo(involvedEntities[1].centerPoint);
         const theta = Vector2D.sum(involvedEntities[0].centerPoint, involvedEntities[1].centerPoint.negative()).phase();
 
         let sign = 1;
-        for (let i = 0; i < involvedRelationships.length; i++) {
-            const offsetFactor = (involvedRelationships.length == 1) ? 0 : sign * Math.floor((i + 1) / 2);
-            sign *= -1;
+        for (let i = 0; i < countRel; i++) {
+            const offsetFactor = ((countRel % 2 == 1) && i == countRel - 1) ? 0 : Math.floor((i + 2) / 2) / ((countRel % 2 == 1) ? 1 : 2);
             const offsetBase = Relationship.MULTIPLE_RELATIONSHIPS_OFFSET;
-            const dx = offsetBase * offsetFactor * Math.sin(theta);
-            const dy = offsetBase * offsetFactor * -Math.cos(theta);
+            const dx = sign * offsetBase * offsetFactor * Math.sin(theta);
+            const dy = sign * offsetBase * offsetFactor * -Math.cos(theta);
             involvedRelationships[i].updateCenterPoint(Vector2D.sum(middle, new Vector2D(dx, dy)));
+
+            sign *= -1;
         }
 
     }
@@ -121,7 +123,7 @@ export default class ERDiagram implements Drawable {
         return found;
     }
 
-    getAttribute(item : ShapeWithAttributes, attributeLabel : string) {
+    getAttribute(item: ShapeWithAttributes, attributeLabel: string) {
         return item.getAttribute(attributeLabel);
     }
 

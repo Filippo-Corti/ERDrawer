@@ -139,11 +139,11 @@ export default class Entity extends ShapeWithAttributes {
                 this.setTwoRelationshipsAndAttributesAsIdentifier(relationships[0], relationships[1], attributes);
                 break;
             default:
-                throw new Error("External Identifiers are currently not implemented");
+                throw new Error("External Identifiers with 3+ Relationship involved are currently not implemented");
         }
     }
 
-    setAttributesAsIdentifier(attributes: Attribute[]): void {
+    private setAttributesAsIdentifier(attributes: Attribute[]): void {
         const attributesConnPoints: ConnectionPoint[] = attributes.map((a) => this.getCurrentConnectionPointFor(a));
 
         if (attributes.length == 1) {
@@ -158,7 +158,7 @@ export default class Entity extends ShapeWithAttributes {
         this.identifierConnPoints = foundConnPoints;
     }
 
-    setOneRelationshipAndAttributesAsIdentifier(relationship: Relationship, attributes: Attribute[]): void {
+    private setOneRelationshipAndAttributesAsIdentifier(relationship: Relationship, attributes: Attribute[]): void {
         const relationshipConnPoint: ConnectionPoint = this.getCurrentConnectionPointFor(relationship);
         let leftConnPoint = this.getPreviousConnectionPoint(relationshipConnPoint.pos);
         let rightConnPoint = this.getNextConnectionPoint(relationshipConnPoint.pos);
@@ -191,8 +191,26 @@ export default class Entity extends ShapeWithAttributes {
         throw new Error("Couldn't find a way to identify this entity");
     }
 
-    setTwoRelationshipsAndAttributesAsIdentifier(relationship1: Relationship, relationship2: Relationship, attributes: Attribute[]): void {
+    private setTwoRelationshipsAndAttributesAsIdentifier(relationship1: Relationship, relationship2: Relationship, attributes: Attribute[]): void {
+        const connPointR1 = this.getCurrentConnectionPointFor(relationship1);
+        const connPointR2 = this.getCurrentConnectionPointFor(relationship2);
+        let connPointsClockwise = [connPointR1, connPointR2];
+        let connPointsCounterclockwise = [connPointR2, connPointR1];
+        let closestRelationshipsConnPointsClockwise = connPointsClockwise;
+        let closestRelationshipsConnPointsCounterclockwise = connPointsCounterclockwise;
 
+        while (true) {
+            connPointsClockwise = [this.getNextConnectionPoint(connPointR1.pos), this.getPreviousConnectionPoint(connPointR2.pos)];
+
+            if (connPointsClockwise[0] != connPointsClockwise[1]) break;
+
+            if (connPointsClockwise[0].value instanceof Relationship)
+                closestRelationshipsConnPointsClockwise[0] = connPointsClockwise[0];
+            if (connPointsClockwise[1].value instanceof Relationship)
+                closestRelationshipsConnPointsClockwise[1] = connPointsClockwise[1];
+        }
+
+        console.log(closestRelationshipsConnPointsClockwise);
     }
 
     getComposedIdentifierPath(): Vector2D[] {
@@ -227,7 +245,6 @@ export default class Entity extends ShapeWithAttributes {
 
         const firstPoint = Vector2D.sum(identifierPath[0], Vector2D.fromPolar(7, dir1));
         const lastPoint = Vector2D.sum(identifierPath[identifierPath.length - 1], Vector2D.fromPolar(7, dir2));
-        console.log([firstPoint, ...identifierPath, lastPoint]);
         return [firstPoint, ...identifierPath, lastPoint];
     }
 
