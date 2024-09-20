@@ -27,7 +27,8 @@ er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "
 er.addAttributes(er.getRelationship("Connesso2", ["Prova", "Xyz"]), ["ciao"]);
 
 const e = er.getEntity("Prova");
-e.setPrimaryKey([e.getAttribute("ciao"), er.getRelationship("Connesso2", ["Prova", "Xyz"]), e.getAttribute("fai"), e.getAttribute("ottimo")]);
+//e.setPrimaryKey([e.getAttribute("ciao"), er.getRelationship("Connesso2", ["Prova", "Xyz"]), e.getAttribute("fai"), e.getAttribute("ottimo")]);
+e.setPrimaryKey([er.getRelationship("Ammesso", ["Prova", "Canguro"])]);
 
 console.log(er);
 erDrawer.drawER();
