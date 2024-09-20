@@ -28,7 +28,7 @@ export default class ERDiagram implements Drawable {
         this.entities.set(e.label, e);
     }
 
-    addRelationship(entities: string[], label: string, centerPoint: Vector2D | null = null): void {
+    addRelationship(label: string, entities: string[], centerPoint: Vector2D | null = null): void {
         if (entities.length < 2) {
             throw new Error("At least two entities are required to form a relationship.");
         }

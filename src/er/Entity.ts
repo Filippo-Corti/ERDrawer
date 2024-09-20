@@ -166,7 +166,7 @@ export default class Entity extends ShapeWithAttributes {
         let foundConnPointsRight: ConnectionPoint[] = [];
         let movingRelationshipsNeeded: boolean = false;
 
-        while (leftConnPoint != rightConnPoint) {
+        while (leftConnPoint != rightConnPoint && this.getNextConnectionPoint(rightConnPoint.pos) != leftConnPoint) {
 
             if (foundConnPointsLeft.length + foundConnPointsRight.length >= attributes.length) {
                 this.updateConnectionPointsFor(attributes, [...foundConnPointsLeft, ...foundConnPointsRight].splice(0, attributes.length));
@@ -199,10 +199,11 @@ export default class Entity extends ShapeWithAttributes {
         let closestRelationshipsConnPointsClockwise = connPointsClockwise;
         let closestRelationshipsConnPointsCounterclockwise = connPointsCounterclockwise;
 
+        let i = 0;
         while (true) {
+            console.log(connPointsClockwise);
             connPointsClockwise = [this.getNextConnectionPoint(connPointR1.pos), this.getPreviousConnectionPoint(connPointR2.pos)];
-
-            if (connPointsClockwise[0] != connPointsClockwise[1]) break;
+            if (connPointsClockwise[0] == connPointsClockwise[1] || this.getNextConnectionPoint(connPointsClockwise[0].pos) == connPointsClockwise[1]) break;
 
             if (connPointsClockwise[0].value instanceof Relationship)
                 closestRelationshipsConnPointsClockwise[0] = connPointsClockwise[0];

@@ -14,25 +14,26 @@ er.addEntity(new Entity(new Vector2D(400, 950), "Canguro"));
 er.addEntity(new Entity(new Vector2D(800, 950), "Testa"));
 er.addEntity(new Entity(new Vector2D(1200, 950), "Coda"));
 
-er.addRelationship(["Prova", "Xyz"], "Connesso");
-er.addRelationship(["Prova", "Xyz"], "Connesso2");
-er.addRelationship(["Prova", "Xyz"], "Connesso23");
-er.addRelationship(["Prova", "Canguro"], "Ammesso");
-er.addRelationship(["Prova", "Canguro", "Xyz"], "Ammesso");
-er.addRelationship(["Canguro", "Testa"], "Collega");
-er.addRelationship(["Canguro", "Testa"], "Mangia");
+er.addRelationship("Connesso", ["Prova", "Xyz"]);
+er.addRelationship("Connesso2", ["Prova", "Xyz"]);
+er.addRelationship("Connesso23", ["Prova", "Xyz"]);
+er.addRelationship("Ammesso", ["Prova", "Canguro"]);
+er.addRelationship("Ammesso", ["Prova", "Canguro", "Xyz"]);
+er.addRelationship("Collega", ["Canguro", "Testa"]);
+er.addRelationship("Opsss", ["Coda", "Testa"]);
 
 const erDrawer = new ERDrawer(er, drawer);
 
 er.addAttributes(er.getEntity("Prova"), ["ciao", "cosa", "fai", "ecco", "ottimo", "ciao2", "ecco2", "ottimo3", "ciao5", "ecco6", "ottimo7", "ciao8"]);
 er.addAttributes(er.getEntity("Xyz"), ["ciao"]);
 er.addAttributes(er.getEntity("Canguro"), ["ciao", "pesce", "prova", "cannone", "anatra"]);
+er.addAttributes(er.getEntity("Testa"), ["ciao"]);
 er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Uno", "Due", "Tre", "Quattro"]);
 er.addAttributes(er.getRelationship("Connesso2", ["Prova", "Xyz"]), ["ciao"]);
 
 const e = er.getEntity("Prova");
 e.setPrimaryKey([e.getAttribute("ciao"), er.getRelationship("Connesso2", ["Prova", "Xyz"]), e.getAttribute("fai"), e.getAttribute("ottimo")]);
-//e.setPrimaryKey([er.getRelationship("Ammesso", ["Prova", "Canguro"])]);
+er.getEntity("Testa").setPrimaryKey([er.getRelationship("Collega", ["Canguro", "Testa"]), er.getRelationship("Opsss", ["Coda", "Testa"])]);
 
 console.log(er);
 erDrawer.drawER();
