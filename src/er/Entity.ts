@@ -132,6 +132,9 @@ export default class Entity extends ShapeWithAttributes {
             case 0:
                 this.setAttributesAsIdentifier(attributes);
                 break;
+            case 1:
+                this.setOneRelationshipAndAttributesAsIdentifier(relationships[0], attributes);
+                break;
             default:
                 throw new Error("External Identifiers are currently not implemented");
         }
@@ -139,9 +142,6 @@ export default class Entity extends ShapeWithAttributes {
 
     setAttributesAsIdentifier(attributes: Attribute[]): void {
         const attributesConnPoints: ConnectionPoint[] = attributes.map((a) => this.getCurrentConnectionPointFor(a));
-        let allConnPoints = Array.from(this.connectionPoints);
-        const randIndex = Random.getRandom(0, allConnPoints.length - 1);
-        allConnPoints = allConnPoints.slice(randIndex).concat(allConnPoints.slice(0, randIndex)); // Start from random point
 
         if (attributes.length == 1) {
             attributes[0].filledPoint = true;
@@ -149,53 +149,52 @@ export default class Entity extends ShapeWithAttributes {
             return;
         }
 
-        let countConsecutiveSpaces: number = 0;
-        let foundConnPoints: ConnectionPoint[] = [];
-        let firstSequenceLength = 0;
-        let isFirstSequence = true;
-        let firstSequence: ConnectionPoint[] = [];
-        for (const [_, connPoint] of allConnPoints) {
-            if (connPoint.value instanceof Relationship) {
-                countConsecutiveSpaces = 0;
-                isFirstSequence = false;
-                foundConnPoints = [];
-                continue;
-            }
-            countConsecutiveSpaces++;
-            if (isFirstSequence) {
-                firstSequenceLength++;
-                firstSequence.push(connPoint);
-            }
-            foundConnPoints.push(connPoint);
-            if (countConsecutiveSpaces >= attributes.length)
-                break;
-        }
+        const foundConnPoints: ConnectionPoint[] = this.getAvailableConnectionPointsSequence(attributes.length);
 
-        if (countConsecutiveSpaces < attributes.length) {
-            countConsecutiveSpaces += firstSequenceLength;
-            foundConnPoints = [...firstSequence, ...foundConnPoints];
-            if (countConsecutiveSpaces < attributes.length)
-                throw new Error("We've got a problem");
-        }
-
-        for (let i = 0; i < attributesConnPoints.length; i++) {
-            const attribute = attributes[i];
-            const oldConnPoint = this.getCurrentConnectionPointFor(attribute);
-            const newConnPoint = foundConnPoints[i];
-            const otherConnectable = newConnPoint.value;
-
-            [oldConnPoint.value, newConnPoint.value] = [newConnPoint.value, oldConnPoint.value];
-            attribute.setConnectedPoint(newConnPoint);
-            if (otherConnectable instanceof Attribute)
-                otherConnectable.setConnectedPoint(oldConnPoint);
-        }
-
+        this.updateConnectionPointsFor(attributes, foundConnPoints);
         this.identifierConnPoints = foundConnPoints;
     }
 
+    setOneRelationshipAndAttributesAsIdentifier(relationship: Relationship, attributes: Attribute[]) {
+        const relationshipConnPoint: ConnectionPoint = this.getCurrentConnectionPointFor(relationship);
+        let leftConnPoint = this.getPreviousConnectionPoint(relationshipConnPoint.pos);
+        let rightConnPoint = this.getNextConnectionPoint(relationshipConnPoint.pos);
+        let foundConnPointsLeft: ConnectionPoint[] = [];
+        let foundConnPointsRight: ConnectionPoint[] = [];
+        let movingRelationshipsNeeded: boolean = false;
+
+        while (leftConnPoint != rightConnPoint) {
+            let roomLeft : boolean = false, roomRight : boolean = false
+            if (!(leftConnPoint.value instanceof Relationship) || movingRelationshipsNeeded) {
+                foundConnPointsLeft = [leftConnPoint, ...foundConnPointsLeft];
+                leftConnPoint = this.getPreviousConnectionPoint(leftConnPoint.pos);
+                roomLeft = true;
+            }
+            if (!(rightConnPoint.value instanceof Relationship) || movingRelationshipsNeeded) {
+                foundConnPointsRight = [...foundConnPointsRight, rightConnPoint];
+                rightConnPoint = this.getNextConnectionPoint(rightConnPoint.pos);
+                roomRight = true;
+            }
+
+            if (!(roomLeft || roomRight)) movingRelationshipsNeeded = true;
+
+            if (foundConnPointsLeft.length + foundConnPointsRight.length >= attributes.length) {
+                this.updateConnectionPointsFor(attributes, [...foundConnPointsLeft, ...foundConnPointsRight]);
+                this.identifierConnPoints = [...foundConnPointsLeft, relationshipConnPoint, ...foundConnPointsRight];
+                return;
+            }
+        }
+        throw new Error("Couldn't find a way to identify this entity");
+    }
+
     getComposedIdentifierPath(): Vector2D[] {
-        const passingPoints: Vector2D[] = this.identifierConnPoints.map((cp) => (cp.value as Attribute).getMiddleSegmentPoint());
+        const passingPoints: Vector2D[] = this.identifierConnPoints.map((cp) => {
+            const deltaVector = Vector2D.fromPolar(15, cp.outDirection);
+            return Vector2D.sum(cp.pos, deltaVector);
+        });
         const identifierPath: Vector2D[] = [passingPoints[0]];
+
+        console.log(passingPoints);
 
         let prevPoint = passingPoints[0];
         for (let i = 1; i < passingPoints.length; i++) {
@@ -214,6 +213,49 @@ export default class Entity extends ShapeWithAttributes {
         const firstPoint = Vector2D.sum(identifierPath[0], Vector2D.fromPolar(8, Segment.fromVectors(identifierPath[0], identifierPath[1]).getDirection()));
         const lastPoint = Vector2D.sum(identifierPath[identifierPath.length - 1], Vector2D.fromPolar(8, Segment.fromVectors(identifierPath[identifierPath.length - 1], identifierPath[identifierPath.length - 2]).getDirection()));
         return [firstPoint, ...identifierPath, lastPoint];
+    }
+
+    private getAvailableConnectionPointsSequence(length: number): ConnectionPoint[] {
+        let allConnPoints = Array.from(this.connectionPoints);
+        let randIndex = Random.getRandom(0, allConnPoints.length - 1);
+        allConnPoints = [...allConnPoints.slice(randIndex), ...allConnPoints.slice(0, randIndex)]; // Start from random point
+
+        const allSequences: ConnectionPoint[][] = [];
+        let currentSequence: ConnectionPoint[] = [];
+
+        for (const [_, connPoint] of allConnPoints) {
+            if (connPoint.value instanceof Relationship) {
+                allSequences.push(currentSequence);
+                currentSequence = [];
+                continue;
+            }
+            currentSequence.push(connPoint);
+            if (currentSequence.length >= length)
+                return currentSequence;
+        }
+        allSequences.push(currentSequence);
+
+        const firstLastSequence: ConnectionPoint[] = [...allSequences[allSequences.length - 1], ...allSequences[0]];
+        if (firstLastSequence.length >= length) {
+            return firstLastSequence.splice(0, length);
+        }
+
+        throw new Error("No such sequence could be found");
+    }
+
+    private updateConnectionPointsFor(connectables: Connectable[], newConnectionPoints: ConnectionPoint[]) {
+        for (let i = 0; i < connectables.length; i++) {
+            const connectable = connectables[i];
+            const oldConnPoint = this.getCurrentConnectionPointFor(connectable);
+            const newConnPoint = newConnectionPoints[i];
+            const otherConnectable = newConnPoint.value;
+
+            [oldConnPoint.value, newConnPoint.value] = [newConnPoint.value, oldConnPoint.value];
+            if (connectable instanceof Attribute)
+                connectable.setConnectedPoint(newConnPoint);
+            if (otherConnectable instanceof Attribute)
+                otherConnectable.setConnectedPoint(oldConnPoint);
+        }
     }
 
 
