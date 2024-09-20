@@ -21,6 +21,7 @@ er.addRelationship("Ammesso", ["Prova", "Canguro"]);
 er.addRelationship("Ammesso", ["Prova", "Canguro", "Xyz"]);
 er.addRelationship("Collega", ["Canguro", "Testa"]);
 er.addRelationship("Opsss", ["Coda", "Testa"]);
+er.addRelationship("WWWW", ["Xyz", "Testa"]);
 
 const erDrawer = new ERDrawer(er, drawer);
 

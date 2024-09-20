@@ -199,19 +199,39 @@ export default class Entity extends ShapeWithAttributes {
         let closestRelationshipsConnPointsClockwise = connPointsClockwise;
         let closestRelationshipsConnPointsCounterclockwise = connPointsCounterclockwise;
 
-        let i = 0;
         while (true) {
-            console.log(connPointsClockwise);
             connPointsClockwise = [this.getNextConnectionPoint(connPointR1.pos), this.getPreviousConnectionPoint(connPointR2.pos)];
-            if (connPointsClockwise[0] == connPointsClockwise[1] || this.getNextConnectionPoint(connPointsClockwise[0].pos) == connPointsClockwise[1]) break;
+            console.log("A", connPointsClockwise);
 
             if (connPointsClockwise[0].value instanceof Relationship)
                 closestRelationshipsConnPointsClockwise[0] = connPointsClockwise[0];
+
+            if (connPointsClockwise[0] == connPointsClockwise[1] || this.getNextConnectionPoint(connPointsClockwise[0].pos) == connPointsClockwise[1]) break;
+
             if (connPointsClockwise[1].value instanceof Relationship)
                 closestRelationshipsConnPointsClockwise[1] = connPointsClockwise[1];
         }
 
+        while (true) {
+            connPointsCounterclockwise = [this.getNextConnectionPoint(connPointR2.pos), this.getPreviousConnectionPoint(connPointR1.pos)];
+            console.log("B", connPointsCounterclockwise);
+
+            if (connPointsCounterclockwise[0].value instanceof Relationship)
+                closestRelationshipsConnPointsCounterclockwise[0] = connPointsCounterclockwise[0];
+
+            if (connPointsCounterclockwise[0] == connPointsCounterclockwise[1] || this.getPreviousConnectionPoint(connPointsCounterclockwise[0].pos) == connPointsCounterclockwise[1]) break;
+            
+            if (connPointsCounterclockwise[1].value instanceof Relationship)
+                closestRelationshipsConnPointsCounterclockwise[1] = connPointsCounterclockwise[1];
+        }
+
         console.log(closestRelationshipsConnPointsClockwise);
+        console.log(closestRelationshipsConnPointsCounterclockwise);
+
+        // Count number of relationships found each way
+        // Choose the one with the least amount of relationships
+        // Eventually move the relationships
+        // But do the attributes fit? Mmmmh
     }
 
     getComposedIdentifierPath(): Vector2D[] {
