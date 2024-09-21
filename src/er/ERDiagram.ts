@@ -1,9 +1,15 @@
 import Drawable from "../utils/Drawable";
 import Vector2D from "../utils/Vector2D";
 import Attribute from "./Attribute";
+import { Cardinality } from "./Cardinality";
 import Entity from "./Entity";
 import Relationship from "./Relationship";
 import ShapeWithAttributes from "./ShapeWithAttributes";
+
+export type RelationshipConnectionInfo = {
+    entityLabel: string,
+    cardinality: Cardinality
+}
 
 export default class ERDiagram implements Drawable {
 
@@ -28,29 +34,29 @@ export default class ERDiagram implements Drawable {
         this.entities.set(e.label, e);
     }
 
-    addRelationship(label: string, entities: string[], centerPoint: Vector2D | null = null): void {
-        if (entities.length < 2) {
-            throw new Error("At least two entities are required to form a relationship.");
-        }
+    addRelationship(label: string, entities: RelationshipConnectionInfo[], centerPoint: Vector2D | null = null): void {
+        if (entities.length < 2)
+            throw new Error("At least two entities are required to form a relationship");
 
-        entities.sort();
+        entities.sort((a, b) => a.entityLabel.localeCompare(b.entityLabel));
+        const entitiesLabels = entities.map((e) => e.entityLabel);
 
-        const entityObjects = entities.map(entityName => {
-            const entity = this.entities.get(entityName);
+        const entityObjects = entities.map(connectionData => {
+            const entity = this.entities.get(connectionData.entityLabel);
             if (!entity) {
-                throw new Error("Entity " + entityName + " does not exist in the ER");
+                throw new Error("Entity " + connectionData.entityLabel + " does not exist in the ER");
             }
-            return entity;
+            return {entity, cardinality: connectionData.cardinality};
         });
 
-        const relationshipKeyInMap = entities.join('$') + "$" + label;
+        const relationshipKeyInMap = entitiesLabels.join('$') + "$" + label;
         if (this.relationships.has(relationshipKeyInMap)) {
             throw new Error(`A relationship with the label ${relationshipKeyInMap} already exists`);
         }
 
         if (!centerPoint) {
-            const avgX = entityObjects.map((e) => e.centerPoint.x).reduce((a, b) => a + b, 0) / entityObjects.length;
-            const avgY = entityObjects.map((e) => e.centerPoint.y).reduce((a, b) => a + b, 0) / entityObjects.length;
+            const avgX = entityObjects.map((e) => e.entity.centerPoint.x).reduce((a, b) => a + b, 0) / entityObjects.length;
+            const avgY = entityObjects.map((e) => e.entity.centerPoint.y).reduce((a, b) => a + b, 0) / entityObjects.length;
             centerPoint = new Vector2D(avgX, avgY);
         }
 
@@ -59,11 +65,11 @@ export default class ERDiagram implements Drawable {
         this.relationships.set(relationshipKeyInMap, newRelationship);
 
         for (const e of entityObjects) {
-            e.linkRelationship(newRelationship);
-            newRelationship.linkToEntity(e);
+            e.entity.linkRelationship(newRelationship);
+            newRelationship.linkToEntity(e.entity, e.cardinality);
         }
 
-        this.positionRelationships(entities);
+        this.positionRelationships(entitiesLabels);
     }
 
     addAttributes(s: ShapeWithAttributes, attributes: string[]) {

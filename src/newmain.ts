@@ -1,4 +1,5 @@
 import Drawer from "./Drawer";
+import { CardinalityValue } from "./er/Cardinality";
 import Entity from "./er/Entity";
 import ERDiagram from "./er/ERDiagram";
 import ERDrawer from "./er/ERDrawer";
@@ -14,13 +15,125 @@ er.addEntity(new Entity(new Vector2D(400, 950), "Canguro"));
 er.addEntity(new Entity(new Vector2D(800, 950), "Testa"));
 er.addEntity(new Entity(new Vector2D(1200, 950), "Coda"));
 
-er.addRelationship("Connesso", ["Prova", "Xyz"]);
-er.addRelationship("Connesso2", ["Prova", "Xyz"]);
-er.addRelationship("Connesso23", ["Prova", "Xyz"]);
-er.addRelationship("Ammesso", ["Prova", "Canguro"]);
-er.addRelationship("Ammesso", ["Prova", "Canguro", "Xyz"]);
-er.addRelationship("Collega", ["Canguro", "Testa"]);
-er.addRelationship("Opsss", ["Coda", "Testa"]);
+er.addRelationship("Connesso", [
+    {
+        entityLabel: "Prova",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Xyz",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+]);
+er.addRelationship("Connesso2", [
+    {
+        entityLabel: "Prova",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Xyz",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+]);
+er.addRelationship("Connesso23", [
+    {
+        entityLabel: "Prova",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Xyz",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+]);
+er.addRelationship("Ammesso", [
+    {
+        entityLabel: "Prova",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Canguro",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+]);
+er.addRelationship("Ammesso", [
+    {
+        entityLabel: "Prova",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Canguro",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Xyz",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.N
+        }
+    },
+]);
+er.addRelationship("Collega", [
+    {
+        entityLabel: "Testa",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Canguro",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+]);
+er.addRelationship("Opsss", [
+    {
+        entityLabel: "Testa",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Coda",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+]);
 //er.addRelationship("A", ["Coda", "Testa"]);
 //er.addRelationship("WWWW", ["Xyz", "Testa"]);
 

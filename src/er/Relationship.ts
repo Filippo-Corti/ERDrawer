@@ -1,24 +1,30 @@
 import Vector2D from "../utils/Vector2D";
+import { Cardinality, CardinalityValue, stringValue } from "./Cardinality";
 import { ConnectionPoint } from "./ConnectionPoint";
 import Entity from "./Entity";
 import ShapeWithAttributes from "./ShapeWithAttributes";
+
+export type EntityConnection = {
+    entity: Entity,
+    cardinality: Cardinality
+}
 
 export default class Relationship extends ShapeWithAttributes {
 
     static HALF_DIAG_X: number = 70;
     static HALF_DIAG_Y: number = 50;
-    static MULTIPLE_RELATIONSHIPS_OFFSET : number = Math.max(Relationship.HALF_DIAG_X, Relationship.HALF_DIAG_Y) * 2 + 10;
+    static MULTIPLE_RELATIONSHIPS_OFFSET: number = Math.max(Relationship.HALF_DIAG_X, Relationship.HALF_DIAG_Y) * 2 + 10;
 
-    entities: Entity[];
+    entities: EntityConnection[];
 
     constructor(centerPoint: Vector2D, label: string) {
         super(centerPoint, label, Relationship.HALF_DIAG_X, Relationship.HALF_DIAG_Y);
         this.entities = [];
     }
 
-    linkToEntity(e: Entity): void {
+    linkToEntity(e: Entity, cardinality: Cardinality = { min: CardinalityValue.ZERO, max: CardinalityValue.N }): void {
         this.occupyConnectionPoint(this.findConnectionPointFor(e).pos, e);
-        this.entities.push(e);
+        this.entities.push({ entity: e, cardinality: cardinality });
     }
 
     isTheNearestConnectionPoint(p: Vector2D, connPoint: Vector2D): boolean {
@@ -57,11 +63,28 @@ export default class Relationship extends ShapeWithAttributes {
 
         // Draw Paths to Entities 
         for (const e of this.entities) {
-            const path = this.getPathTo(e);
+            const path = this.getPathTo(e.entity);
             ctx.beginPath();
             for (const v of path) {
                 ctx.lineTo(v.x, v.y);
             }
+            //Draw Cardinality Text
+            const cardinalityDirection: number = (this.getCurrentConnectionPointFor(e.entity).outDirection + 2 * Math.PI) % (2 * Math.PI);
+            const cardinalityText = stringValue(e.cardinality);
+            ctx.save();
+            ctx.fillStyle = "black";
+            ctx.textBaseline = "middle";
+            ctx.font = "13px serif";
+            ctx.translate(path[0].x, path[0].y);
+            if (cardinalityDirection > Math.PI / 2 && cardinalityDirection < 3 / 2 * Math.PI) {
+                ctx.rotate(cardinalityDirection + Math.PI);
+                ctx.textAlign = "end";
+            } else {
+                ctx.rotate(cardinalityDirection);
+                ctx.textAlign = "start";
+            }
+            ctx.fillText(cardinalityText, 0, -8);
+            ctx.restore();
             ctx.stroke();
         }
 
@@ -120,7 +143,7 @@ export default class Relationship extends ShapeWithAttributes {
     }
 
     getPathTo(e: Entity): Vector2D[] {
-        const STRAIGHT_SEGMENT_LENGTH : number = 30;
+        const STRAIGHT_SEGMENT_LENGTH: number = 30;
         const myConnPoint = this.getCurrentConnectionPointFor(e);
         const myCorner = Vector2D.sum(myConnPoint.pos, Vector2D.fromPolar(STRAIGHT_SEGMENT_LENGTH, myConnPoint.outDirection));
         const theirConnPoint = e.getCurrentConnectionPointFor(this);
