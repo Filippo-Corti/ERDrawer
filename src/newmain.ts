@@ -21,7 +21,8 @@ er.addRelationship("Ammesso", ["Prova", "Canguro"]);
 er.addRelationship("Ammesso", ["Prova", "Canguro", "Xyz"]);
 er.addRelationship("Collega", ["Canguro", "Testa"]);
 er.addRelationship("Opsss", ["Coda", "Testa"]);
-er.addRelationship("WWWW", ["Xyz", "Testa"]);
+//er.addRelationship("A", ["Coda", "Testa"]);
+//er.addRelationship("WWWW", ["Xyz", "Testa"]);
 
 const erDrawer = new ERDrawer(er, drawer);
 
@@ -33,7 +34,7 @@ er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "
 er.addAttributes(er.getRelationship("Connesso2", ["Prova", "Xyz"]), ["ciao"]);
 
 const e = er.getEntity("Prova");
-e.setPrimaryKey([e.getAttribute("ciao"), er.getRelationship("Connesso2", ["Prova", "Xyz"]), e.getAttribute("fai"), e.getAttribute("ottimo")]);
+e.setPrimaryKey([e.getAttribute("ciao"), er.getRelationship("Connesso", ["Prova", "Xyz"]), e.getAttribute("fai"), e.getAttribute("ottimo")]);
 er.getEntity("Testa").setPrimaryKey([er.getRelationship("Collega", ["Canguro", "Testa"]), er.getRelationship("Opsss", ["Coda", "Testa"])]);
 
 console.log(er);

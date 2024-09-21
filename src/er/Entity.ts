@@ -76,7 +76,7 @@ export default class Entity extends ShapeWithAttributes {
 
             ctx.fillStyle = "black";
             ctx.beginPath();
-            ctx.arc(lastPoint.x, lastPoint.y, Math.max(Attribute.CIRCLE_SIZE, Math.min(this.deltaX, this.deltaY) / 3), 0, 2 * Math.PI, true);
+            ctx.arc(lastPoint.x, lastPoint.y, Math.min(Attribute.CIRCLE_SIZE, Math.min(this.deltaX, this.deltaY) / 2), 0, 2 * Math.PI, true);
             ctx.stroke();
             ctx.fill();
         }
@@ -166,7 +166,7 @@ export default class Entity extends ShapeWithAttributes {
         let foundConnPointsRight: ConnectionPoint[] = [];
         let movingRelationshipsNeeded: boolean = false;
 
-        while (leftConnPoint != rightConnPoint && this.getNextConnectionPoint(rightConnPoint.pos) != leftConnPoint) {
+        while (leftConnPoint != rightConnPoint && this.getPreviousConnectionPoint(rightConnPoint.pos) != leftConnPoint) {
 
             if (foundConnPointsLeft.length + foundConnPointsRight.length >= attributes.length) {
                 this.updateConnectionPointsFor(attributes, [...foundConnPointsLeft, ...foundConnPointsRight].splice(0, attributes.length));
@@ -188,50 +188,95 @@ export default class Entity extends ShapeWithAttributes {
 
             if (!(roomLeft || roomRight)) movingRelationshipsNeeded = true;
         }
+        if (foundConnPointsLeft.length + foundConnPointsRight.length >= attributes.length) {
+            this.updateConnectionPointsFor(attributes, [...foundConnPointsLeft, ...foundConnPointsRight].splice(0, attributes.length));
+            this.identifierConnPoints = [...foundConnPointsLeft, relationshipConnPoint, ...foundConnPointsRight].splice(0, attributes.length + 1);
+            return;
+        }
         throw new Error("Couldn't find a way to identify this entity");
     }
 
     private setTwoRelationshipsAndAttributesAsIdentifier(relationship1: Relationship, relationship2: Relationship, attributes: Attribute[]): void {
-        const connPointR1 = this.getCurrentConnectionPointFor(relationship1);
-        const connPointR2 = this.getCurrentConnectionPointFor(relationship2);
-        let connPointsClockwise = [connPointR1, connPointR2];
-        let connPointsCounterclockwise = [connPointR2, connPointR1];
-        let closestRelationshipsConnPointsClockwise = connPointsClockwise;
-        let closestRelationshipsConnPointsCounterclockwise = connPointsCounterclockwise;
+        // const connPointR1 = this.getCurrentConnectionPointFor(relationship1);
+        // const connPointR2 = this.getCurrentConnectionPointFor(relationship2);
+        // let connPoints1 = [connPointR1, connPointR2];
+        // let connPoints2 = [connPointR2, connPointR1];
+        // let closestRelationshipsConnPoints1 = connPoints1;
+        // let closestRelationshipsConnPoints2 = connPoints2;
 
-        while (true) {
-            connPointsClockwise = [this.getNextConnectionPoint(connPointR1.pos), this.getPreviousConnectionPoint(connPointR2.pos)];
-            console.log("A", connPointsClockwise);
+        // console.log(this.getNextConnectionPoint(new Vector2D(750, 935)));
+        // while (true) {
+        //     // console.log("Prima:", connPoints1);
+        //     connPoints1 = [this.getNextConnectionPoint(connPoints1[0].pos), this.getPreviousConnectionPoint(connPoints1[1].pos)];
+        //     //console.log("Dopo:", connPoints1);
 
-            if (connPointsClockwise[0].value instanceof Relationship)
-                closestRelationshipsConnPointsClockwise[0] = connPointsClockwise[0];
+        //     //console.log("--------------");
+        //     if (connPoints1[0].value instanceof Relationship)
+        //         closestRelationshipsConnPoints1[0] = connPoints1[0];
 
-            if (connPointsClockwise[0] == connPointsClockwise[1] || this.getNextConnectionPoint(connPointsClockwise[0].pos) == connPointsClockwise[1]) break;
+        //     if (connPoints1[0] == connPoints1[1] || this.getNextConnectionPoint(connPoints1[0].pos) == connPoints1[1]) break;
 
-            if (connPointsClockwise[1].value instanceof Relationship)
-                closestRelationshipsConnPointsClockwise[1] = connPointsClockwise[1];
+        //     if (connPoints1[1].value instanceof Relationship)
+        //         closestRelationshipsConnPoints1[1] = connPoints1[1];
+        // }
+
+        // while (true) {
+        //     //console.log("B", connPoints2);
+        //     connPoints2 = [this.getNextConnectionPoint(connPoints2[0].pos), this.getPreviousConnectionPoint(connPoints2[1].pos)];
+
+        //     if (connPoints2[0].value instanceof Relationship)
+        //         closestRelationshipsConnPoints2[0] = connPoints2[0];
+
+        //     if (connPoints2[0] == connPoints2[1] || this.getPreviousConnectionPoint(connPoints2[0].pos) == connPoints2[1]) break;
+
+        //     if (connPoints2[1].value instanceof Relationship)
+        //         closestRelationshipsConnPoints2[1] = connPoints2[1];
+        // }
+
+        // console.log(closestRelationshipsConnPoints1);
+        // console.log(closestRelationshipsConnPoints2);
+
+        // // Count number of relationships found each way
+        // // Choose the one with the least amount of relationships
+        // // Eventually move the relationships
+        // // But do the attributes fit? Mmmmh
+
+        const relationshipConnPoint: ConnectionPoint = this.getCurrentConnectionPointFor(relationship1);
+        let leftConnPoint = this.getPreviousConnectionPoint(relationshipConnPoint.pos);
+        let rightConnPoint = this.getNextConnectionPoint(relationshipConnPoint.pos);
+        let foundConnPointsLeft: ConnectionPoint[] = [];
+        let foundConnPointsRight: ConnectionPoint[] = [];
+        let movingRelationshipsNeeded: boolean = false;
+
+        while (leftConnPoint != rightConnPoint && this.getPreviousConnectionPoint(rightConnPoint.pos) != leftConnPoint) {
+
+            if (foundConnPointsLeft.length + foundConnPointsRight.length >= attributes.length + 1) {
+                this.updateConnectionPointsFor([...attributes, relationship2], [...foundConnPointsLeft, ...foundConnPointsRight].splice(0, attributes.length + 1));
+                this.identifierConnPoints = [...foundConnPointsLeft, relationshipConnPoint, ...foundConnPointsRight].splice(0, attributes.length + 2);
+                return;
+            }
+
+            let roomLeft: boolean = false, roomRight: boolean = false
+            if (!(leftConnPoint.value instanceof Relationship) || movingRelationshipsNeeded) {
+                foundConnPointsLeft = [leftConnPoint, ...foundConnPointsLeft];
+                leftConnPoint = this.getPreviousConnectionPoint(leftConnPoint.pos);
+                roomLeft = true;
+            }
+            if (!(rightConnPoint.value instanceof Relationship) || movingRelationshipsNeeded) {
+                foundConnPointsRight = [...foundConnPointsRight, rightConnPoint];
+                rightConnPoint = this.getNextConnectionPoint(rightConnPoint.pos);
+                roomRight = true;
+            }
+
+            if (!(roomLeft || roomRight)) movingRelationshipsNeeded = true;
         }
-
-        while (true) {
-            connPointsCounterclockwise = [this.getNextConnectionPoint(connPointR2.pos), this.getPreviousConnectionPoint(connPointR1.pos)];
-            console.log("B", connPointsCounterclockwise);
-
-            if (connPointsCounterclockwise[0].value instanceof Relationship)
-                closestRelationshipsConnPointsCounterclockwise[0] = connPointsCounterclockwise[0];
-
-            if (connPointsCounterclockwise[0] == connPointsCounterclockwise[1] || this.getPreviousConnectionPoint(connPointsCounterclockwise[0].pos) == connPointsCounterclockwise[1]) break;
-            
-            if (connPointsCounterclockwise[1].value instanceof Relationship)
-                closestRelationshipsConnPointsCounterclockwise[1] = connPointsCounterclockwise[1];
+        if (foundConnPointsLeft.length + foundConnPointsRight.length >= attributes.length + 1) {
+            this.updateConnectionPointsFor([...attributes, relationship2], [...foundConnPointsLeft, ...foundConnPointsRight].splice(0, attributes.length + 1));
+            this.identifierConnPoints = [...foundConnPointsLeft, relationshipConnPoint, ...foundConnPointsRight].splice(0, attributes.length + 2);
+            return;
         }
-
-        console.log(closestRelationshipsConnPointsClockwise);
-        console.log(closestRelationshipsConnPointsCounterclockwise);
-
-        // Count number of relationships found each way
-        // Choose the one with the least amount of relationships
-        // Eventually move the relationships
-        // But do the attributes fit? Mmmmh
+        console.log(foundConnPointsLeft, foundConnPointsRight);
+        throw new Error("Couldn't find a way to identify this entity");
     }
 
     getComposedIdentifierPath(): Vector2D[] {

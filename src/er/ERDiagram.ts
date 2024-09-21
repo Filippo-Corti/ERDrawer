@@ -91,9 +91,10 @@ export default class ERDiagram implements Drawable {
         const middle = involvedEntities[0].centerPoint.halfWayTo(involvedEntities[1].centerPoint);
         const theta = Vector2D.sum(involvedEntities[0].centerPoint, involvedEntities[1].centerPoint.negative()).phase();
 
-        let sign = 1;
+        let sign: number = 1;
+        const evenCount: boolean = countRel % 2 == 0;
         for (let i = 0; i < countRel; i++) {
-            const offsetFactor = ((countRel % 2 == 1) && i == countRel - 1) ? 0 : Math.floor((i + 2) / 2) / ((countRel % 2 == 1) ? 1 : 2);
+            const offsetFactor = (!evenCount && i == 0) ? 0 : Math.floor((i + 1 + ((evenCount) ? 1 : 0)) / 2) / ((evenCount) ? 2 : 1);
             const offsetBase = Relationship.MULTIPLE_RELATIONSHIPS_OFFSET;
             const dx = sign * offsetBase * offsetFactor * Math.sin(theta);
             const dy = sign * offsetBase * offsetFactor * -Math.cos(theta);
