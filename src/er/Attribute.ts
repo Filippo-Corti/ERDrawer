@@ -32,9 +32,9 @@ export default class Attribute implements Connectable, Drawable {
         this.setConnectedPoint(found);
     }
 
-    setConnectedPoint(cp : ConnectionPoint) : void {
+    setConnectedPoint(cp: ConnectionPoint): void {
         this.centerPoint = cp.pos;
-        this.segmentDirection = cp.outDirection;
+        this.segmentDirection = (cp.outDirection + 2 * Math.PI) % (2 * Math.PI);
         this.connectionPoints = new Map<string, ConnectionPoint>();
         this.connectionPoints.set(cp.pos.toString(), { pos: cp.pos, value: this, outDirection: cp.outDirection });
     }
@@ -69,6 +69,7 @@ export default class Attribute implements Connectable, Drawable {
             ctx.textAlign = "end";
             ctx.fillText(this.label, - (Attribute.CIRCLE_SIZE + 3), 0);
         } else {
+            if (this.label == "Due") console.log(this.segmentDirection);
             ctx.rotate(this.segmentDirection);
             ctx.textAlign = "start";
             ctx.fillText(this.label, Attribute.CIRCLE_SIZE + 3, 0);
@@ -130,10 +131,10 @@ export default class Attribute implements Connectable, Drawable {
         return this.connectionPoints.get(this.centerPoint.toString())!;
     }
 
-    getMiddleSegmentPoint() : Vector2D {
+    getMiddleSegmentPoint(): Vector2D {
         const deltaVector = Vector2D.fromPolar(this.segmentLength, this.segmentDirection);
         const endPoint = Vector2D.sum(this.centerPoint, deltaVector);
-        
+
         return this.centerPoint.halfWayTo(endPoint);
     }
 
