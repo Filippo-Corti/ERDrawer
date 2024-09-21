@@ -60,7 +60,6 @@ export default class ERDiagram implements Drawable {
             centerPoint = new Vector2D(avgX, avgY);
         }
 
-
         const newRelationship = new Relationship(centerPoint, label);
         this.relationships.set(relationshipKeyInMap, newRelationship);
 
@@ -86,7 +85,7 @@ export default class ERDiagram implements Drawable {
         const involvedEntities: Entity[] = entities.map((entityName) => this.entities.get(entityName)!);
 
         for (const [k, v] of this.relationships) {
-            if (k.startsWith(entitiesKeyPrefix)) {
+            if (k.startsWith(entitiesKeyPrefix) && v.entities.length == entities.length) {
                 involvedRelationships.push(v);
             }
         }

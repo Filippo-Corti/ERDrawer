@@ -59,4 +59,22 @@ export default abstract class ShapeWithAttributes extends Shape {
         return availableConnPoints[Random.getRandom(0, availableConnPoints.length - 1)];
     }
 
+    updateCenterPoint(newCenterPoint: Vector2D): void {
+        if (this.centerPoint.equals(newCenterPoint)) return;
+
+        const centerPointsDiff = Vector2D.sum(newCenterPoint, this.centerPoint.negative());
+        const newConnectionPoints: Map<string, ConnectionPoint> = new Map<string, ConnectionPoint>();
+
+        for (const [_, oldCP] of this.connectionPoints) {
+            const newPoint = Vector2D.sum(oldCP.pos, centerPointsDiff);
+            oldCP.pos = newPoint;
+            newConnectionPoints.set(newPoint.toString(), oldCP)
+            if (oldCP.value instanceof Attribute) 
+                oldCP.value.setConnectedPoint(oldCP);
+        }
+
+        this.centerPoint = newCenterPoint;
+        this.connectionPoints = newConnectionPoints;
+    }
+
 }

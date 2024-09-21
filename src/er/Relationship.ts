@@ -32,6 +32,10 @@ export default class Relationship extends ShapeWithAttributes {
         return (currDist <= Math.hypot(this.deltaX, this.deltaY) / 2);
     }
 
+    getEntityCounter() : number {
+        return this.entities.length;
+    }
+
     getCorners(): Vector2D[] {
         return [
             new Vector2D(this.centerPoint.x, this.centerPoint.y - Relationship.HALF_DIAG_Y),

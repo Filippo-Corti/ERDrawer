@@ -69,7 +69,6 @@ export default class Attribute implements Connectable, Drawable {
             ctx.textAlign = "end";
             ctx.fillText(this.label, - (Attribute.CIRCLE_SIZE + 3), 0);
         } else {
-            if (this.label == "Due") console.log(this.segmentDirection);
             ctx.rotate(this.segmentDirection);
             ctx.textAlign = "start";
             ctx.fillText(this.label, Attribute.CIRCLE_SIZE + 3, 0);
