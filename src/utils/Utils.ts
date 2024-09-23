@@ -1,3 +1,4 @@
+import { Segment } from "./Segment";
 import Vector2D from "./Vector2D";
 
 export type ConnectionPoint = {
@@ -48,6 +49,19 @@ export function contains<T>(haystack: T[], needle: T): boolean {
             }
         } else {
             if (o == needle) return true;
+        }
+    }
+    return false;
+}
+
+export function doBrokenLinesIntersect(line1: Vector2D[], line2: Vector2D[]): boolean {
+    for (let i = 0; i < line1.length - 1; i++) {
+        const s1 = Segment.fromVectors(line1[i], line1[i + 1]);
+        for (let j = 0; j < line2.length - 1; j++) {
+            const s2 = Segment.fromVectors(line2[j], line2[j + 1]);
+            if (s1.intersects(s2)) {
+                return true;
+            }
         }
     }
     return false;

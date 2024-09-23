@@ -1,6 +1,7 @@
+import clone from "clone";
 import Drawable from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
-import { containsAny } from "../utils/Utils";
+import { containsAny, doBrokenLinesIntersect } from "../utils/Utils";
 import Vector2D from "../utils/Vector2D";
 import Attribute from "./Attribute";
 import Connectable from "./Connectable";
@@ -104,30 +105,30 @@ export default abstract class Shape implements Connectable, Drawable {
         throw new Error("P is not a Connection Point");
     }
 
-    findConnectionPointFor(c: Connectable, closestSegment: boolean = true): ConnectionPoint {
-        const segmentFromConnectable = Segment.fromVectors(c.centerPoint, this.centerPoint);
-        const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromConnectable);
-        const intersectionSegments: Segment[] = this.getSegmentsByPoint(intersectionPoint);
+    // findConnectionPointFor(c: Connectable, closestSegment: boolean = true): ConnectionPoint {
+    //     const segmentFromConnectable = Segment.fromVectors(c.centerPoint, this.centerPoint);
+    //     const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromConnectable);
+    //     const intersectionSegments: Segment[] = this.getSegmentsByPoint(intersectionPoint);
 
-        this.findConnectionPointForA(c, closestSegment);
-        do {
-            const allConnPoints = this.getAllConnectionPoints();
-            let minDist = Number.MAX_VALUE;
-            let minPoint = null;
-            for (const cp of allConnPoints) {
-                if (cp.value !== null) continue;
-                const currDist = cp.pos.distanceTo(intersectionPoint);
-                if (currDist < minDist && (containsAny(intersectionSegments, this.getSegmentsByPoint(cp.pos)) || !closestSegment)) {
-                    minDist = currDist;
-                    minPoint = cp;
-                }
-            }
-            if (minPoint) return minPoint;
-        } while (this.reduceDeltasAndRegenerate());
-        if (closestSegment)
-            return this.findConnectionPointFor(c, false);
-        throw new Error("Couldn't find a connection point");
-    }
+    //     this.findConnectionPointForA(c, closestSegment);
+    //     do {
+    //         const allConnPoints = this.getAllConnectionPoints();
+    //         let minDist = Number.MAX_VALUE;
+    //         let minPoint = null;
+    //         for (const cp of allConnPoints) {
+    //             if (cp.value !== null) continue;
+    //             const currDist = cp.pos.distanceTo(intersectionPoint);
+    //             if (currDist < minDist && (containsAny(intersectionSegments, this.getSegmentsByPoint(cp.pos)) || !closestSegment)) {
+    //                 minDist = currDist;
+    //                 minPoint = cp;
+    //             }
+    //         }
+    //         if (minPoint) return minPoint;
+    //     } while (this.reduceDeltasAndRegenerate());
+    //     if (closestSegment)
+    //         return this.findConnectionPointFor(c, false);
+    //     throw new Error("Couldn't find a connection point");
+    // }
 
     getConnectionLinePointsTo(c: Connectable): Vector2D[] {
         const myConnPoint = this.getCurrentConnectionPointFor(c);
@@ -142,7 +143,7 @@ export default abstract class Shape implements Connectable, Drawable {
         ];
     }
 
-    findConnectionPointForA(c: Connectable, closestSegment: boolean = true): ConnectionPoint {
+    findConnectionPointFor(c: Connectable, noIntersections: boolean = true): ConnectionPoint {
         let connPointOnC;
         try {
             const found = c.getCurrentConnectionPointFor(this);
@@ -156,46 +157,81 @@ export default abstract class Shape implements Connectable, Drawable {
         let possibleConnPoints = Array.from(this.connectionPoints.values());
         let shapeSegments = this.getSegments();
 
-
         // Delete CPs that pass through the Entity
-        possibleConnPoints = possibleConnPoints.filter((cp) => {
-            const connPointWithOffset: Vector2D = Vector2D.sum(cp.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, cp.outDirection));
-            const virtualEdge: Segment = Segment.fromVectors(connPointWithOffset, connPointOnC);
-            return !virtualEdge.intersectsAny(shapeSegments);
-        })
+        if (!(c instanceof Attribute)) {
+            possibleConnPoints = possibleConnPoints.filter((cp) => {
+                const connPointWithOffset: Vector2D = Vector2D.sum(cp.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, cp.outDirection));
+                const virtualEdge: Segment = Segment.fromVectors(connPointWithOffset, connPointOnC);
+                return !virtualEdge.intersectsAny(shapeSegments);
+            })
+        }
 
         // Sort CPs by value and distance to intersectionPoint
         const compareCPs = (a: ConnectionPoint, b: ConnectionPoint) => {
-            const firstGroupA = (!a.value || a.value instanceof Attribute);
-            const firstGroupB = (!b.value || b.value instanceof Attribute);
-            if (firstGroupA && !firstGroupB) return -1;
-            if (!firstGroupA && firstGroupB) return 1;
+            if (!a.value && b.value) return -1;
+            if (!b.value && a.value) return 1;
+            if ((a.value instanceof Attribute) && !(b.value instanceof Attribute)) return 1;
+            if (!(a.value instanceof Attribute) && (b.value instanceof Attribute)) return -1;
 
-            // If both are of the same type, sort by distance
+            // If both are of the same type (null, Attribute or Shape), sort by distance
             return a.pos.distanceTo(intersectionPoint) - b.pos.distanceTo(intersectionPoint);
         };
 
         possibleConnPoints.sort(compareCPs);
 
+        console.log(c, clone(possibleConnPoints));
+        let i = 0;
         for (const cp of possibleConnPoints) {
             const connPointWithOffset: Vector2D = Vector2D.sum(cp.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, cp.outDirection));
-            const segment: Segment = Segment.fromVectors(connPointWithOffset, connPointOnC);
-
+            const potentialLine: Vector2D[] = (c instanceof Attribute) ? [c.centerPoint, connPointOnC] : [c.centerPoint, connPointOnC, connPointWithOffset, this.centerPoint]; // Not working, need to get the correct line for attributes as well 
+            const anyIntersections: boolean = this.intersectsAnyConnectable(potentialLine);
+            console.log("Intersections?", anyIntersections, potentialLine);
             switch (true) {
                 case cp.value == null:
+                    console.log(i);
+                    if (!anyIntersections || !noIntersections) {
+                        console.log("Found a free connection point for", c, "found", cp, "no intersezioni: ", noIntersections);
+                        return cp;
+                    }
                     break;
                 case cp.value instanceof Attribute:
+                    console.log(i);
+                    if (!anyIntersections || !noIntersections) {
+                        // Find available CP for a swap
+                        for (const [_, otherCP] of this.connectionPoints) {
+                            if (otherCP.value == null) {
+                                [cp.value, otherCP.value] = [null, cp.value];
+                                if (otherCP.value instanceof Attribute)
+                                    otherCP.value.setConnectedPoint(otherCP);
+                                console.log("B Found an attribute connection point for", c, "found", cp, "no intersezioni: ", noIntersections);
+                                return cp;
+                            }
+                        }
+                    }
                     break;
                 case cp.value instanceof Shape:
+                    console.log(i);
                     break;
             }
+            i++;
         }
 
+        console.log("deltasasss");
+        if (this.reduceDeltasAndRegenerate())
+            return this.findConnectionPointFor(c, noIntersections);
+
+        if (noIntersections)
+            return this.findConnectionPointFor(c, false);
+
+        throw new Error("Couldn't find a connection point");
         //console.log(c.centerPoint, "to", this.centerPoint, "has valid conn points: ", possibleConnPoints);
     }
 
     intersectsAnyConnectable(line: Vector2D[]): boolean {
-        return Array.from(this.connectionPoints.values()).find((cp) => cp.value?.getConnectionLinePointsTo(this), )
+        return Array.from(this.connectionPoints.values()).some((cp) => {
+            if (cp.value == null) return false;
+            return doBrokenLinesIntersect(line, cp.value.getConnectionLinePointsTo(this))
+        });
     }
 
 
