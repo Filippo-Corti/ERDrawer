@@ -1,4 +1,5 @@
 import Drawer from "../Drawer";
+import { Segment } from "../utils/Segment";
 import { Random } from "../utils/Utils";
 import Vector2D from "../utils/Vector2D";
 import Entity from "./Entity";
@@ -9,7 +10,8 @@ import Shape from "./Shape";
 type ERNode = {
     reference: Shape, // Multi-Relationship or Entity
     disp: Vector2D,
-    pos: Vector2D
+    pos: Vector2D,
+    repulsionIntensity: number
 }
 
 type EREdge = {
@@ -37,50 +39,43 @@ export default class ERDrawer {
     }
 
     layout() {
-        const [nodes, edges] = this.ERtoRandomGraph();
-        this.executeFructhermanReingold(nodes, edges, 100);
+        const [nodes, edges] = this.chooseBestGraphLayout(20, 100);
         this.graphToER(nodes, edges);
     }
 
-    // /* Positions the Nodes in the Graph in a way that:
-    //     - Looks harmonious (using Fruchterman-Reingold)
-    //     - Looks geometrically organized (positions are discretized)
-    //     - Avoids crossings (it finds the best disposition out of N tries) 
-    //     - Avoids edges passing across nodes
-    // */
-    // layoutGraph(numberOfGraphs: number, iterationsPerGraph: number): void {
-    //     let minCrossings = 100;
-    //     let minGraph = this.graph.clone();
+    chooseBestGraphLayout(numberOfGraphs: number, iterationsPerGraph: number): [ERNode[], EREdge[]] {
+        let minCrossings = 100;
+        let bestGraphLayout = this.ERtoRandomGraph();
 
-    //     for (let i = 0; i < numberOfGraphs; i++) {
-    //         // Generate New Random Graph 
-    //         const [nodes, edges] = this.ERtoRandomGraph();
+        for (let i = 0; i < numberOfGraphs; i++) {
+            // Generate New Random Graph 
+            const [nodes, edges] = this.ERtoRandomGraph();
+            console.log(nodes[0].pos.x);
 
-    //         // Apply the Layout Algorithm
-    //         this.executeFructhermanReingold(iterationsPerGraph, BORDER, true);
-    //         this.discretizeNodesCoordinates(BORDER);
+            // Apply the Layout Algorithm
+            this.executeFructhermanReingold(nodes, edges, iterationsPerGraph);
+            this.discretizeNodesCoordinates(nodes);
 
-    //         // Reset Nodes connection points
-    //         this.graph.nodes.forEach((n) => n.resetConnectionPoints());
-    //         // Calculate Edges positions (based on new nodes positions!)
-    //         try {
-    //             this.graph.layoutEdges();
-    //         } catch (error) {
-    //             continue; // If you can't calculate new vertices, it's not a good layout
-    //         }
+            // Reset Nodes connection points
+            // this.graph.nodes.forEach((n) => n.resetConnectionPoints());
+            // // Calculate Edges positions (based on new nodes positions!)
+            // try {
+            //     this.graph.layoutEdges();
+            // } catch (error) {
+            //     continue; // If you can't calculate new vertices, it's not a good layout
+            // }
 
-    //         // Check if current layout is better than the best one so far (the new edge positions are used!)
-    //         let crossings = this.countCrossings();
-    //         if (crossings < minCrossings && !this.doesAnyEdgeCrossANode()) {
-    //             minCrossings = crossings;
-    //             minGraph = this.graph.clone();
-    //         }
-    //     }
-
-    //     this.graph = minGraph.clone();
-    //     console.log("Found best solution with", minCrossings, "crossings");
-    //     console.log(this.graph);
-    // }
+            // Check if current layout is better than the best one so far (the new edge positions are used!)
+            let crossings = this.countEdgeCrossings(edges);
+            if (crossings < minCrossings && !this.doesAnyEdgeCrossANode(nodes, edges)) {
+                minCrossings = crossings;
+                bestGraphLayout = [structuredClone(nodes), structuredClone(edges)];
+                console.log("Better", crossings);
+            }
+            console.log(bestGraphLayout[0][0].pos.x, bestGraphLayout[0][0].pos.y);
+        }
+        return bestGraphLayout
+    }
 
     //Base code comes from https://faculty.washington.edu/joelross/courses/archive/s13/cs261/lab/k/fruchterman91graph.pdf
     //Positions Nodes using the Fruchterman-Reingold Algorithm.
@@ -102,7 +97,7 @@ export default class ERDrawer {
                     if (v == u) continue;
 
                     const gamma: Vector2D = Vector2D.sum(v.pos, u.pos.negative());
-                    const gammaAbs: number = gamma.magnitude();
+                    const gammaAbs: number = gamma.magnitude() / u.repulsionIntensity;
                     const fr: number = f_r(gammaAbs);
                     v.disp.sum(new Vector2D(gamma.x / gammaAbs * fr, gamma.y / gammaAbs * fr));
                 }
@@ -130,9 +125,77 @@ export default class ERDrawer {
         }
     }
 
+    //Positions Nodes in a discretized grid.
+    //If two Nodes would occupy the same spot, the discretization doesn't happen
+    discretizeNodesCoordinates(nodes: ERNode[]): void {
+        const rows = Math.floor(this.drawer.height / ERDrawer.DELTA + 1);
+        const cols = Math.floor(this.drawer.width / ERDrawer.DELTA + 1);
+
+        var nodesPerSquare: ERNode[][] = Array.from({ length: rows * cols }, () => []);
+        for (const v of nodes) {
+            const discrCoords = this.getDiscretizedCoords(v.pos);
+            const nodeCol = Math.round(discrCoords.x / ERDrawer.DELTA);
+            const nodeRow = Math.round(discrCoords.y / ERDrawer.DELTA);
+            nodesPerSquare[nodeRow * cols + nodeCol].push(v);
+        }
+
+        //Discretize only if 1 per square
+        nodesPerSquare.filter((a) => a.length <= 1).forEach((a) => {
+            a.forEach((node) => node.pos = this.getDiscretizedCoords(node.pos));
+        })
+
+    }
+
+    //Returns the discrete coordinates of v, within the boundaries of the drawing canvas
+    private getDiscretizedCoords(v: Vector2D): Vector2D {
+        return this.getCoordsWithBoundaries(new Vector2D(Math.round(v.x / ERDrawer.DELTA) * ERDrawer.DELTA, Math.round(v.y / ERDrawer.DELTA) * ERDrawer.DELTA));
+    }
+
     //Returns coordinates of v making sure that they are within at least ERDrawer.ER_DRAWING_MARGIN px from the border of the canvas
     private getCoordsWithBoundaries(v: Vector2D): Vector2D {
         return new Vector2D(Math.min(this.drawer.width - ERDrawer.ER_MARGIN, Math.max(0 + ERDrawer.ER_MARGIN, v.x)), Math.min(this.drawer.height - ERDrawer.ER_MARGIN, Math.max(0 + ERDrawer.ER_MARGIN, v.y)));
+    }
+
+    //Returns the number of edge pairs that intersect in the current graph disposition
+    // + the number of edges that intersect with a node
+    countEdgeCrossings(edges: EREdge[]): number {
+        let count: number = 0;
+        for (let i = 0; i < edges.length; i++) {
+            const e = edges[i];
+            const s1 = Segment.fromVectors(e.erNode1.pos, e.erNode2.pos);
+
+            for (let j = i + 1; j < edges.length; j++) {
+                const f = edges[j];
+                const s2 = Segment.fromVectors(f.erNode1.pos, f.erNode2.pos);
+
+                if (s1.intersects(s2)) {
+                    if (s1.parallel(s2)) {
+                        count += 999; // This is a crossing we really want to avoid
+                    } else {
+                        count += 1;
+                    }
+                }
+
+            }
+        }
+        return count;
+    }
+
+
+    //Returns whether an Edge is crossing a Node or not.
+    doesAnyEdgeCrossANode(nodes: ERNode[], edges: EREdge[], minOffset: number = 50): boolean {
+        for (const e of edges) {
+            for (const v of nodes) {
+                if (v == e.erNode1 || v == e.erNode2) continue;
+
+                const s = Segment.fromVectors(e.erNode1.pos, e.erNode2.pos);
+                if (s.distanceToPoint(v.pos) < Math.hypot(Entity.HALF_DIM_X, Entity.HALF_DIM_Y) + minOffset) {
+                    //console.log("Distance between the edge " + e.node1.label + " - " + e.node2.label + " and the node " + v.label + " is too short.");
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private ERtoRandomGraph(): [ERNode[], EREdge[]] {
@@ -144,7 +207,8 @@ export default class ERDrawer {
             erNodes.push({
                 reference: entity,
                 disp: new Vector2D(0, 0),
-                pos: new Vector2D(Random.getRandom(minX, maxX), Random.getRandom(minY, maxY))
+                pos: new Vector2D(Random.getRandom(minX, maxX), Random.getRandom(minY, maxY)),
+                repulsionIntensity: 1
             });
         }
 
@@ -159,7 +223,8 @@ export default class ERDrawer {
                 erNodes.push({
                     reference: relationship,
                     disp: new Vector2D(0, 0),
-                    pos: new Vector2D(Random.getRandom(minX, maxX), Random.getRandom(minY, maxY))
+                    pos: new Vector2D(Random.getRandom(minX, maxX), Random.getRandom(minY, maxY)),
+                    repulsionIntensity: 0
                 });
             }
         }
@@ -168,6 +233,7 @@ export default class ERDrawer {
     }
 
     private graphToER(nodes: ERNode[], edges: EREdge[]): void {
+        console.log(nodes, edges);
         const er = new ERDiagram();
         const moreThanBinaryRelationships = [];
         for (const n of nodes) {
@@ -178,6 +244,7 @@ export default class ERDrawer {
             }
         }
 
+        console.log(moreThanBinaryRelationships);
         for (const n of moreThanBinaryRelationships) {
             const linkedEntities: RelationshipConnectionInfo[] = (n.reference as Relationship).entities.map((e) => ({
                 entityLabel: e.entity.label,
