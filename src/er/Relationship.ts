@@ -14,6 +14,7 @@ export default class Relationship extends ShapeWithAttributes {
     static HALF_DIAG_X: number = 70;
     static HALF_DIAG_Y: number = 50;
     static MULTIPLE_RELATIONSHIPS_OFFSET: number = Math.max(Relationship.HALF_DIAG_X, Relationship.HALF_DIAG_Y) * 2 + 10;
+    static STRAIGHT_SEGMENT_LENGTH: number = 30;
 
     entities: EntityConnection[];
 
@@ -67,7 +68,7 @@ export default class Relationship extends ShapeWithAttributes {
 
         // Draw Paths to Entities 
         for (const e of this.entities) {
-            const path = this.getPathTo(e.entity);
+            const path = this.getConnectionLinePointsTo(e.entity);
             ctx.beginPath();
             for (const v of path) {
                 ctx.lineTo(v.x, v.y);
@@ -144,20 +145,6 @@ export default class Relationship extends ShapeWithAttributes {
         } while (ctx.measureText(this.label).width > Relationship.HALF_DIAG_X * 1.25 - BORDER);
 
         return fontSize;
-    }
-
-    getPathTo(e: Entity): Vector2D[] {
-        const STRAIGHT_SEGMENT_LENGTH: number = 30;
-        const myConnPoint = this.getCurrentConnectionPointFor(e);
-        const myCorner = Vector2D.sum(myConnPoint.pos, Vector2D.fromPolar(STRAIGHT_SEGMENT_LENGTH, myConnPoint.outDirection));
-        const theirConnPoint = e.getCurrentConnectionPointFor(this);
-        const theirCorner = Vector2D.sum(theirConnPoint.pos, Vector2D.fromPolar(STRAIGHT_SEGMENT_LENGTH, theirConnPoint.outDirection));
-        return [
-            myConnPoint.pos,
-            myCorner,
-            theirCorner,
-            theirConnPoint.pos
-        ];
     }
 
 }

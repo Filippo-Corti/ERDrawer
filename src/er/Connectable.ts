@@ -26,5 +26,6 @@ export default interface Connectable {
 
     getNextConnectionPoint(p: Vector2D) : ConnectionPoint;
 
+    getConnectionLinePointsTo(c : Connectable) : Vector2D[];
 
 }

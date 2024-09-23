@@ -130,6 +130,20 @@ export default class Attribute implements Connectable, Drawable {
         return this.connectionPoints.get(this.centerPoint.toString())!;
     }
 
+    getConnectionLinePointsTo(c: Connectable): Vector2D[] {
+        if (c != this.connected) throw new Error("This Attribute is not connected to " + c);
+
+        const ctx = document.createElement("canvas").getContext("2d")!; // Fictionary context to measure label length
+        ctx.font = this.labelFontSize + "px serif";
+        const totalLenght = this.segmentLength + Attribute.CIRCLE_SIZE + 3 + ctx.measureText(this.label).width;
+
+        return [
+            this.centerPoint,
+            Vector2D.sum(this.centerPoint, Vector2D.fromPolar(totalLenght, this.segmentDirection))
+        ];
+    }
+
+
     getMiddleSegmentPoint(): Vector2D {
         const deltaVector = Vector2D.fromPolar(this.segmentLength, this.segmentDirection);
         const endPoint = Vector2D.sum(this.centerPoint, deltaVector);

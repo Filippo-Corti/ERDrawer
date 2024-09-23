@@ -10,7 +10,7 @@ export class Segment {
         this.b = new Vector2D(x2, y2);
     }
 
-    static fromVectors(a : Vector2D, b : Vector2D) : Segment {
+    static fromVectors(a: Vector2D, b: Vector2D): Segment {
         return new Segment(a.x, a.y, b.x, b.y);
     }
 
@@ -43,6 +43,10 @@ export class Segment {
         if (o4 == 0 && Segment.onSegment(s.a, this.b, s.b)) return true;
 
         return false; // Doesn't fall in any of the above cases 
+    }
+
+    intersectsAny(segments: Segment[]): boolean {
+        return segments.find((s) => this.intersects(s)) != null;
     }
 
     // Returns the intersection point between the segments this and s.
@@ -96,7 +100,7 @@ export class Segment {
     }
 
     // Returns whether p is on this
-    contains(p : Vector2D) {
+    contains(p: Vector2D) {
         return Segment.onSegment(this.a, p, this.b);
     }
 
@@ -145,11 +149,11 @@ export class Segment {
     }
 
     // Orientation in Gradients
-    getDirection() : number {
+    getDirection(): number {
         return new Vector2D(this.a.x - this.b.x, this.a.y - this.b.y).phase();
     }
 
-    equals(o : Segment) : boolean {
+    equals(o: Segment): boolean {
         return (o.a.equals(this.a) && o.b.equals(this.b) || o.a.equals(this.b) && o.b.equals(this.a));
     }
 
