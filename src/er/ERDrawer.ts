@@ -7,6 +7,8 @@ import ERDiagram, { RelationshipConnectionInfo } from "./ERDiagram";
 import Relationship from "./Relationship";
 import Shape from "./Shape";
 
+import clone from "clone";
+
 type ERNode = {
     reference: Shape, // Multi-Relationship or Entity
     disp: Vector2D,
@@ -15,7 +17,7 @@ type ERNode = {
 }
 
 type EREdge = {
-    reference: Relationship, // Binary Relationship
+    reference: Relationship | null, // Binary Relationship or null if it's an edge between Entity and Multi-Relationship
     erNode1: ERNode,
     erNode2: ERNode
 }
@@ -39,7 +41,7 @@ export default class ERDrawer {
     }
 
     layout() {
-        const [nodes, edges] = this.chooseBestGraphLayout(20, 100);
+        const [nodes, edges] = this.chooseBestGraphLayout(20, 200);
         this.graphToER(nodes, edges);
     }
 
@@ -50,7 +52,6 @@ export default class ERDrawer {
         for (let i = 0; i < numberOfGraphs; i++) {
             // Generate New Random Graph 
             const [nodes, edges] = this.ERtoRandomGraph();
-            console.log(nodes[0].pos.x);
 
             // Apply the Layout Algorithm
             this.executeFructhermanReingold(nodes, edges, iterationsPerGraph);
@@ -69,11 +70,10 @@ export default class ERDrawer {
             let crossings = this.countEdgeCrossings(edges);
             if (crossings < minCrossings && !this.doesAnyEdgeCrossANode(nodes, edges)) {
                 minCrossings = crossings;
-                bestGraphLayout = [structuredClone(nodes), structuredClone(edges)];
-                console.log("Better", crossings);
+                bestGraphLayout = [clone(nodes), clone(edges)];
             }
-            console.log(bestGraphLayout[0][0].pos.x, bestGraphLayout[0][0].pos.y);
         }
+        console.log("Least amount of crossings: ", minCrossings);
         return bestGraphLayout
     }
 
@@ -172,7 +172,9 @@ export default class ERDrawer {
                     if (s1.parallel(s2)) {
                         count += 999; // This is a crossing we really want to avoid
                     } else {
-                        count += 1;
+                        if (!(s1.a.equals(s2.a) || s1.a.equals(s2.b) || s1.b.equals(s2.a) || s1.b.equals(s2.b))) {
+                            count += 1;
+                        }
                     }
                 }
 
@@ -180,7 +182,6 @@ export default class ERDrawer {
         }
         return count;
     }
-
 
     //Returns whether an Edge is crossing a Node or not.
     doesAnyEdgeCrossANode(nodes: ERNode[], edges: EREdge[], minOffset: number = 50): boolean {
@@ -220,12 +221,20 @@ export default class ERDrawer {
                     erNode2: erNodes.find((erNode) => erNode.reference.label == relationship.entities[1].entity.label)!,
                 });
             } else {
-                erNodes.push({
+                const node = {
                     reference: relationship,
                     disp: new Vector2D(0, 0),
                     pos: new Vector2D(Random.getRandom(minX, maxX), Random.getRandom(minY, maxY)),
-                    repulsionIntensity: 0
-                });
+                    repulsionIntensity: 0.5
+                };
+                erNodes.push(node);
+                for (const connectedEntity of relationship.entities) {
+                    erEdges.push({
+                        reference: null,
+                        erNode1: node,
+                        erNode2: erNodes.find((erNode) => erNode.reference.label == connectedEntity.entity.label)!,
+                    });
+                }
             }
         }
 
@@ -254,6 +263,7 @@ export default class ERDrawer {
         }
 
         for (const e of edges) {
+            if(e.reference == null) continue;
             const linkedEntities: RelationshipConnectionInfo[] = e.reference.entities.map((e) => ({
                 entityLabel: e.entity.label,
                 cardinality: e.cardinality
