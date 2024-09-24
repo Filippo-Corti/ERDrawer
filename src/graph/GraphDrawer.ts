@@ -21,11 +21,11 @@ export class GraphDrawer {
             v.size = this.calcNodeSize();
         });
         //try {
-            this.drawer.clear();
-            this.graph.draw(this.drawer.ctx);
+        this.drawer.clear();
+        this.graph.draw(this.drawer.ctx);
         //} catch(error) {
-          //  console.error(error);
-            //alert("Couldn't draw it. Try 'Discretize Graph'");
+        //  console.error(error);
+        //alert("Couldn't draw it. Try 'Discretize Graph'");
         //}
         //this.drawer.drawGrid(GraphDrawer.DELTA);
     }
@@ -36,7 +36,7 @@ export class GraphDrawer {
         - Avoids crossings (it finds the best disposition out of N tries) 
         - Avoids edges passing across nodes
     */
-    layoutGraph(numberOfGraphs : number, iterationsPerGraph : number): void {
+    layoutGraph(numberOfGraphs: number, iterationsPerGraph: number): void {
         const BORDER = 200;
 
         let minCrossings = 100;
@@ -44,7 +44,7 @@ export class GraphDrawer {
 
         for (let i = 0; i < numberOfGraphs; i++) {
             // Generate New Random Graph 
-            this.graph.randomizePositions(BORDER,  this.drawer.width - BORDER, BORDER, this.drawer.height - BORDER);
+            this.graph.randomizePositions(BORDER, this.drawer.width - BORDER, BORDER, this.drawer.height - BORDER);
 
             // Apply the Layout Algorithm
             this.executeFructhermanReingold(iterationsPerGraph, BORDER, true);
@@ -55,7 +55,7 @@ export class GraphDrawer {
             // Calculate Edges positions (based on new nodes positions!)
             try {
                 this.graph.layoutEdges();
-            } catch(error) {
+            } catch (error) {
                 continue; // If you can't calculate new vertices, it's not a good layout
             }
 
@@ -70,7 +70,7 @@ export class GraphDrawer {
         this.graph = minGraph.clone();
         console.log("Found best solution with", minCrossings, "crossings");
         console.log(this.graph);
-}
+    }
 
     //Base code comes from https://faculty.washington.edu/joelross/courses/archive/s13/cs261/lab/k/fruchterman91graph.pdf
     //Positions Nodes using the Fruchterman-Reingold Algorithm.
@@ -202,7 +202,7 @@ export class GraphDrawer {
 
 
     //Returns whether an Edge is crossing a Node or not.
-    doesAnyEdgeCrossANode(minOffset : number = 50) : boolean {
+    doesAnyEdgeCrossANode(minOffset: number = 50): boolean {
         for (const e of this.graph.edges) {
             for (const [_, v] of this.graph.nodes) {
                 if (v == e.node1 || v == e.node2) continue;
