@@ -39,38 +39,38 @@ er.addRelationship("Connesso", [
         }
     },
 ]);
-// er.addRelationship("Connesso2", [
-//     {
-//         entityLabel: "Prova",
-//         cardinality: {
-//             min: CardinalityValue.ZERO,
-//             max: CardinalityValue.ONE
-//         }
-//     },
-//     {
-//         entityLabel: "Xyz",
-//         cardinality: {
-//             min: CardinalityValue.ZERO,
-//             max: CardinalityValue.ONE
-//         }
-//     },
-// ]);
-// er.addRelationship("Connesso23", [
-//     {
-//         entityLabel: "Prova",
-//         cardinality: {
-//             min: CardinalityValue.ZERO,
-//             max: CardinalityValue.ONE
-//         }
-//     },
-//     {
-//         entityLabel: "Xyz",
-//         cardinality: {
-//             min: CardinalityValue.ZERO,
-//             max: CardinalityValue.ONE
-//         }
-//     },
-// ]);
+er.addRelationship("Connesso2", [
+    {
+        entityLabel: "Prova",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Xyz",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+]);
+er.addRelationship("Connesso23", [
+    {
+        entityLabel: "Prova",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+    {
+        entityLabel: "Xyz",
+        cardinality: {
+            min: CardinalityValue.ZERO,
+            max: CardinalityValue.ONE
+        }
+    },
+]);
 er.addRelationship("Ammesso", [
     {
         entityLabel: "Prova",
@@ -183,6 +183,4 @@ document.getElementById("layout-btn")!.addEventListener("click", () => {
     erDrawer.layout();
     erDrawer.drawER();
     console.log(erDrawer.er);
-    console.log(Array.from(erDrawer.er.getEntity("Canguro").attributes).filter((x) => x.label == "cannone")[0].getConnectionLinePointsTo(erDrawer.er.getEntity("Canguro")));
-    console.log(Array.from(erDrawer.er.getEntity("Canguro").relationships).filter((x) => x.label == "Ammesso")[0].getConnectionLinePointsTo(erDrawer.er.getEntity("Canguro")));
 });

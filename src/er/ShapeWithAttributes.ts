@@ -1,7 +1,5 @@
-import { Random } from "../utils/Utils";
 import Vector2D from "../utils/Vector2D";
 import Attribute from "./Attribute";
-import Connectable from "./Connectable";
 import { ConnectionPoint } from "./ConnectionPoint";
 import Shape from "./Shape";
 

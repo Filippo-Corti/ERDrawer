@@ -204,17 +204,14 @@ export default abstract class Shape implements Connectable, Drawable {
     anyIntersectionBetweenConnectables(connectionPoints: ConnectionPoint[], newLine: Vector2D[]): boolean {
         const CPsOfRelationships = connectionPoints.filter((cp) => cp.value instanceof Relationship);
         let allLines = [newLine, ...CPsOfRelationships.map((cp) => cp.value!.getConnectionLinePointsTo(this))];
-        if (this.label == "Canguro")
-            console.log(clone(connectionPoints), CPsOfRelationships, allLines);
         for (const line of allLines) {
             const intersections = connectionPoints.some((cp) => {
                 if (cp.value == null) return false;
+                if (cp.pos.equals(line[0]) || cp.pos.equals(line[line.length - 1])) return false;
                 return doBrokenLinesIntersect(line, cp.value.getConnectionLinePointsTo(this, cp))
             });
             if (intersections) return true;
         }
-        if (this.label == "Canguro")
-            console.log("No intersection");
         return false;
     }
 

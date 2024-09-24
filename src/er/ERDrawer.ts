@@ -281,8 +281,6 @@ export default class ERDrawer {
             er.addAttributes(er.getRelationship(n.reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
         }
 
-
-
         for (const e of edges) {
             if(e.references == null) continue;
             for(let reference of e.references) {
