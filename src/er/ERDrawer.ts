@@ -18,9 +18,10 @@ type ERNode = {
 }
 
 type EREdge = {
-    reference: Relationship | null, // Binary Relationship or null if it's an edge between Entity and Multi-Relationship
+    references: Relationship[] | null, // Binary Relationship array or null if it's an edge between Entity and Multi-Relationship
     erNode1: ERNode,
-    erNode2: ERNode
+    erNode2: ERNode,
+    count: number
 }
 
 export default class ERDrawer {
@@ -42,7 +43,7 @@ export default class ERDrawer {
     }
 
     layout() {
-        const [nodes, edges] = this.chooseBestGraphLayout(20, 300);
+        const [nodes, edges] = this.chooseBestGraphLayout(50, 300);
         this.graphToER(nodes, edges);
     }
 
@@ -202,7 +203,7 @@ export default class ERDrawer {
 
     private ERtoRandomGraph(): [ERNode[], EREdge[]] {
         const erNodes: ERNode[] = [];
-        const erEdges: EREdge[] = [];
+        let erEdges: EREdge[] = [];
         const minX = ERDrawer.ER_MARGIN, maxX = this.drawer.width - ERDrawer.ER_MARGIN, minY = ERDrawer.ER_MARGIN, maxY = this.drawer.height - ERDrawer.ER_MARGIN
 
         for (const entity of this.er.entities.values()) {
@@ -216,10 +217,21 @@ export default class ERDrawer {
 
         for (const relationship of this.er.relationships.values()) {
             if (relationship.getEntityCounter() == 2) {
+                const erNode1 = erNodes.find((erNode) => erNode.reference.label == relationship.entities[0].entity.label)!;
+                const erNode2 = erNodes.find((erNode) => erNode.reference.label == relationship.entities[1].entity.label)!;
+                let existingEdge = erEdges.find((e) => e.erNode1 == erNode1 && e.erNode2 == erNode2);
+                let count = 1;
+                let references = [relationship];
+                if (existingEdge) {
+                    erEdges = erEdges.filter((e) => e !== existingEdge); //Remove edge
+                    count = existingEdge.count++;
+                    references = [...existingEdge.references!, relationship];
+                }
                 erEdges.push({
-                    reference: relationship,
-                    erNode1: erNodes.find((erNode) => erNode.reference.label == relationship.entities[0].entity.label)!,
-                    erNode2: erNodes.find((erNode) => erNode.reference.label == relationship.entities[1].entity.label)!,
+                    references: references,
+                    erNode1: erNode1,
+                    erNode2: erNode2,
+                    count: count
                 });
             } else {
                 const node = {
@@ -231,9 +243,10 @@ export default class ERDrawer {
                 erNodes.push(node);
                 for (const connectedEntity of relationship.entities) {
                     erEdges.push({
-                        reference: null,
+                        references: null,
                         erNode1: node,
                         erNode2: erNodes.find((erNode) => erNode.reference.label == connectedEntity.entity.label)!,
+                        count: 1
                     });
                 }
             }
@@ -267,14 +280,16 @@ export default class ERDrawer {
         }
 
         for (const e of edges) {
-            if(e.reference == null) continue;
-            const linkedEntities: RelationshipConnectionInfo[] = e.reference.entities.map((e) => ({
-                entityLabel: e.entity.label,
-                cardinality: e.cardinality
-            }));
-            const attributeLabels = e.reference.attributes.map((a) => a.label);
-            er.addRelationship(e.reference.label, linkedEntities);
-            er.addAttributes(er.getRelationship(e.reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
+            if(e.references == null) continue;
+            for(let reference of e.references) {
+                const linkedEntities: RelationshipConnectionInfo[] = reference.entities.map((e) => ({
+                    entityLabel: e.entity.label,
+                    cardinality: e.cardinality
+                }));
+                const attributeLabels = reference.attributes.map((a) => a.label);
+                er.addRelationship(reference.label, linkedEntities);
+                er.addAttributes(er.getRelationship(reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
+            }
         }
 
         this.er = er;

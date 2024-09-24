@@ -26,6 +26,14 @@ export default class Entity extends ShapeWithAttributes {
         this.relationships.push(r);
     }
 
+    unlinkRelationship(r : Relationship) : void {
+        const found = Array.from(this.connectionPoints.values()).find((cp) => cp.value == r);
+        if (found) {
+            found.value = null;
+        }
+        this.relationships = this.relationships.filter((rel) => rel !== r);
+    }
+
     isTheNearestConnectionPoint(p: Vector2D, connPoint: Vector2D): boolean {
         const currDist = connPoint.distanceTo(p);
         return (currDist <= Math.hypot(this.deltaX, this.deltaY) / 2);

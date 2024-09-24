@@ -147,4 +147,25 @@ export default class Relationship extends ShapeWithAttributes {
         return fontSize;
     }
 
+    updateCenterPoint(newCenterPoint: Vector2D): void {
+        super.updateCenterPoint(newCenterPoint);
+        const currEntities = this.entities;
+        this.entities = [];
+        this.connectionPoints.forEach((v) => {
+            if (v.value instanceof Entity) {
+                v.value = null;
+            }
+        });
+
+        currEntities.forEach((e) => {
+            e.entity.unlinkRelationship(this);
+        })
+
+        currEntities.forEach((e) => {
+            e.entity.linkRelationship(this);
+            this.linkToEntity(e.entity, e.cardinality); // Recalculate best connections
+        });
+
+    }
+
 }
