@@ -8,9 +8,10 @@ import Relationship from "./Relationship";
 import Shape from "./Shape";
 
 import clone from "clone";
+import ShapeWithAttributes from "./ShapeWithAttributes";
 
 type ERNode = {
-    reference: Shape, // Multi-Relationship or Entity
+    reference: ShapeWithAttributes, // Multi-Relationship or Entity
     disp: Vector2D,
     pos: Vector2D,
     repulsionIntensity: number
@@ -41,7 +42,7 @@ export default class ERDrawer {
     }
 
     layout() {
-        const [nodes, edges] = this.chooseBestGraphLayout(20, 200);
+        const [nodes, edges] = this.chooseBestGraphLayout(20, 300);
         this.graphToER(nodes, edges);
     }
 
@@ -242,24 +243,27 @@ export default class ERDrawer {
     }
 
     private graphToER(nodes: ERNode[], edges: EREdge[]): void {
-        console.log(nodes, edges);
         const er = new ERDiagram();
         const moreThanBinaryRelationships = [];
         for (const n of nodes) {
             if (n.reference instanceof Entity) {
-                er.addEntity(new Entity(n.pos, n.reference.label));
+                const newEntity = new Entity(n.pos, n.reference.label)
+                const attributeLabels = n.reference.attributes.map((a) => a.label);
+                er.addEntity(newEntity);
+                er.addAttributes(newEntity, attributeLabels);
             } else {
                 moreThanBinaryRelationships.push(n);
             }
         }
 
-        console.log(moreThanBinaryRelationships);
         for (const n of moreThanBinaryRelationships) {
             const linkedEntities: RelationshipConnectionInfo[] = (n.reference as Relationship).entities.map((e) => ({
                 entityLabel: e.entity.label,
                 cardinality: e.cardinality
             }));
+            const attributeLabels = n.reference.attributes.map((a) => a.label);
             er.addRelationship(n.reference.label, linkedEntities, n.pos);
+            er.addAttributes(er.getRelationship(n.reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
         }
 
         for (const e of edges) {
@@ -268,7 +272,9 @@ export default class ERDrawer {
                 entityLabel: e.entity.label,
                 cardinality: e.cardinality
             }));
+            const attributeLabels = e.reference.attributes.map((a) => a.label);
             er.addRelationship(e.reference.label, linkedEntities);
+            er.addAttributes(er.getRelationship(e.reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
         }
 
         this.er = er;

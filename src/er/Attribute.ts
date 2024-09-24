@@ -2,17 +2,18 @@ import Drawable from "../utils/Drawable";
 import Vector2D from "../utils/Vector2D";
 import Connectable from "./Connectable";
 import { ConnectionPoint } from "./ConnectionPoint";
+import Relationship from "./Relationship";
 
 export default class Attribute implements Connectable, Drawable {
 
     static CIRCLE_SIZE = 5;
+    static LABEL_FONTSIZE: number = 15;
+    static SEGMENT_LENGTH: number = Relationship.STRAIGHT_SEGMENT_LENGTH;
 
     centerPoint: Vector2D;
     connectionPoints: Map<string, ConnectionPoint>;
     label: string;
     connected: Connectable | null = null;
-    labelFontSize: number = 15;
-    segmentLength: number = 30;
     segmentDirection: number = 0;
     filledPoint: boolean;
 
@@ -22,6 +23,12 @@ export default class Attribute implements Connectable, Drawable {
         this.filledPoint = filledPoint;
         this.connectionPoints = new Map<string, ConnectionPoint>();
         this.connectionPoints.set(this.centerPoint.toString(), { pos: this.centerPoint, value: null, outDirection: 0 });
+    }
+
+    static measurePotentialLength(label: string): number {
+        const ctx = document.createElement("canvas").getContext("2d")!; // Fictionary context to measure label length
+        ctx.font = Attribute.LABEL_FONTSIZE + "px serif";
+        return Attribute.SEGMENT_LENGTH + Attribute.CIRCLE_SIZE + 3 + ctx.measureText(label).width;
     }
 
     linkToConnectable(c: Connectable): void {
@@ -40,7 +47,7 @@ export default class Attribute implements Connectable, Drawable {
     }
 
     draw(ctx: CanvasRenderingContext2D): void {
-        const deltaVector = Vector2D.fromPolar(this.segmentLength, this.segmentDirection);
+        const deltaVector = Vector2D.fromPolar(Attribute.SEGMENT_LENGTH, this.segmentDirection);
         const endPoint = Vector2D.sum(this.centerPoint, deltaVector);
 
         // Draw Line
@@ -62,7 +69,7 @@ export default class Attribute implements Connectable, Drawable {
         ctx.save();
         ctx.fillStyle = "black";
         ctx.textBaseline = "middle";
-        ctx.font = this.labelFontSize + "px serif";
+        ctx.font = Attribute.LABEL_FONTSIZE + "px serif";
         ctx.translate(endPoint.x, endPoint.y);
         if (this.segmentDirection > Math.PI / 2 && this.segmentDirection < 3 / 2 * Math.PI) {
             ctx.rotate(this.segmentDirection + Math.PI);
@@ -133,19 +140,15 @@ export default class Attribute implements Connectable, Drawable {
     getConnectionLinePointsTo(c: Connectable): Vector2D[] {
         if (c != this.connected) throw new Error("This Attribute is not connected to " + c);
 
-        const ctx = document.createElement("canvas").getContext("2d")!; // Fictionary context to measure label length
-        ctx.font = this.labelFontSize + "px serif";
-        const totalLenght = this.segmentLength + Attribute.CIRCLE_SIZE + 3 + ctx.measureText(this.label).width;
-
         return [
             this.centerPoint,
-            Vector2D.sum(this.centerPoint, Vector2D.fromPolar(totalLenght, this.segmentDirection))
+            Vector2D.sum(this.centerPoint, Vector2D.fromPolar(Attribute.measurePotentialLength(this.label), this.segmentDirection))
         ];
     }
 
 
     getMiddleSegmentPoint(): Vector2D {
-        const deltaVector = Vector2D.fromPolar(this.segmentLength, this.segmentDirection);
+        const deltaVector = Vector2D.fromPolar(Attribute.SEGMENT_LENGTH, this.segmentDirection);
         const endPoint = Vector2D.sum(this.centerPoint, deltaVector);
 
         return this.centerPoint.halfWayTo(endPoint);

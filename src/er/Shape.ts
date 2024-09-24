@@ -144,16 +144,10 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     findConnectionPointFor(c: Connectable, noIntersections: boolean = true): ConnectionPoint {
-        let connPointOnC;
-        try {
-            const found = c.getCurrentConnectionPointFor(this);
-            connPointOnC = Vector2D.sum(found.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, found.outDirection));
-        } catch {
-            connPointOnC = c.centerPoint;
-        }
+        const connPointOnC: ConnectionPoint = (() => { try { return c.getCurrentConnectionPointFor(this) } catch { return { pos: c.centerPoint, value: null, outDirection: 0 } } })(); //Either the CP or the center point
+        const connPointOnCWithOffset: Vector2D = Vector2D.sum(connPointOnC.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, connPointOnC.outDirection));
+        const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(Segment.fromVectors(connPointOnCWithOffset, this.centerPoint));
 
-        const segmentFromConnectable = Segment.fromVectors(connPointOnC, this.centerPoint);
-        const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(segmentFromConnectable);
         let possibleConnPoints = Array.from(this.connectionPoints.values());
         let shapeSegments = this.getSegments();
 
@@ -161,7 +155,7 @@ export default abstract class Shape implements Connectable, Drawable {
         if (!(c instanceof Attribute)) {
             possibleConnPoints = possibleConnPoints.filter((cp) => {
                 const connPointWithOffset: Vector2D = Vector2D.sum(cp.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, cp.outDirection));
-                const virtualEdge: Segment = Segment.fromVectors(connPointWithOffset, connPointOnC);
+                const virtualEdge: Segment = Segment.fromVectors(connPointWithOffset, connPointOnCWithOffset);
                 return !virtualEdge.intersectsAny(shapeSegments);
             })
         }
@@ -179,23 +173,25 @@ export default abstract class Shape implements Connectable, Drawable {
 
         possibleConnPoints.sort(compareCPs);
 
-        console.log(c, clone(possibleConnPoints));
+        //console.log(c, clone(possibleConnPoints));
         let i = 0;
         for (const cp of possibleConnPoints) {
             const connPointWithOffset: Vector2D = Vector2D.sum(cp.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, cp.outDirection));
-            const potentialLine: Vector2D[] = (c instanceof Attribute) ? [c.centerPoint, connPointOnC] : [c.centerPoint, connPointOnC, connPointWithOffset, this.centerPoint]; // Not working, need to get the correct line for attributes as well 
+            const potentialLine: Vector2D[] = (c instanceof Attribute)
+                ? [cp.pos, Vector2D.sum(connPointWithOffset, Vector2D.fromPolar(Attribute.measurePotentialLength(c.label) - Relationship.STRAIGHT_SEGMENT_LENGTH + 5, cp.outDirection))]
+                : [cp.pos, connPointWithOffset, connPointOnCWithOffset, connPointOnC.pos];
             const anyIntersections: boolean = this.intersectsAnyConnectable(potentialLine);
-            console.log("Intersections?", anyIntersections, potentialLine);
+            //console.log("Intersections?", anyIntersections, potentialLine);
             switch (true) {
                 case cp.value == null:
-                    console.log(i);
+                    //console.log(i);
                     if (!anyIntersections || !noIntersections) {
-                        console.log("Found a free connection point for", c, "found", cp, "no intersezioni: ", noIntersections);
+                        //console.log("Found a free connection point for", c, "found", cp, "no intersezioni: ", noIntersections);
                         return cp;
                     }
                     break;
                 case cp.value instanceof Attribute:
-                    console.log(i);
+                    //console.log(i);
                     if (!anyIntersections || !noIntersections) {
                         // Find available CP for a swap
                         for (const [_, otherCP] of this.connectionPoints) {
@@ -203,28 +199,29 @@ export default abstract class Shape implements Connectable, Drawable {
                                 [cp.value, otherCP.value] = [null, cp.value];
                                 if (otherCP.value instanceof Attribute)
                                     otherCP.value.setConnectedPoint(otherCP);
-                                console.log("B Found an attribute connection point for", c, "found", cp, "no intersezioni: ", noIntersections);
+                                //console.log("B Found an attribute connection point for", c, "found", cp, "no intersezioni: ", noIntersections);
                                 return cp;
                             }
                         }
                     }
                     break;
                 case cp.value instanceof Shape:
-                    console.log(i);
+                    console.log("Found a shape but better if we don't");
                     break;
             }
             i++;
         }
 
-        console.log("deltasasss");
+        //console.log("deltasasss");
         if (this.reduceDeltasAndRegenerate())
             return this.findConnectionPointFor(c, noIntersections);
 
-        if (noIntersections)
+        if (noIntersections) {
+            console.log("Need to intersect, unfortunately");
             return this.findConnectionPointFor(c, false);
+        }
 
         throw new Error("Couldn't find a connection point");
-        //console.log(c.centerPoint, "to", this.centerPoint, "has valid conn points: ", possibleConnPoints);
     }
 
     intersectsAnyConnectable(line: Vector2D[]): boolean {

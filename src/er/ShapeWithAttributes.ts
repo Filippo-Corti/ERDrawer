@@ -35,30 +35,6 @@ export default abstract class ShapeWithAttributes extends Shape {
         throw new Error("Attribute " + label + " not in " + this.label);
     }
 
-    // findConnectionPointFor(c: Connectable, closestSegment: boolean = true): ConnectionPoint {
-    //     if (!(c instanceof Attribute)) {
-    //         return super.findConnectionPointFor(c, closestSegment);
-    //     }
-
-    //     const allConnPoints = this.getAllConnectionPoints();
-    //     const availableConnPoints: ConnectionPoint[] = [];
-
-    //     for (const cp of allConnPoints) {
-    //         if (cp.value !== null) continue;
-    //         availableConnPoints.push(cp);
-    //     }
-
-    //     if (availableConnPoints.length == 0) {
-    //         if (this.reduceDeltasAndRegenerate()) {
-    //             return this.findConnectionPointFor(c, closestSegment);
-    //         }
-    //         else
-    //             throw new Error("Couldn't find room for this attribute");
-    //     }
-
-    //     return availableConnPoints[Random.getRandom(0, availableConnPoints.length - 1)];
-    // }
-
     updateCenterPoint(newCenterPoint: Vector2D): void {
         if (this.centerPoint.equals(newCenterPoint)) return;
 
