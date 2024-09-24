@@ -31,6 +31,7 @@ export default class ERDrawer {
 
     er: ERDiagram;
     drawer: Drawer;
+    i : number = 0;
 
     constructor(er: ERDiagram, drawer: Drawer) {
         this.er = er;
@@ -43,6 +44,7 @@ export default class ERDrawer {
     }
 
     layout() {
+        this.i++;
         const [nodes, edges] = this.chooseBestGraphLayout(50, 300);
         this.graphToER(nodes, edges);
     }
@@ -268,7 +270,7 @@ export default class ERDrawer {
                 moreThanBinaryRelationships.push(n);
             }
         }
-
+        
         for (const n of moreThanBinaryRelationships) {
             const linkedEntities: RelationshipConnectionInfo[] = (n.reference as Relationship).entities.map((e) => ({
                 entityLabel: e.entity.label,
@@ -278,6 +280,8 @@ export default class ERDrawer {
             er.addRelationship(n.reference.label, linkedEntities, n.pos);
             er.addAttributes(er.getRelationship(n.reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
         }
+
+
 
         for (const e of edges) {
             if(e.references == null) continue;

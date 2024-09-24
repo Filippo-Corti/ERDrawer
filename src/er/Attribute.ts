@@ -137,12 +137,13 @@ export default class Attribute implements Connectable, Drawable {
         return this.connectionPoints.get(this.centerPoint.toString())!;
     }
 
-    getConnectionLinePointsTo(c: Connectable): Vector2D[] {
+    getConnectionLinePointsTo(c: Connectable, startingConnPoint? : ConnectionPoint): Vector2D[] {
         if (c != this.connected) throw new Error("This Attribute is not connected to " + c);
+        const connPoint = startingConnPoint || this.connectionPoints.get(this.centerPoint.toString())!;
 
         return [
-            this.centerPoint,
-            Vector2D.sum(this.centerPoint, Vector2D.fromPolar(Attribute.measurePotentialLength(this.label), this.segmentDirection))
+            connPoint.pos,
+            Vector2D.sum(connPoint.pos, Vector2D.fromPolar(Attribute.measurePotentialLength(this.label) + 15, connPoint.outDirection))
         ];
     }
 
