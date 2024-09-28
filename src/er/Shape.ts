@@ -103,8 +103,8 @@ export default abstract class Shape implements Connectable, Drawable {
         throw new Error("P is not a Connection Point");
     }
 
-    getConnectionLinePointsTo(c: Connectable, startingConnPoint?: ConnectionPoint): Vector2D[] {
-        const myConnPoint = startingConnPoint || this.getCurrentConnectionPointFor(c);
+    getConnectionLinePointsTo(c: Connectable, _startingConnPoint?: ConnectionPoint): Vector2D[] {
+        const myConnPoint = this.getCurrentConnectionPointFor(c);
         const myCorner = Vector2D.sum(myConnPoint.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, myConnPoint.outDirection));
         const theirConnPoint = c.getCurrentConnectionPointFor(this);
         const theirCorner = Vector2D.sum(theirConnPoint.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, theirConnPoint.outDirection));
@@ -117,8 +117,11 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     findConnectionPointFor(c: Connectable, dontIntersectOption: boolean = true): ConnectionPoint {
+        //console.log(this.label, "-", c.label);
         const connPointOnC: ConnectionPoint = (() => { try { return c.getCurrentConnectionPointFor(this) } catch { return { pos: c.centerPoint, value: null, outDirection: 0 } } })(); //Either the CP or the center point
-        const connPointOnCWithOffset: Vector2D = Vector2D.sum(connPointOnC.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, connPointOnC.outDirection));
+        const connPointOnCWithOffset: Vector2D = (connPointOnC.pos.equals(c.centerPoint))
+            ? c.centerPoint
+            : Vector2D.sum(connPointOnC.pos, Vector2D.fromPolar(Relationship.STRAIGHT_SEGMENT_LENGTH, connPointOnC.outDirection));
         const intersectionPoint: Vector2D = this.getPointByIntersectingSegment(Segment.fromVectors(connPointOnCWithOffset, this.centerPoint));
 
         let possibleConnPoints = Array.from(this.connectionPoints.values());
@@ -200,12 +203,13 @@ export default abstract class Shape implements Connectable, Drawable {
 
     anyIntersectionBetweenConnectables(connectionPoints: ConnectionPoint[], newLine: Vector2D[]): boolean {
         const CPsOfRelationships = connectionPoints.filter((cp) => cp.value instanceof Relationship);
-        let allLines = [newLine, ...CPsOfRelationships.map((cp) => cp.value!.getConnectionLinePointsTo(this))];
+        let allLines = [newLine, ...CPsOfRelationships.map((cp) => cp.value!.getConnectionLinePointsTo(this, cp))];
+        //console.log(connectionPoints, allLines);
         for (const line of allLines) {
             const intersections = connectionPoints.some((cp) => {
                 if (cp.value == null) return false;
                 if (cp.pos.equals(line[0]) || cp.pos.equals(line[line.length - 1])) return false;
-                return doBrokenLinesIntersect(line, cp.value.getConnectionLinePointsTo(this, cp))
+                return doBrokenLinesIntersect(line, cp.value.getConnectionLinePointsTo(this, cp)) // Va molto rivisto questo parametro cp (Ha senso solo negli attributi)
             });
             if (intersections) return true;
         }
