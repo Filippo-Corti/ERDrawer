@@ -1,14 +1,11 @@
-import clone from "clone";
 import Drawable from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
-import { containsAny, doBrokenLinesIntersect } from "../utils/Utils";
+import { doBrokenLinesIntersect } from "../utils/Utils";
 import Vector2D from "../utils/Vector2D";
 import Attribute from "./Attribute";
 import Connectable from "./Connectable";
 import { ConnectionPoint } from "./ConnectionPoint";
-import Entity from "./Entity";
 import Relationship from "./Relationship";
-import ShapeWithAttributes from "./ShapeWithAttributes";
 
 export default abstract class Shape implements Connectable, Drawable {
 

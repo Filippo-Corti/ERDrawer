@@ -5,7 +5,6 @@ import Vector2D from "../utils/Vector2D";
 import Entity from "./Entity";
 import ERDiagram, { RelationshipConnectionInfo } from "./ERDiagram";
 import Relationship from "./Relationship";
-import Shape from "./Shape";
 
 import clone from "clone";
 import ShapeWithAttributes from "./ShapeWithAttributes";

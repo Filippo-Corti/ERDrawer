@@ -1,5 +1,5 @@
-import { Drawer } from "../Drawer";
-import { Vector2D } from "../utils/Vector2D";
+import Drawer from "../Drawer";
+import Vector2D from "../utils/Vector2D";
 import { Graph } from "./Graph";
 import { Node } from "./Node";
 

@@ -1,8 +1,8 @@
 import { Node } from "./Node";
 import { Edge } from "./Edge";
-import { Drawable } from "../utils/Drawable";
+import Drawable from "../utils/Drawable";
 import { Random } from "../utils/Utils";
-import { Vector2D } from "../utils/Vector2D";
+import Vector2D from "../utils/Vector2D";
 
 export class Graph implements Drawable {
 

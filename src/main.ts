@@ -1,5 +1,5 @@
 import './style.css'
-import { Drawer } from './Drawer';
+import Drawer from './Drawer';
 import { GraphDrawer } from './graph/GraphDrawer.ts';
 import { GraphSerializer } from './graph/GraphSerializer.ts';
 import { Node } from './graph/Node.ts';
@@ -100,17 +100,17 @@ function addPoint(event : Event) : boolean {
     return false;
 }
 
-function waitingKeypress() {
-    return new Promise<void>((resolve) => {
-        document.addEventListener('keydown', onKeyHandler);
-        function onKeyHandler(e: { keyCode: number; }) {
-            if (e.keyCode === 13) {
-                document.removeEventListener('keydown', onKeyHandler);
-                resolve();
-            }
-        }
-    });
-}
+// function waitingKeypress() {
+//     return new Promise<void>((resolve) => {
+//         document.addEventListener('keydown', onKeyHandler);
+//         function onKeyHandler(e: { keyCode: number; }) {
+//             if (e.keyCode === 13) {
+//                 document.removeEventListener('keydown', onKeyHandler);
+//                 resolve();
+//             }
+//         }
+//     });
+// }
 
 console.log(graph);
 console.log(graph.clone())

@@ -1,6 +1,6 @@
-import { Drawable } from "../utils/Drawable";
+import Drawable from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
-import { Vector2D } from "../utils/Vector2D";
+import Vector2D from "../utils/Vector2D";
 import { Graph } from "./Graph";
 
 export class Node implements Drawable {

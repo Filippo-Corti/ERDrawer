@@ -1,9 +1,7 @@
 import { Edge } from "../graph/Edge";
 import { Node } from "../graph/Node";
 import { Segment } from "../utils/Segment";
-import { ConnectionPoint } from "../utils/Utils";
-import { Vector2D } from "../utils/Vector2D";
-import { Attribute } from "./Attribute";
+import Vector2D from "../utils/Vector2D";
 import { Entity } from "./Entity";
 
 export class BinaryRelationship extends Edge {
@@ -11,10 +9,8 @@ export class BinaryRelationship extends Edge {
     label: string;
     halfDiagX: number = 70;
     halfDiagY: number = 50;
-    connectionPoints: ConnectionPoint[]; // Vector2D Hashcode to boolean
     deltaConnectionPointsX: number = this.halfDiagX / 2;
     deltaConnectionPointsY: number = this.halfDiagY / 2;
-    attributes: Map<string, Attribute>;
     
     cardNode1: [string, string];
     cardNode2: [string, string];

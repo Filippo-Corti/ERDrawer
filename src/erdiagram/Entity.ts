@@ -2,7 +2,7 @@ import { Graph } from "../graph/Graph";
 import { Node } from "../graph/Node";
 import { Segment } from "../utils/Segment";
 import { ConnectionPoint, Random } from "../utils/Utils";
-import { Vector2D } from "../utils/Vector2D";
+import Vector2D from "../utils/Vector2D";
 import { Attribute } from "./Attribute";
 
 export class Entity extends Node {

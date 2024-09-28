@@ -1,5 +1,5 @@
-import { Drawable } from "../utils/Drawable";
-import { Vector2D } from "../utils/Vector2D";
+import Drawable from "../utils/Drawable";
+import Vector2D from "../utils/Vector2D";
 
 export class Attribute implements Drawable {
 
