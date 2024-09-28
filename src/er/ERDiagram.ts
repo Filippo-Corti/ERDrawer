@@ -67,8 +67,6 @@ export default class ERDiagram implements Drawable {
             e.entity.linkRelationship(newRelationship);
             newRelationship.linkToEntity(e.entity, e.cardinality);
         }
-
-        this.positionRelationships(entitiesLabels);
     }
 
     addAttributes(s: ShapeWithAttributes, attributes: string[]) {
@@ -76,38 +74,6 @@ export default class ERDiagram implements Drawable {
             const attribute = new Attribute(attLabel);
             s.addAttribute(attribute);
         }
-    }
-
-    positionRelationships(entities: string[]) {
-        const entitiesKeyPrefix = entities.join('$') + "$";
-        const involvedRelationships: Relationship[] = [];
-
-        const involvedEntities: Entity[] = entities.map((entityName) => this.entities.get(entityName)!);
-
-        for (const [k, v] of this.relationships) {
-            if (k.startsWith(entitiesKeyPrefix) && v.entities.length == entities.length) {
-                involvedRelationships.push(v);
-            }
-        }
-        const countRel: number = involvedRelationships.length;
-
-        if (countRel <= 1) return;
-
-        const middle = involvedEntities[0].centerPoint.halfWayTo(involvedEntities[1].centerPoint);
-        const theta = Vector2D.sum(involvedEntities[0].centerPoint, involvedEntities[1].centerPoint.negative()).phase();
-
-        let sign: number = 1;
-        const evenCount: boolean = countRel % 2 == 0;
-        for (let i = 0; i < countRel; i++) {
-            const offsetFactor = (!evenCount && i == 0) ? 0 : Math.floor((i + 1 + ((evenCount) ? 1 : 0)) / 2) / ((evenCount) ? 2 : 1);
-            const offsetBase = Relationship.MULTIPLE_RELATIONSHIPS_OFFSET;
-            const dx = sign * offsetBase * offsetFactor * Math.sin(theta);
-            const dy = sign * offsetBase * offsetFactor * -Math.cos(theta);
-            involvedRelationships[i].updateCenterPoint(Vector2D.sum(middle, new Vector2D(dx, dy)));
-
-            sign *= -1;
-        }
-
     }
 
     getEntity(entityLabel: string): Entity {

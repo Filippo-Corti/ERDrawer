@@ -30,7 +30,7 @@ export default class ERDrawer {
 
     er: ERDiagram;
     drawer: Drawer;
-    i : number = 0;
+    i: number = 0;
 
     constructor(er: ERDiagram, drawer: Drawer) {
         this.er = er;
@@ -225,7 +225,7 @@ export default class ERDrawer {
                 let references = [relationship];
                 if (existingEdge) {
                     erEdges = erEdges.filter((e) => e !== existingEdge); //Remove edge
-                    count = existingEdge.count++;
+                    count = existingEdge.count + 1;
                     references = [...existingEdge.references!, relationship];
                 }
                 erEdges.push({
@@ -269,7 +269,7 @@ export default class ERDrawer {
                 moreThanBinaryRelationships.push(n);
             }
         }
-        
+
         for (const n of moreThanBinaryRelationships) {
             const linkedEntities: RelationshipConnectionInfo[] = (n.reference as Relationship).entities.map((e) => ({
                 entityLabel: e.entity.label,
@@ -281,19 +281,48 @@ export default class ERDrawer {
         }
 
         for (const e of edges) {
-            if(e.references == null) continue;
-            for(let reference of e.references) {
+            if (e.references == null) continue;
+            const centerPoints = this.getRelationshipsPosition(er, e.references[0].entities.map((e) => e.entity.label), e.count);
+            let i = 0;
+            for (let reference of e.references) {
                 const linkedEntities: RelationshipConnectionInfo[] = reference.entities.map((e) => ({
                     entityLabel: e.entity.label,
                     cardinality: e.cardinality
                 }));
                 const attributeLabels = reference.attributes.map((a) => a.label);
-                er.addRelationship(reference.label, linkedEntities);
+                er.addRelationship(reference.label, linkedEntities, centerPoints[i++]);
                 er.addAttributes(er.getRelationship(reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
             }
         }
 
         this.er = er;
+    }
+
+    getRelationshipsPosition(er: ERDiagram, involvedEntitiesLabels: string[], n: number): Vector2D[] {
+        const involvedEntities: Entity[] = involvedEntitiesLabels.map((entityName) => er.entities.get(entityName)!);
+
+        if (n <= 1) {
+            const avgX = involvedEntities.map((e) => e.centerPoint.x).reduce((a, b) => a + b, 0) / involvedEntities.length;
+            const avgY = involvedEntities.map((e) => e.centerPoint.y).reduce((a, b) => a + b, 0) / involvedEntities.length;
+            return [new Vector2D(avgX, avgY)];
+        }
+
+        const middle = involvedEntities[0].centerPoint.halfWayTo(involvedEntities[1].centerPoint);
+        const theta = Vector2D.sum(involvedEntities[0].centerPoint, involvedEntities[1].centerPoint.negative()).phase();
+
+        let centerPoints: Vector2D[] = [];
+        let sign: number = 1;
+        const evenCount: boolean = n % 2 == 0;
+        for (let i = 0; i < n; i++) {
+            const offsetFactor = (!evenCount && i == 0) ? 0 : Math.floor((i + 1 + ((evenCount) ? 1 : 0)) / 2) / ((evenCount) ? 2 : 1);
+            const offsetBase = Relationship.MULTIPLE_RELATIONSHIPS_OFFSET;
+            const dx = sign * offsetBase * offsetFactor * Math.sin(theta);
+            const dy = sign * offsetBase * offsetFactor * -Math.cos(theta);
+            centerPoints.push(Vector2D.sum(middle, new Vector2D(dx, dy)));
+            sign *= -1;
+        }
+
+        return centerPoints;
     }
 
 }

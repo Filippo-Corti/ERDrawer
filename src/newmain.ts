@@ -15,7 +15,6 @@ er.addEntity(new Entity(new Vector2D(400, 600), "Canguro"));
 er.addEntity(new Entity(new Vector2D(600, 300), "Testa"));
 er.addEntity(new Entity(new Vector2D(800, 500), "Coda"));
 
-
 er.addAttributes(er.getEntity("Testa"), ["ciao"]);
 er.addAttributes(er.getEntity("Testa"), ["b", "s", "q"]);
 er.addAttributes(er.getEntity("Prova"), ["ciao", "cosa", "fai", "ecco", "ottimo", "ciao2", "ecco2", "ottimo3", "ciao5", "ecco6", "ottimo7", "ciao8"]);
