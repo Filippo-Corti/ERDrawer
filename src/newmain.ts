@@ -55,22 +55,22 @@ er.addRelationship("Connesso2", [
         }
     },
 ]);
-er.addRelationship("Connesso23", [
-    {
-        entityLabel: "Prova",
-        cardinality: {
-            min: CardinalityValue.ZERO,
-            max: CardinalityValue.ONE
-        }
-    },
-    {
-        entityLabel: "Xyz",
-        cardinality: {
-            min: CardinalityValue.ZERO,
-            max: CardinalityValue.ONE
-        }
-    },
-]);
+// er.addRelationship("Connesso23", [
+//     {
+//         entityLabel: "Prova",
+//         cardinality: {
+//             min: CardinalityValue.ZERO,
+//             max: CardinalityValue.ONE
+//         }
+//     },
+//     {
+//         entityLabel: "Xyz",
+//         cardinality: {
+//             min: CardinalityValue.ZERO,
+//             max: CardinalityValue.ONE
+//         }
+//     },
+// ]);
 er.addRelationship("Ammesso", [
     {
         entityLabel: "Prova",
@@ -143,7 +143,7 @@ er.addRelationship("Opsss", [
     },
 ]);
 
-// er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Uno", "Due", "Tre", "Quattro"]);
+er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Uno", "Due", "Tre", "Quattro"]);
 
 const erDrawer = new ERDrawer(er, drawer);
 

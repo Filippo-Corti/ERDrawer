@@ -25,7 +25,7 @@ export default abstract class ShapeWithAttributes extends Shape {
         a.linkToConnectable(this);
     }
 
-    getAttribute(label : string) : Attribute {
+    getAttribute(label: string): Attribute {
         const found = this.attributes.find((a) => a.label == label);
         if (found)
             return found;
@@ -38,17 +38,22 @@ export default abstract class ShapeWithAttributes extends Shape {
 
         const centerPointsDiff = Vector2D.sum(newCenterPoint, this.centerPoint.negative());
         const newConnectionPoints: Map<string, ConnectionPoint> = new Map<string, ConnectionPoint>();
+        const attributes = this.attributes.map((a) => ({ label: a.label, filledPoint: a.filledPoint }));
 
         for (const [_, oldCP] of this.connectionPoints) {
             const newPoint = Vector2D.sum(oldCP.pos, centerPointsDiff);
             oldCP.pos = newPoint;
+            oldCP.value = null;
             newConnectionPoints.set(newPoint.toString(), oldCP)
-            if (oldCP.value instanceof Attribute) 
-                oldCP.value.setConnectedPoint(oldCP);
         }
 
         this.centerPoint = newCenterPoint;
         this.connectionPoints = newConnectionPoints;
+
+        for (const a of attributes) {
+            const attribute = new Attribute(a.label, a.filledPoint);
+            this.addAttribute(attribute);
+        }
     }
 
 }

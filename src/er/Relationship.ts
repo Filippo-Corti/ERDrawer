@@ -148,18 +148,15 @@ export default class Relationship extends ShapeWithAttributes {
     }
 
     updateCenterPoint(newCenterPoint: Vector2D): void {
-        super.updateCenterPoint(newCenterPoint);
         const currEntities = this.entities;
+        super.updateCenterPoint(newCenterPoint);
         this.entities = [];
-        this.connectionPoints.forEach((v) => {
-            if (v.value instanceof Entity) {
-                v.value = null;
-            }
-        });
 
         currEntities.forEach((e) => {
             e.entity.unlinkRelationship(this);
         })
+
+        console.log(this);
 
         currEntities.forEach((e) => {
             e.entity.linkRelationship(this);
