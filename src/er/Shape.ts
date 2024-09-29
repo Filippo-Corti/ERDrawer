@@ -1,3 +1,4 @@
+import clone from "clone";
 import Drawable from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
 import { doBrokenLinesIntersect } from "../utils/Utils";
@@ -14,16 +15,11 @@ export default abstract class Shape implements Connectable, Drawable {
     label: string;
     labelFontSize: number;
 
-    deltaX: number;
-    deltaY: number;
+    neededToIntersect: boolean = false;
 
-    neededToIntersect : boolean = false;
-
-    constructor(centerPoint: Vector2D, label: string, deltaX: number, deltaY: number) {
+    constructor(centerPoint: Vector2D, label: string) {
         this.centerPoint = centerPoint;
         this.label = label;
-        this.deltaX = deltaX;
-        this.deltaY = deltaY;
         this.connectionPoints = new Map<string, ConnectionPoint>();
         this.labelFontSize = this.calculateLabelSize();
         this.generateConnectionPoints();
@@ -38,6 +34,8 @@ export default abstract class Shape implements Connectable, Drawable {
     abstract getCorners(): Vector2D[];
 
     abstract isTheNearestConnectionPoint(p: Vector2D, connPoint: Vector2D): boolean;
+
+    abstract increaseConnPointsAndRegenerate(): boolean;
 
     getAllConnectionPoints(): IterableIterator<ConnectionPoint> {
         return this.connectionPoints.values();
@@ -74,7 +72,7 @@ export default abstract class Shape implements Connectable, Drawable {
     getCurrentConnectionPointFor(c: Connectable): ConnectionPoint {
         const found: ConnectionPoint | undefined = Array.from(this.connectionPoints.values()).find((cp) => cp.value == c);
         if (!found) {
-            throw new Error("P is not a valid Connection Point for this shape");
+            throw new Error("C is not a valid Connectable for this shape");
         }
         return found;
     }
@@ -119,7 +117,6 @@ export default abstract class Shape implements Connectable, Drawable {
     }
 
     findConnectionPointFor(c: Connectable, dontIntersectOption: boolean = true): ConnectionPoint {
-        //console.log(this.label, "-", c.label);
         const connPointOnC: ConnectionPoint = (() => { try { return c.getCurrentConnectionPointFor(this) } catch { return { pos: c.centerPoint, value: null, outDirection: 0 } } })(); //Either the CP or the center point
         const connPointOnCWithOffset: Vector2D = (connPointOnC.pos.equals(c.centerPoint))
             ? c.centerPoint
@@ -155,7 +152,9 @@ export default abstract class Shape implements Connectable, Drawable {
                         return { pos: cp.pos, value: newValue, outDirection: cp.outDirection };
                     });
                     const anyIntersections: boolean = this.anyIntersectionBetweenConnectables(potentialConnPoints, potentialLine);
-                    if (!anyIntersections || !dontIntersectOption) return currentCP;
+                    if (!anyIntersections || !dontIntersectOption) {
+                        return currentCP;
+                    }
                     break;
                 case currentCP.value instanceof Attribute:
                     // Find available CP for a swap
@@ -179,7 +178,7 @@ export default abstract class Shape implements Connectable, Drawable {
             }
         }
 
-        if (this.reduceDeltasAndRegenerate())
+        if (this.increaseConnPointsAndRegenerate())
             return this.findConnectionPointFor(c, dontIntersectOption);
 
         if (dontIntersectOption) {
@@ -256,27 +255,6 @@ export default abstract class Shape implements Connectable, Drawable {
         }
 
         throw new Error("No intersection between the shape and the given segment");
-    }
-
-    reduceDeltasAndRegenerate(): boolean {
-        const canDivideX: boolean = (this.deltaX >= 15);
-        const canDivideY: boolean = (this.deltaY >= 20);
-        if (!(canDivideX || canDivideY)) return false;
-
-        if (canDivideX)
-            this.deltaX /= 2;
-        if (canDivideY)
-            this.deltaY /= 2;
-
-        const oldConnPoints = this.connectionPoints;
-        this.generateConnectionPoints();
-        for (const [_, oldP] of oldConnPoints) {
-            if (oldP.value !== null) {
-                this.occupyConnectionPoint(oldP.pos, oldP.value);
-            }
-        }
-
-        return true;
     }
 
     updateCenterPoint(newCenterPoint: Vector2D): void {

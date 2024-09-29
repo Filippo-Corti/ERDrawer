@@ -7,8 +7,8 @@ export default abstract class ShapeWithAttributes extends Shape {
 
     attributes: Attribute[];
 
-    constructor(centerPoint: Vector2D, label: string, deltaX: number, deltaY: number) {
-        super(centerPoint, label, deltaX, deltaY);
+    constructor(centerPoint: Vector2D, label: string) {
+        super(centerPoint, label);
         this.attributes = [];
     }
 

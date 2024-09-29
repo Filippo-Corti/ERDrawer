@@ -1,3 +1,4 @@
+import clone from "clone";
 import Drawer from "./Drawer";
 import { CardinalityValue } from "./er/Cardinality";
 import Entity from "./er/Entity";
@@ -142,7 +143,8 @@ er.addRelationship("Opsss", [
     },
 ]);
 
-// er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Uno", "Due", "Tre", "Quattro"]);
+
+er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Uno", "Due", "Tre", "Quattro"]);
 
 const erDrawer = new ERDrawer(er, drawer);
 

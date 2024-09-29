@@ -1,3 +1,4 @@
+import clone from "clone";
 import Vector2D from "../utils/Vector2D";
 import { Cardinality, CardinalityValue, stringValue } from "./Cardinality";
 import { ConnectionPoint } from "./ConnectionPoint";
@@ -17,10 +18,12 @@ export default class Relationship extends ShapeWithAttributes {
     static STRAIGHT_SEGMENT_LENGTH: number = 30;
 
     entities: EntityConnection[];
+    delta: number;
 
     constructor(centerPoint: Vector2D, label: string) {
-        super(centerPoint, label, Relationship.HALF_DIAG_X, Relationship.HALF_DIAG_Y);
+        super(centerPoint, label);
         this.entities = [];
+        this.delta = Math.hypot(Relationship.HALF_DIAG_X, Relationship.HALF_DIAG_Y);
     }
 
     linkToEntity(e: Entity, cardinality: Cardinality = { min: CardinalityValue.ZERO, max: CardinalityValue.N }): void {
@@ -30,10 +33,10 @@ export default class Relationship extends ShapeWithAttributes {
 
     isTheNearestConnectionPoint(p: Vector2D, connPoint: Vector2D): boolean {
         const currDist = connPoint.distanceTo(p);
-        return (currDist <= Math.hypot(this.deltaX, this.deltaY) / 2);
+        return (currDist <= this.delta / 2);
     }
 
-    getEntityCounter() : number {
+    getEntityCounter(): number {
         return this.entities.length;
     }
 
@@ -103,33 +106,37 @@ export default class Relationship extends ShapeWithAttributes {
 
         // Top to Right Points
         const corner1 = { pos: new Vector2D(corners[0].x, corners[0].y), value: null, outDirection: - Math.PI / 2 };
+        let dir = Vector2D.sum(corners[1], corners[0].negative()).phase();
         this.connectionPoints.set(corner1.pos.toString(), corner1);
-        for (let x = corners[0].x + this.deltaX, y = corners[0].y + this.deltaY; x < corners[1].x && y < corners[1].y; x += this.deltaX, y += this.deltaY) {
-            const cp = { pos: new Vector2D(x, y), value: null, outDirection: -1 / 4 * Math.PI };
+        for (let p = Vector2D.sum(corner1.pos, Vector2D.fromPolar(this.delta, dir)); Math.abs(p.x - corners[1].x) > 10E-1; p.sum(Vector2D.fromPolar(this.delta, dir))) {
+            const cp = { pos: clone(p), value: null, outDirection: -1 / 4 * Math.PI };
             this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
         // Right To Bottom Points
         const corner2 = { pos: new Vector2D(corners[1].x, corners[1].y), value: null, outDirection: 0 };
+        dir = Vector2D.sum(corners[2], corners[1].negative()).phase();
         this.connectionPoints.set(corner2.pos.toString(), corner2);
-        for (let x = corners[1].x - this.deltaX, y = corners[1].y + this.deltaY; x > corners[2].x && y < corners[2].y; x -= this.deltaX, y += this.deltaY) {
-            const cp = { pos: new Vector2D(x, y), value: null, outDirection: 1 / 4 * Math.PI };
+        for (let p = Vector2D.sum(corner2.pos, Vector2D.fromPolar(this.delta, dir)); Math.abs(p.x - corners[2].x) > 10E-1; p.sum(Vector2D.fromPolar(this.delta, dir))) {
+            const cp = { pos: clone(p), value: null, outDirection: 1 / 4 * Math.PI };
             this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
         // Bottom to Left Points
         const corner3 = { pos: new Vector2D(corners[2].x, corners[2].y), value: null, outDirection: Math.PI / 2 };
+        dir = Vector2D.sum(corners[3], corners[2].negative()).phase();
         this.connectionPoints.set(corner3.pos.toString(), corner3);
-        for (let x = corners[2].x - this.deltaX, y = corners[2].y - this.deltaY; x > corners[3].x && y > corners[3].y; x -= this.deltaX, y -= this.deltaY) {
-            const cp = { pos: new Vector2D(x, y), value: null, outDirection: 3 / 4 * Math.PI };
+        for (let p = Vector2D.sum(corner3.pos, Vector2D.fromPolar(this.delta, dir)); Math.abs(p.x - corners[3].x) > 10E-1; p.sum(Vector2D.fromPolar(this.delta, dir))) {
+            const cp = { pos: clone(p), value: null, outDirection: 3 / 4 * Math.PI };
             this.connectionPoints.set(cp.pos.toString(), cp);
         }
 
         // Left to Top Points
         const corner4 = { pos: new Vector2D(corners[3].x, corners[3].y), value: null, outDirection: Math.PI };
+        dir = Vector2D.sum(corners[0], corners[3].negative()).phase();
         this.connectionPoints.set(corner4.pos.toString(), corner4);
-        for (let x = corners[3].x + this.deltaX, y = corners[3].y - this.deltaY; x < corners[0].x && y > corners[0].y; x += this.deltaX, y -= this.deltaY) {
-            const cp = { pos: new Vector2D(x, y), value: null, outDirection: - 3 / 4 * Math.PI };
+        for (let p = Vector2D.sum(corner4.pos, Vector2D.fromPolar(this.delta, dir)); Math.abs(p.x - corners[0].x) > 10E-1; p.sum(Vector2D.fromPolar(this.delta, dir))) {
+            const cp = { pos: clone(p), value: null, outDirection: - 3 / 4 * Math.PI };
             this.connectionPoints.set(cp.pos.toString(), cp);
         }
     }
@@ -163,6 +170,24 @@ export default class Relationship extends ShapeWithAttributes {
             this.linkToEntity(e.entity, e.cardinality); // Recalculate best connections
         });
 
+    }
+
+    increaseConnPointsAndRegenerate(): boolean {
+        const canDivide: boolean = (this.delta >= 15);
+        if (!canDivide) return false;
+
+        if (canDivide)
+            this.delta /= 2;
+
+        const oldConnPoints = this.connectionPoints;
+        this.generateConnectionPoints();
+        for (const [_, oldP] of oldConnPoints) {
+            if (oldP.value !== null) {
+                this.occupyConnectionPoint(oldP.pos, oldP.value);
+            }
+        }
+
+        return true;
     }
 
 }

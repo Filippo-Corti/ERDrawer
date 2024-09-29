@@ -15,10 +15,15 @@ export default class Entity extends ShapeWithAttributes {
     relationships: Relationship[];
     identifierConnPoints: ConnectionPoint[];
 
+    deltaX: number;
+    deltaY: number;
+
     constructor(centerPoint: Vector2D, label: string) {
-        super(centerPoint, label, Entity.HALF_DIM_X, Entity.HALF_DIM_Y);
+        super(centerPoint, label);
         this.relationships = [];
         this.identifierConnPoints = [];
+        this.deltaX = Entity.HALF_DIM_X;
+        this.deltaY = Entity.HALF_DIM_Y;
     }
 
     linkRelationship(r: Relationship): void {
@@ -26,7 +31,7 @@ export default class Entity extends ShapeWithAttributes {
         this.relationships.push(r);
     }
 
-    unlinkRelationship(r : Relationship) : void {
+    unlinkRelationship(r: Relationship): void {
         const found = Array.from(this.connectionPoints.values()).find((cp) => cp.value == r);
         if (found) {
             found.value = null;
@@ -130,6 +135,28 @@ export default class Entity extends ShapeWithAttributes {
         } while (ctx.measureText(this.label).width > (Entity.HALF_DIM_X - BORDER) * 2);
 
         return fontSize;
+    }
+
+
+    increaseConnPointsAndRegenerate(): boolean {
+        const canDivideX: boolean = (this.deltaX >= 15);
+        const canDivideY: boolean = (this.deltaY >= 20);
+        if (!(canDivideX || canDivideY)) return false;
+
+        if (canDivideX)
+            this.deltaX /= 2;
+        if (canDivideY)
+            this.deltaY /= 2;
+
+        const oldConnPoints = this.connectionPoints;
+        this.generateConnectionPoints();
+        for (const [_, oldP] of oldConnPoints) {
+            if (oldP.value !== null) {
+                this.occupyConnectionPoint(oldP.pos, oldP.value);
+            }
+        }
+
+        return true;
     }
 
     setPrimaryKey(involvedConnectables: Connectable[]): void {
