@@ -51,8 +51,7 @@ export default class ERDrawer {
     layout() {
         this.i++;
         const bestLayouts = this.chooseBestGraphLayouts(50, 300);
-        console.log(bestLayouts.length);
-        this.graphToER(bestLayouts[0]);
+        console.log(this.calculateLayoutPenaltyScore(bestLayouts[0]));
     }
 
     chooseBestGraphLayouts(numberOfGraphs: number, iterationsPerGraph: number): LayoutConfiguration[] {
@@ -82,23 +81,30 @@ export default class ERDrawer {
         return bestGraphLayouts
     }
 
-    calculateLayoutPenaltyScore(layout : LayoutConfiguration) : number {
+    calculateLayoutPenaltyScore(layout: LayoutConfiguration): number {
         let score = 0;
         this.graphToER(layout);
 
         // Check if intersections were needed to fill the CP 
-        for(const shape of this.er.getAllShapes()) {
-            if (shape.neededToIntersect) 
+        for (const shape of this.er.getAllShapes()) {
+            if (shape.neededToIntersect)
                 score += 10;
         }
 
         // Check intersections between edges and other relationships
-        for(const e of this.er.entities) {
-            for(const r of this.er.relationships) {
-
+        for (const [_, relationship1] of this.er.relationships) {
+            for (const connectedEntity of relationship1.entities) {
+                const path: Vector2D[] = relationship1.getConnectionLinePointsTo(connectedEntity.entity);
+                const diagonalSegment: Segment = Segment.fromVectors(path[1], path[2]);
+                for (const [_, relationship2] of this.er.relationships) {
+                    if (relationship1 == relationship2) continue;
+                    if (diagonalSegment.intersectsAny(relationship2.getSegments()))
+                        score += 10;
+                }
             }
         }
 
+        return score;
     }
 
     //Base code comes from https://faculty.washington.edu/joelross/courses/archive/s13/cs261/lab/k/fruchterman91graph.pdf
