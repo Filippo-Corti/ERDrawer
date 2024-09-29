@@ -17,6 +17,8 @@ export default abstract class Shape implements Connectable, Drawable {
     deltaX: number;
     deltaY: number;
 
+    neededToIntersect : boolean = false;
+
     constructor(centerPoint: Vector2D, label: string, deltaX: number, deltaY: number) {
         this.centerPoint = centerPoint;
         this.label = label;
@@ -182,6 +184,7 @@ export default abstract class Shape implements Connectable, Drawable {
 
         if (dontIntersectOption) {
             console.log("Need to intersect, unfortunately");
+            this.neededToIntersect = true;
             //console.log("Tried to connect", c.label, "to", this.label);
             return this.findConnectionPointFor(c, false);
         }

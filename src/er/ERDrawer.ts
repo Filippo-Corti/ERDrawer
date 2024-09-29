@@ -23,10 +23,16 @@ type EREdge = {
     count: number
 }
 
+type LayoutConfiguration = {
+    nodes: ERNode[],
+    edges: EREdge[]
+}
+
 export default class ERDrawer {
 
     static ER_MARGIN: number = 200;
     static DELTA = 200;
+    static MIN_DIST_BETWEEN_NODES: number = 250;
 
     er: ERDiagram;
     drawer: Drawer;
@@ -44,40 +50,55 @@ export default class ERDrawer {
 
     layout() {
         this.i++;
-        const [nodes, edges] = this.chooseBestGraphLayout(50, 300);
-        this.graphToER(nodes, edges);
+        const bestLayouts = this.chooseBestGraphLayouts(50, 300);
+        console.log(bestLayouts.length);
+        this.graphToER(bestLayouts[0]);
     }
 
-    chooseBestGraphLayout(numberOfGraphs: number, iterationsPerGraph: number): [ERNode[], EREdge[]] {
+    chooseBestGraphLayouts(numberOfGraphs: number, iterationsPerGraph: number): LayoutConfiguration[] {
         let minCrossings = 100;
-        let bestGraphLayout = this.ERtoRandomGraph();
+        let bestGraphLayouts: LayoutConfiguration[] = [this.ERtoRandomGraph()];
 
         for (let i = 0; i < numberOfGraphs; i++) {
             // Generate New Random Graph 
-            const [nodes, edges] = this.ERtoRandomGraph();
+            const layout: LayoutConfiguration = this.ERtoRandomGraph();
 
             // Apply the Layout Algorithm
-            this.executeFructhermanReingold(nodes, edges, iterationsPerGraph);
-            this.discretizeNodesCoordinates(nodes);
-
-            // Reset Nodes connection points
-            // this.graph.nodes.forEach((n) => n.resetConnectionPoints());
-            // // Calculate Edges positions (based on new nodes positions!)
-            // try {
-            //     this.graph.layoutEdges();
-            // } catch (error) {
-            //     continue; // If you can't calculate new vertices, it's not a good layout
-            // }
+            this.executeFructhermanReingold(layout.nodes, layout.edges, iterationsPerGraph);
+            this.discretizeNodesCoordinates(layout.nodes);
 
             // Check if current layout is better than the best one so far (the new edge positions are used!)
-            let crossings = this.countEdgeCrossings(edges);
-            if (crossings < minCrossings && !this.doesAnyEdgeCrossANode(nodes, edges)) {
-                minCrossings = crossings;
-                bestGraphLayout = [clone(nodes), clone(edges)];
+            let crossings = this.countEdgeCrossings(layout.edges);
+            if (crossings <= minCrossings && !this.doesAnyEdgeCrossANode(layout.nodes, layout.edges) && !this.areNodesTooClose(layout.nodes)) {
+                if (crossings == minCrossings) {
+                    bestGraphLayouts.push({ nodes: clone(layout.nodes), edges: clone(layout.edges) });
+                } else {
+                    minCrossings = crossings;
+                    bestGraphLayouts = [{ nodes: clone(layout.nodes), edges: clone(layout.edges) }];
+                }
             }
         }
         console.log("Least amount of crossings: ", minCrossings);
-        return bestGraphLayout
+        return bestGraphLayouts
+    }
+
+    calculateLayoutPenaltyScore(layout : LayoutConfiguration) : number {
+        let score = 0;
+        this.graphToER(layout);
+
+        // Check if intersections were needed to fill the CP 
+        for(const shape of this.er.getAllShapes()) {
+            if (shape.neededToIntersect) 
+                score += 10;
+        }
+
+        // Check intersections between edges and other relationships
+        for(const e of this.er.entities) {
+            for(const r of this.er.relationships) {
+
+            }
+        }
+
     }
 
     //Base code comes from https://faculty.washington.edu/joelross/courses/archive/s13/cs261/lab/k/fruchterman91graph.pdf
@@ -202,7 +223,19 @@ export default class ERDrawer {
         return false;
     }
 
-    private ERtoRandomGraph(): [ERNode[], EREdge[]] {
+
+    areNodesTooClose(nodes: ERNode[]): boolean {
+        for (let i = 0; i < nodes.length - 1; i++) {
+            for (let j = i + 1; j < nodes.length; j++) {
+                const [n, m] = [nodes[i], nodes[j]];
+                if (n.pos.distanceTo(m.pos) < ERDrawer.MIN_DIST_BETWEEN_NODES)
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private ERtoRandomGraph(): LayoutConfiguration {
         const erNodes: ERNode[] = [];
         let erEdges: EREdge[] = [];
         const minX = ERDrawer.ER_MARGIN, maxX = this.drawer.width - ERDrawer.ER_MARGIN, minY = ERDrawer.ER_MARGIN, maxY = this.drawer.height - ERDrawer.ER_MARGIN
@@ -253,13 +286,13 @@ export default class ERDrawer {
             }
         }
 
-        return [erNodes, erEdges];
+        return { nodes: erNodes, edges: erEdges };
     }
 
-    private graphToER(nodes: ERNode[], edges: EREdge[]): void {
+    private graphToER(layout: LayoutConfiguration): void {
         const er = new ERDiagram();
         const moreThanBinaryRelationships = [];
-        for (const n of nodes) {
+        for (const n of layout.nodes) {
             if (n.reference instanceof Entity) {
                 const newEntity = new Entity(n.pos, n.reference.label)
                 const attributeLabels = n.reference.attributes.map((a) => a.label);
@@ -280,7 +313,7 @@ export default class ERDrawer {
             er.addAttributes(er.getRelationship(n.reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
         }
 
-        for (const e of edges) {
+        for (const e of layout.edges) {
             if (e.references == null) continue;
             const centerPoints = this.getRelationshipsPosition(er, e.references[0].entities.map((e) => e.entity.label), e.count);
             let i = 0;

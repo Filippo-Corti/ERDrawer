@@ -4,6 +4,7 @@ import Attribute from "./Attribute";
 import { Cardinality } from "./Cardinality";
 import Entity from "./Entity";
 import Relationship from "./Relationship";
+import Shape from "./Shape";
 import ShapeWithAttributes from "./ShapeWithAttributes";
 
 export type RelationshipConnectionInfo = {
@@ -46,7 +47,7 @@ export default class ERDiagram implements Drawable {
             if (!entity) {
                 throw new Error("Entity " + connectionData.entityLabel + " does not exist in the ER");
             }
-            return {entity, cardinality: connectionData.cardinality};
+            return { entity, cardinality: connectionData.cardinality };
         });
 
         const relationshipKeyInMap = entitiesLabels.join('$') + "$" + label;
@@ -97,6 +98,10 @@ export default class ERDiagram implements Drawable {
 
     getAttribute(item: ShapeWithAttributes, attributeLabel: string) {
         return item.getAttribute(attributeLabel);
+    }
+
+    getAllShapes(): Shape[] {
+        return (Array.from(this.entities.values()) as Shape[]).concat(Array.from(this.relationships.values()) as Shape[]);
     }
 
 }
