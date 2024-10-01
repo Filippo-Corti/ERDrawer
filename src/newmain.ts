@@ -146,9 +146,11 @@ er.addRelationship("Opsss", [
 
 er.addAttributes(er.getRelationship("Ammesso", ["Prova", "Canguro"]), ["ciao", "Cosa", "Uno", "Due", "Tre", "Quattro"]);
 
+
 const erDrawer = new ERDrawer(er, drawer);
 
-
+const e = erDrawer.er.getEntity("Prova");
+// e.setPrimaryKey(["ciao", "ottimo", "fai"], [erDrawer.er.getRelationship("Connesso", ["Prova", "Xyz"])]);
 //erDrawer.er.getEntity("Testa").setPrimaryKey([erDrawer.er.getRelationship("Collega", ["Canguro", "Testa"]), erDrawer.er.getRelationship("Opsss", ["Coda", "Testa"])]);
 
 
@@ -178,8 +180,6 @@ function addPoint(event: Event): boolean {
 
 document.getElementById("layout-btn")!.addEventListener("click", () => {
     erDrawer.layout();
-    // const e = erDrawer.er.getEntity("Prova");
-    // e.setPrimaryKey([e.getAttribute("ciao"), erDrawer.er.getRelationship("Connesso", ["Prova", "Xyz"]), e.getAttribute("fai"), e.getAttribute("ottimo")]);
     erDrawer.drawER();
-    console.log(erDrawer.er);
+    console.log(clone(erDrawer.er));
 });

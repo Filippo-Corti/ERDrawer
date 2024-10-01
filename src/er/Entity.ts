@@ -159,9 +159,8 @@ export default class Entity extends ShapeWithAttributes {
         return true;
     }
 
-    setPrimaryKey(involvedConnectables: Connectable[]): void {
-        const relationships: Relationship[] = involvedConnectables.filter((c) => c instanceof Relationship);
-        const attributes: Attribute[] = involvedConnectables.filter((c) => c instanceof Attribute);
+    setPrimaryKey(attributesLabels : string[], relationships: Relationship[] = []): void {
+        const attributes: Attribute[] = attributesLabels.map((label) => this.getAttribute(label));
 
         switch (relationships.length) {
             case 0:

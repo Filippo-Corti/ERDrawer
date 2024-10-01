@@ -8,6 +8,8 @@ import Relationship from "./Relationship";
 
 import clone from "clone";
 import ShapeWithAttributes from "./ShapeWithAttributes";
+import Connectable from "./Connectable";
+import Attribute from "./Attribute";
 
 type ERNode = {
     reference: ShapeWithAttributes, // Multi-Relationship or Entity
@@ -307,6 +309,8 @@ export default class ERDrawer {
     private graphToER(layout: LayoutConfiguration): void {
         const er = new ERDiagram();
         const moreThanBinaryRelationships = [];
+
+        //Set Entities
         for (const n of layout.nodes) {
             if (n.reference instanceof Entity) {
                 const newEntity = new Entity(n.pos, n.reference.label)
@@ -318,6 +322,7 @@ export default class ERDrawer {
             }
         }
 
+        //Set Multi-Relationships
         for (const n of moreThanBinaryRelationships) {
             const linkedEntities: RelationshipConnectionInfo[] = (n.reference as Relationship).entities.map((e) => ({
                 entityLabel: e.entity.label,
@@ -328,6 +333,7 @@ export default class ERDrawer {
             er.addAttributes(er.getRelationship(n.reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
         }
 
+        //Set Relationships
         for (const e of layout.edges) {
             if (e.references == null) continue;
             const centerPoints = this.getRelationshipsPosition(er, e.references[0].entities.map((e) => e.entity.label), e.count);
@@ -341,6 +347,18 @@ export default class ERDrawer {
                 er.addRelationship(reference.label, linkedEntities, centerPoints[i++]);
                 er.addAttributes(er.getRelationship(reference.label, linkedEntities.map((le) => le.entityLabel)), attributeLabels);
             }
+        }
+
+        //Set Identifiers
+        for (const n of layout.nodes) {
+            if (!(n.reference instanceof Entity)) continue;
+
+            const newEntity = er.getEntity(n.reference.label)!;
+            const identifyingConnectables: Connectable[] = n.reference.identifierConnPoints.map((cp) => cp.value!);
+            const identifyingAttributes: Attribute[] = identifyingConnectables.filter((c) => c instanceof Attribute);
+            const identifyingRelationships: Relationship[] = identifyingConnectables.filter((c) => c instanceof Relationship).map((r) => er.getRelationship(r.label, r.entities.map((e) => e.entity.label)));
+            //console.log(clone(n.reference), identifyingAttributes.map((a) => a.label), identifyingRelationships);
+            er.addIdentifier(newEntity.label, identifyingAttributes.map((a) => a.label), identifyingRelationships);
         }
 
         this.er = er;

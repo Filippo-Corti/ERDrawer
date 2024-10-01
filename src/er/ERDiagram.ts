@@ -2,6 +2,7 @@ import Drawable from "../utils/Drawable";
 import Vector2D from "../utils/Vector2D";
 import Attribute from "./Attribute";
 import { Cardinality } from "./Cardinality";
+import Connectable from "./Connectable";
 import Entity from "./Entity";
 import Relationship from "./Relationship";
 import Shape from "./Shape";
@@ -75,6 +76,12 @@ export default class ERDiagram implements Drawable {
             const attribute = new Attribute(attLabel);
             s.addAttribute(attribute);
         }
+    }
+
+    addIdentifier(entityLabel: string, attributesLabels: string[], relationships: Relationship[] = []) {
+        const entity = this.getEntity(entityLabel);
+        if (attributesLabels.length > 0 || relationships.length > 0)
+            entity.setPrimaryKey(attributesLabels, relationships);
     }
 
     getEntity(entityLabel: string): Entity {
