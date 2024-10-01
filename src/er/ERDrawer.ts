@@ -32,7 +32,7 @@ export default class ERDrawer {
 
     static ER_MARGIN: number = 200;
     static DELTA = 200;
-    static MIN_DIST_BETWEEN_NODES: number = 250;
+    static MIN_DIST_BETWEEN_NODES: number = 300;
 
     er: ERDiagram;
     drawer: Drawer;
@@ -51,7 +51,16 @@ export default class ERDrawer {
     layout() {
         this.i++;
         const bestLayouts = this.chooseBestGraphLayouts(50, 300);
-        console.log(this.calculateLayoutPenaltyScore(bestLayouts[0]));
+        let minScore = this.calculateLayoutPenaltyScore(bestLayouts[0]);
+        let minIndex = 0;
+        for (let i = 1; i < bestLayouts.length; i++) {
+            let score = this.calculateLayoutPenaltyScore(bestLayouts[i]);
+            if (score < minScore) {
+                minScore = score;
+                minIndex = i;
+            }
+        }
+        this.graphToER(bestLayouts[minIndex]);
     }
 
     chooseBestGraphLayouts(numberOfGraphs: number, iterationsPerGraph: number): LayoutConfiguration[] {

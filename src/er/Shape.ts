@@ -1,4 +1,3 @@
-import clone from "clone";
 import Drawable from "../utils/Drawable";
 import { Segment } from "../utils/Segment";
 import { doBrokenLinesIntersect } from "../utils/Utils";
