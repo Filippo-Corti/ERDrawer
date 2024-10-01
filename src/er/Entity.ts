@@ -18,12 +18,13 @@ export default class Entity extends ShapeWithAttributes {
     deltaX: number;
     deltaY: number;
 
-    constructor(centerPoint: Vector2D, label: string) {
+    constructor(centerPoint: Vector2D, label: string, deltaX: number = Entity.HALF_DIM_X, deltaY: number = Entity.HALF_DIM_Y) {
         super(centerPoint, label);
         this.relationships = [];
         this.identifierConnPoints = [];
-        this.deltaX = Entity.HALF_DIM_X;
-        this.deltaY = Entity.HALF_DIM_Y;
+        this.deltaX = deltaX;
+        this.deltaY = deltaY;
+        this.generateConnectionPoints();
     }
 
     linkRelationship(r: Relationship): void {

@@ -5,7 +5,7 @@ import Entity from "./er/Entity";
 import ERDiagram from "./er/ERDiagram";
 import ERDrawer from "./er/ERDrawer";
 import Vector2D from "./utils/Vector2D";
-import { ERDiagramSerializer } from "./er/ERDiagramSerializer";
+import ERDiagramSerializer from "./er/ERDiagramSerializer";
 
 const drawer = new Drawer("drawing-board");
 const er = new ERDiagram();
@@ -202,4 +202,23 @@ document.getElementById("export-btn")!.addEventListener("click", () => {
     downloadFile(graphJson, 'er.json');
 })
 
+
+// Import Button
+
+document.getElementById("import-btn")!.addEventListener("click", () => {
+    const fileInput = document.getElementById('fileInput') as HTMLInputElement;
+    const file = fileInput.files ? fileInput.files[0] : null;
+    if (!file)
+        return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const erJson = event.target!.result as string;
+        const er = ERDiagramSerializer.importDiagram(erJson);
+        erDrawer.er = er;
+        console.log(erDrawer.er);
+        erDrawer.drawER();
+    };
+    reader.readAsText(file);
+})
 

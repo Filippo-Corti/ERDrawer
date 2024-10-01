@@ -20,10 +20,11 @@ export default class Relationship extends ShapeWithAttributes {
     entities: EntityConnection[];
     delta: number;
 
-    constructor(centerPoint: Vector2D, label: string) {
+    constructor(centerPoint: Vector2D, label: string, delta: number = Math.hypot(Relationship.HALF_DIAG_X, Relationship.HALF_DIAG_Y)) {
         super(centerPoint, label);
         this.entities = [];
-        this.delta = Math.hypot(Relationship.HALF_DIAG_X, Relationship.HALF_DIAG_Y);
+        this.delta = delta;
+        this.generateConnectionPoints();
     }
 
     linkToEntity(e: Entity, cardinality: Cardinality = { min: CardinalityValue.ZERO, max: CardinalityValue.N }): void {

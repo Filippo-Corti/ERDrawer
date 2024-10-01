@@ -21,7 +21,6 @@ export default abstract class Shape implements Connectable, Drawable {
         this.label = label;
         this.connectionPoints = new Map<string, ConnectionPoint>();
         this.labelFontSize = this.calculateLabelSize();
-        this.generateConnectionPoints();
     }
 
     abstract draw(ctx: CanvasRenderingContext2D): void;
@@ -55,6 +54,7 @@ export default abstract class Shape implements Connectable, Drawable {
     occupyConnectionPoint(p: Vector2D, value: Connectable): void {
         const found: ConnectionPoint | undefined = this.connectionPoints.get(p.toString());
         if (!found) {
+            console.log(this, p);
             throw new Error("P is not a valid Connection Point for this shape");
         }
         found.value = value;
