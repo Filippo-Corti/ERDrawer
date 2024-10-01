@@ -5,6 +5,7 @@ import Entity from "./er/Entity";
 import ERDiagram from "./er/ERDiagram";
 import ERDrawer from "./er/ERDrawer";
 import Vector2D from "./utils/Vector2D";
+import { ERDiagramSerializer } from "./er/ERDiagramSerializer";
 
 const drawer = new Drawer("drawing-board");
 const er = new ERDiagram();
@@ -175,6 +176,16 @@ function addPoint(event: Event): boolean {
     return false;
 }
 
+function downloadFile(content: string, fileName: string) {
+    const a = document.createElement('a');
+    const file = new Blob([content], { type: 'application/json' });
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(a.href);
+}
+
+
 
 // Layout Button
 
@@ -183,3 +194,12 @@ document.getElementById("layout-btn")!.addEventListener("click", () => {
     erDrawer.drawER();
     console.log(clone(erDrawer.er));
 });
+
+// Export Button
+
+document.getElementById("export-btn")!.addEventListener("click", () => {
+    const graphJson = ERDiagramSerializer.exportDiagram(erDrawer.er);
+    downloadFile(graphJson, 'er.json');
+})
+
+
